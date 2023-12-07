@@ -1,0 +1,94 @@
+install_proot() {
+open_proot_os_list=$(
+			whiptail --title "选择功能" --menu "termux按自己需求来" 15 60 4 \
+			"1" "ubuntu18.04_arm64_rootfs" \
+			"2" "ubuntu20.04_arm64_rootfs" \
+			"3" "ubuntu22.04_arm64_rootfs" \
+			"0" "退出" 3>&1 1>&2 2>&3
+		)
+		case ${open_proot_os_list} in
+			1)
+				os_name=ubuntu18.04_arm64_rootfs
+				Download_proot_url=https://mirrors.tuna.tsinghua.edu.cn/lxc-images/images/ubuntu/bionic/arm64/default/20230829_07%3A43/rootfs.tar.xz
+				;;
+			2)
+				os_name=ubuntu20.04_arm64_rootfs
+				Download_proot_url=https://mirrors.tuna.tsinghua.edu.cn/lxc-images/images/ubuntu/focal/arm64/default/20230829_07:42/rootfs.tar.xz
+				;;
+			3)
+				os_name=ubuntu22.04_arm64_rootfs
+				Download_proot_url=https://mirrors.tuna.tsinghua.edu.cn/lxc-images/images/ubuntu/jammy/arm64/default/20230829_07%3A57/rootfs.tar.xz
+				;;
+			*)
+				exit 1
+				;;
+		esac
+			if [ -f ${HOME}/.gancm/download/${os_name}.tar.xz ]; then
+				echo -e "${INFO}${RED}${HOME}/.gancm/download/${os_name}.tar.xz${RES}已存在 即将直接使用"
+			else
+				if wget -q --show-progress "${Download_proot_url}" -O ${HOME}/.gancm/download/${os_name}.tar.xz ; then
+					echo -e "${INFO}文件存储在${RED}${HOME}/.gancm/download/${os_name}.tar.xz${RES}"
+					echo -e "${INFO}您可以使用${RED}rm -rfv ${HOME}/.gancm/download/${os_name}.tar.xz${RES}来节省存储空间"
+				else
+					echo -e "${WORRY}请检查网络访问问题${RES}"
+					exit
+				fi
+			fi
+			
+			if [ ! -d ${HOME}/.gancm/proot/${os_name} ]; then
+				mkdir ${HOME}/.gancm/proot/${os_name}
+			fi
+			unset LD_PRELOAD
+			proot --link2symlink tar -xJf ${HOME}/.gancm/download/${os_name}.tar.xz -C ${HOME}/.gancm/proot/${os_name}/ --exclude='dev' || :
+			cp ${HOME}/.gancm/function/proot_proc/.* ${HOME}/.gancm/proot/${os_name}/proc/
+			cp ${HOME}/.gancm/function/proot_optimization ${HOME}/.gancm/proot/${os_name}/root/优化.sh
+			proot \
+			--link2symlink -0 \
+			--rootfs=${HOME}/.gancm/proot/${os_name}/ \
+			--bind=/dev \
+			--bind=/sys \
+			--bind=/proc \
+			--bind="${HOME}/.gancm/proot/${os_name}/proc/.loadavg:/proc/loadavg" \
+			--bind="${HOME}/.gancm/proot/${os_name}/proc/.version:/proc/version" \
+			--bind="${HOME}/.gancm/proot/${os_name}/proc/.uptime:/proc/uptime" \
+			--bind="${HOME}/.gancm/proot/${os_name}/proc/.stat:/proc/stat" \
+			--kernel-release="5.15.0" \
+			-w /root /usr/bin/env \
+			-i HOME=/root \
+			PATH=/usr/local/sbin:/usr/local/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/games:/usr/local/games \
+			TERM=xterm-256color \
+			LANG=zh_CN.UTF-8 \
+			/bin/bash 优化.sh
+}
+start_proot(){
+list_dir ${HOME}/.gancm/proot
+		case $open in
+		0)
+			echo -e "${RED}quit${RES}"
+			;;
+		*)
+		if [ ! $? = 0 ];then
+			exit
+		fi
+			os_name=${listq[(($open-1))]}
+			unset LD_PRELOAD
+			proot \
+			--link2symlink -0 \
+			--rootfs=${HOME}/.gancm/proot/${os_name}/ \
+			--bind=/dev \
+			--bind=/sys \
+			--bind=/proc \
+			--bind="${HOME}/.gancm/proot/${os_name}/proc/.loadavg:/proc/loadavg" \
+			--bind="${HOME}/.gancm/proot/${os_name}/proc/.version:/proc/version" \
+			--bind="${HOME}/.gancm/proot/${os_name}/proc/.uptime:/proc/uptime" \
+			--bind="${HOME}/.gancm/proot/${os_name}/proc/.stat:/proc/stat" \
+			--kernel-release="5.15.0" \
+			-w /root /usr/bin/env \
+			-i HOME=/root \
+			PATH=/usr/local/sbin:/usr/local/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/games:/usr/local/games \
+			TERM=xterm-256color \
+			LANG=zh_CN.UTF-8 \
+			/bin/bash --login
+			;;
+		esac
+}
