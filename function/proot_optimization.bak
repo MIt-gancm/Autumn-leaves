@@ -1,0 +1,56 @@
+RED='\e[1;31m'    # 红
+GREEN='\e[1;32m'  # 绿
+YELLOW='\e[1;33m' # 黄
+BLUE='\e[1;34m'   # 蓝
+PINK='\e[1;35m'   # 粉红
+RES='\e[0m'    # 清除颜色
+##字体颜色
+#!/bin/bash
+self_install() {
+	case ${2} in
+	pip)
+		if [ ! -f "$(command -v ${1})" ]; then
+			echo -e "${RED}目前并没有安装 ${1} 正在安装${RES}"
+			pip install -y ${1}
+		fi
+		;;
+	pip3)
+		if [ ! -f "$(command -v ${1})" ]; then
+			echo -e "${RED}目前并没有安装 ${1} 正在安装${RES}"
+			pip3 install -y ${1}
+		fi
+		;;
+	apt)
+		if [ ! -f "$(command -v ${1})" ]; then
+			echo -e "${RED}目前并没有安装 ${1} 正在安装${RES}"
+			apt install -y ${1}
+		fi
+		;;
+	pkg)
+		if [ ! -f "$(command -v ${1})" ]; then
+			echo -e "${RED}目前并没有安装 ${1} 正在安装${RES}"
+			pkg install -y ${1}
+		fi
+		;;
+	esac
+}
+echo -e "${INFO}优化系统请勿退出"
+apt update
+echo -e "${GREEN}尝试修复时区${RES}"
+echo "127.0.0.1 localhost" > /etc/hosts
+mkdir -p /run/systemd/resolve
+echo -e "${GREEN}尝试修复dns${RES}"
+echo -e "
+nameserver 8.8.8.8
+nameserver 114.114.114.114
+" > /run/systemd/resolve/stub-resolv.conf
+echo -e "${GREEN}尝试禁用无用检测${RES}"
+touch ~/.hushlogin
+self_install wget apt
+self_install git apt
+self_install jq apt
+self_install curl apt
+self_install bc apt
+self_install language-pack-zh-hans apt
+rm -rf $0
+exit
