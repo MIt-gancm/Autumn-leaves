@@ -1,3 +1,0 @@
-yy=$(curl -Ls 'https://v1.hitokoto.cn/?c=a&c=d&c=i' &)
-echo -e "${YELLOW}$(echo ${yy} | jq ".from")${RES}
-$(echo ${yy} | jq ".hitokoto")"
