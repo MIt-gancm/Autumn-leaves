@@ -5,7 +5,7 @@ GREEN='\e[1;32m'  # 绿
 YELLOW='\e[1;33m' # 黄
 BLUE='\e[1;34m'   # 蓝
 PINK='\e[1;35m'   # 粉红
-RES='\e[0m'    # 清除颜色
+RES='\e[0m'       # 清除颜色
 ##字体颜色
 
 #常用变量和函数
@@ -49,9 +49,9 @@ validity_git() {
 	if [ ! -f ${HOME}/.gancm/config/config.sh ]; then
 		wheregit=$(
 			whiptail --title "选择默认安装源" --menu "以后的每次安装会优先考虑默认安装源" 15 60 4 \
-			"1"	"Github" \
-			"2"	"Gitee" \
-			"0"	"退出" 3>&1 1>&2 2>&3
+				"1" "Github" \
+				"2" "Gitee" \
+				"0" "退出" 3>&1 1>&2 2>&3
 		)
 		case ${wheregit} in
 		1)
@@ -77,9 +77,6 @@ validity_dir() {
 	if [ ! -d ${HOME}/.gancm/download ]; then
 		mkdir ${HOME}/.gancm/download
 	fi
-	if [ ! -d ${HOME}/.gancm/Plugins ]; then
-		mkdir ${HOME}/.gancm/Plugins
-	fi
 	if [ ! -d ${HOME}/.gancm/config ]; then
 		mkdir ${HOME}/.gancm/config
 	fi
@@ -92,7 +89,7 @@ validity() {
 	validity_git
 }
 Modify_the_variable() {
-	sed -i "s/^${1}=.*/${1}=${2}/"  ${3}
+	sed -i "s/^${1}=.*/${1}=${2}/" ${3}
 	#使用格式
 	#Modify_the_variable 变量名 变量值 变量存储位置
 	#Modify_the_variable git github.com ${HOME}/.gancm/config/config.sh
@@ -117,7 +114,6 @@ SUSSEC="[${GREEN}成功${RES}]:"
 INFO="[${BLUE}信息${RES}]:"
 #变量
 
-
 case ${1} in
 -h | --help)
 	echo -e "
@@ -126,7 +122,7 @@ case ${1} in
 	hcjx
 	;;
 *)
-validity
+	validity
 	case $(uname -o) in
 	Android)
 		self_install jq pkg
@@ -140,11 +136,10 @@ validity
 		self_install wget apt
 		self_install whiptail apt
 		variable &
-		source ${HOME}/.gancm/local/Linux/Ubuntu/Ubuntu20.04/Ubuntu_menu  $1 $2 $3
+		source ${HOME}/.gancm/local/Linux/Ubuntu/Ubuntu20.04/Ubuntu_menu $1 $2 $3
 		;;
 
 	esac
 
 	;;
 esac
-

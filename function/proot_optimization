@@ -3,7 +3,7 @@ GREEN='\e[1;32m'  # 绿
 YELLOW='\e[1;33m' # 黄
 BLUE='\e[1;34m'   # 蓝
 PINK='\e[1;35m'   # 粉红
-RES='\e[0m'    # 清除颜色
+RES='\e[0m'       # 清除颜色
 ##字体颜色
 #!/bin/bash
 self_install() {
@@ -37,13 +37,13 @@ self_install() {
 echo -e "${INFO}优化系统请勿退出"
 apt update -y
 echo -e "${GREEN}尝试修复时区${RES}"
-echo "127.0.0.1 localhost" > /etc/hosts
+echo "127.0.0.1 localhost" >/etc/hosts
 mkdir -p /run/systemd/resolve
 echo -e "${GREEN}尝试修复dns${RES}"
 echo -e "
 nameserver 8.8.8.8
 nameserver 114.114.114.114
-" > /run/systemd/resolve/stub-resolv.conf
+" >/run/systemd/resolve/stub-resolv.conf
 echo -e "${GREEN}尝试禁用无用检测${RES}"
 touch ~/.hushlogin
 self_install wget apt
