@@ -46,7 +46,8 @@ hcjx() {
 	read -r
 }
 validity_git() {
-	if [ ! -f ${HOME}/.gancm/config/config.sh ]; then
+	source ${HOME}/.gancm/config/config.sh
+	if [ ${git} = "" ]; then
 		wheregit=$(
 			whiptail --title "选择默认安装源" --menu "以后的每次安装会优先考虑默认安装源" 15 60 4 \
 				"1" "Github" \
