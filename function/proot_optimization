@@ -5,7 +5,6 @@ BLUE='\e[1;34m'   # 蓝
 PINK='\e[1;35m'   # 粉红
 RES='\e[0m'       # 清除颜色
 ##字体颜色
-#!/bin/bash
 self_install() {
 	case ${2} in
 	pip)
@@ -46,6 +45,7 @@ nameserver 114.114.114.114
 " >/run/systemd/resolve/stub-resolv.conf
 echo -e "${GREEN}尝试禁用无用检测${RES}"
 touch ~/.hushlogin
+apt update
 self_install wget apt
 self_install git apt
 self_install jq apt

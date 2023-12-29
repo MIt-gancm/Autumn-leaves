@@ -55,7 +55,6 @@ start)
 			;;
 		esac
 		;;
-
 	*)
 		echo -e "待添加_Android_menu"
 		;;
