@@ -98,7 +98,7 @@ Modify_the_variable() {
 }
 list_dir() {
 	sun=1
-	list=$(ls $1)
+	list=$@
 	listq=($list)
 	listn=""
 	for i in $list; do
@@ -106,6 +106,9 @@ list_dir() {
 		let sun++
 	done
 	open=$(whiptail --title "选择" --menu "选择功能" 15 70 8 0 返回上级 $listn 3>&1 1>&2 2>&3)
+	if [ ! "$?" = "0" ]; then
+		exit 1
+	fi
 	# 选择结果${listq[(($open-1))]}
 }
 #函数
@@ -114,7 +117,6 @@ WORRY="[${YELLOW}警告${RES}]:"
 SUSSEC="[${GREEN}成功${RES}]:"
 INFO="[${BLUE}信息${RES}]:"
 #变量
-
 case ${1} in
 -h | --help)
 	echo -e "

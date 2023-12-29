@@ -1,28 +1,32 @@
 install_proot() {
-	open_proot_os_list=$(
-		whiptail --title "选择功能" --menu "termux按自己需求来" 15 60 4 \
-			"1" "ubuntu18.04_arm64_rootfs" \
-			"2" "ubuntu20.04_arm64_rootfs" \
-			"3" "ubuntu22.04_arm64_rootfs" \
-			"0" "退出" 3>&1 1>&2 2>&3
-	)
-	case ${open_proot_os_list} in
-	1)
-		os_name=ubuntu18.04_arm64_rootfs
-		Download_proot_url=https://mirrors.tuna.tsinghua.edu.cn/lxc-images/images/ubuntu/bionic/arm64/default/20230829_07%3A43/rootfs.tar.xz
-		;;
-	2)
-		os_name=ubuntu20.04_arm64_rootfs
-		Download_proot_url=https://mirrors.tuna.tsinghua.edu.cn/lxc-images/images/ubuntu/focal/arm64/default/20230829_07:42/rootfs.tar.xz
-		;;
-	3)
-		os_name=ubuntu22.04_arm64_rootfs
-		Download_proot_url=https://mirrors.tuna.tsinghua.edu.cn/lxc-images/images/ubuntu/jammy/arm64/default/20230829_07%3A57/rootfs.tar.xz
-		;;
-	*)
+l() {
+	sun=1
+	list=$@
+	listq=($list)
+	listn=""
+	for i in $list; do
+		listn+=" $sun $i"
+		let sun++
+	done
+	open=$(whiptail --title "proot_$(echo ${proot_list_json}|jq -r .version)" --menu "$(echo ${proot_list_json}|jq -r .$(uname -m).message)" 15 70 8 0 返回上级 $listn 3>&1 1>&2 2>&3)
+	# 选择结果${listq[(($open-1))]}
+}
+	if [ "${git}" = "gitee.com" ]; then
+		proot_list_json=$(curl -SL https://gitee.com/MIt-gancm/resource-library/raw/main/Autumn-leaves/Ubuntu_proot.json)
+	else
+		proot_list_json=$(curl -SL https://raw.githubusercontent.com/MIt-gancm/resource-library/main/Autumn-leaves/Ubuntu_proot.json)
+	fi 
+	l $(echo ${proot_list_json}|jq -r ".$(uname -m).proot_files.systems[]")
+	if [ "${open}" = "0" ]; then
 		exit 1
-		;;
-	esac
+	fi
+	os_name="$(echo ${proot_list_json}|jq -r ".$(uname -m).proot_files.${listq[(($open-1))]}.proot_file_name")"
+	Download_proot_url="$(echo ${proot_list_json}|jq -r ".$(uname -m).proot_files.${listq[(($open-1))]}.proot_file_url")"
+	if [ "${Download_proot_url}" = "NULL" ] ;then
+		echo -e "${ERROR}暂时没有下载链接"
+		hcjx
+		exit
+	fi
 	if [ -f ${HOME}/.gancm/download/${os_name}.tar.xz ]; then
 		echo -e "${INFO}${RED}${HOME}/.gancm/download/${os_name}.tar.xz${RES}已存在 即将直接使用"
 	else
@@ -61,7 +65,7 @@ install_proot() {
 		/bin/bash 优化.sh
 }
 start_proot() {
-	list_dir ${HOME}/.gancm/proot
+	list_dir $(ls ${HOME}/.gancm/proot)
 	case $open in
 	0)
 		echo -e "${RED}quit${RES}"
