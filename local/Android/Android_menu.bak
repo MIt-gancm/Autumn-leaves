@@ -25,7 +25,6 @@ start)
 
 	;;
 *)
-	while true; do
 	Android_menu=$(
 		whiptail --title "选择功能" --menu "termux按自己需求来" 15 60 4 \
 			"1" "管理proot容器" \
@@ -36,7 +35,6 @@ start)
 	1)
 		self_install proot pkg
 		#必要安装 proot功能实现的基础
-		while true; do
 		open_proot=$(
 			whiptail --title "选择功能" --menu "termux按自己需求来" 15 60 4 \
 				"1" "安装proot容器" \
@@ -52,16 +50,12 @@ start)
 			;;
 		*)
 			echo -e "${RED}quit$RES"
-			break
 			;;
 		esac
-		done
 		;;
 	*)
 		echo -e "待添加_Android_menu"
-		break
 		;;
 	esac
-	done
 	;;
 esac
