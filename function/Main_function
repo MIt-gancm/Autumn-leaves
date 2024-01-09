@@ -121,3 +121,4 @@ WORRY="[${YELLOW}警告${RES}]:"
 SUSSEC="[${GREEN}成功${RES}]:"
 INFO="[${BLUE}信息${RES}]:"
 #变量
+validity

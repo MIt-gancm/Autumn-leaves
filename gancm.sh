@@ -1,8 +1,4 @@
-if source $HOME/.gancm/function/Main_function; then
-	echo -e "$SUSSEC加载主功能成功"
-else
-	echo -e "$WORRY加载主功能失败"
-fi
+source $HOME/.gancm/function/Main_function
 case ${1} in
 -h | --help)
 	echo -e "
