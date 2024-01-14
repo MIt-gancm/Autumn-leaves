@@ -1,5 +1,5 @@
 useAndroid_function() {
-	bash $HOME/.gancm/local/Android/Android_function $1
+	bash $HOME/.gancm/local/Android/Android_function $1 $2
 }
 case $1 in
 install)
@@ -28,7 +28,7 @@ start)
 	while true; do
 	Android_menu=$(
 		whiptail --title "选择功能" --menu "termux按自己需求来" 15 60 4 \
-			"1" "管理proot容器" \
+			"1" "proot容器" \
 			"2" "待添加" \
 			"0" "退出" 3>&1 1>&2 2>&3
 	)
@@ -40,7 +40,7 @@ start)
 		open_proot=$(
 			whiptail --title "选择功能" --menu "termux按自己需求来" 15 60 4 \
 				"1" "安装proot容器" \
-				"2" "启动proot容器" \
+				"2" "管理启动proot容器" \
 				"0" "退出" 3>&1 1>&2 2>&3
 		)
 		case $open_proot in
@@ -48,7 +48,38 @@ start)
 			useAndroid_function install_proot
 			;;
 		2)
-			useAndroid_function start_proot
+			while true; do
+			if [ "$(ls ${HOME}/.gancm/proot)" = "" ]; then
+				echo -e "${ERROR}请先安装容器"
+				hcjx
+				break
+			fi
+			list_dir $(ls ${HOME}/.gancm/proot)
+			os_name=${listq[(($open - 1))]}
+			if [ ${open} = "0" ]; then
+				break
+			fi
+			while true; do
+     		open_proot=$(
+     			whiptail --title "选择功能" --menu "当前容器:proot_${os_name}" 15 60 4 \
+     				"1" "启动proot容器" \
+     				"2" "移除proot容器" \
+     				"0" "退出" 3>&1 1>&2 2>&3
+     		)
+     		case $open_proot in
+				1)
+				useAndroid_function start_proot ${listq[(($open - 1))]}
+				;;
+				2)
+				useAndroid_function rm_proot ${listq[(($open - 1))]}
+				break 2
+				;;
+				*)
+				break
+				;;
+			esac
+			done
+			done
 			;;
 		*)
 			echo -e "${RED}quit$RES"

@@ -53,7 +53,7 @@ rm_WORRY() {
 	else
 		rm_name=$1
 	fi
-	echo -e "${INFO}准备删除${rm_name}"
+	echo -e "${INFO}准备删除${dir}"
      echo -e "${WORRY}为了避免错误操作请输入一下问题的答案:"
      number_1=$(echo $(($RANDOM%10)))
 	number_2=$(echo $(($RANDOM%10)))

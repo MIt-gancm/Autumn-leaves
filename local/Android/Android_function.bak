@@ -1,8 +1,5 @@
-if source $HOME/.gancm/function/Main_function; then
-	echo -e "$SUSSEC加载主功能成功"
-else
-	echo -e "$WORRY加载主功能失败"
-fi
+source $HOME/.gancm/function/Main_function
+#加载通用函数变量
 install_proot() {
 	if [ "${git}" = "gitee.com" ]; then
 		proot_list_json=$(curl -SL https://gitee.com/MIt-gancm/resource-library/raw/main/Autumn-leaves/Ubuntu_proot.json)
@@ -13,6 +10,9 @@ install_proot() {
 	if [ "${open}" = "0" ]; then
 		exit 1
 	fi
+	if [ ! $? = 0 ]; then
+			exit
+		fi
 	os_name="$(echo ${proot_list_json}|jq -r ".$(uname -m).proot_files.${listq[(($open-1))]}.proot_file_name")"
 	Download_proot_url="$(echo ${proot_list_json}|jq -r ".$(uname -m).proot_files.${listq[(($open-1))]}.proot_file_url")"
 	if [ "${Download_proot_url}" = "NULL" ] ;then
@@ -58,7 +58,7 @@ install_proot() {
 		/bin/bash 优化.sh
 }
 start_proot() {
-	list_dir $(ls ${HOME}/.gancm/proot)
+	os_name=$1
 	case $open in
 	0)
 		echo -e "${RED}quit${RES}"
@@ -67,7 +67,9 @@ start_proot() {
 		if [ ! $? = 0 ]; then
 			exit
 		fi
-		os_name=${listq[(($open - 1))]}
+		if [ "$os_name" = "" ]; then
+			install_proot
+		fi
 		unset LD_PRELOAD
 		proot \
 			--link2symlink -0 \
@@ -86,14 +88,37 @@ start_proot() {
 			TERM=xterm-256color \
 			LANG=zh_CN.UTF-8 \
 			/bin/bash --login
+		hcjx
 		;;
 	esac
 }
+rm_proot() {
+	rm_WORRY "${HOME}/.gancm/proot/${os_name}/" ${os_name}
+	# os_name=$1
+	# echo -e "${INFO}准备删除${os_name}"
+     # echo -e "${WORRY}为了避免错误操作请输入一下问题的答案:"
+     # number_1=$(echo $(($RANDOM%10)))
+	# number_2=$(echo $(($RANDOM%10)))
+     # sum_number=$(((${number_1}+${number_2})))
+     # read -p "${number_1}+${number_2}=?" sum_number_ToF
+     # if [ "${sum_number_ToF}" = "${sum_number}" ]; then
+     	# echo -e "${SUSSEC}开始删除"
+     	# rm -rfv ${HOME}/.gancm/proot/${os_name}/
+     	# echo -e "${SUSSEC}删除完成"
+     	# hcjx
+     # else
+     	# echo -e "${ERROR}回答错误"
+     	# hcjx
+     # fi
+}
 case $1 in
 	install_proot)
-		install_proot
+		install_proot $2 $3 $4 $5
 		;;
 	start_proot)
-		start_proot
+		start_proot $2 $3 $4 $5
+		;;
+	rm_proot)
+		rm_proot $2 $3 $4 $5
 		;;
 esac

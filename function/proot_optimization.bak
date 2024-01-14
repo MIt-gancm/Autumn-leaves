@@ -34,8 +34,6 @@ self_install() {
 	esac
 }
 echo -e "${INFO}优化系统请勿退出"
-apt update -y
-echo -e "${GREEN}尝试修复时区${RES}"
 echo "127.0.0.1 localhost" >/etc/hosts
 mkdir -p /run/systemd/resolve
 echo -e "${GREEN}尝试修复dns${RES}"
@@ -45,7 +43,7 @@ nameserver 114.114.114.114
 " >/run/systemd/resolve/stub-resolv.conf
 echo -e "${GREEN}尝试禁用无用检测${RES}"
 touch ~/.hushlogin
-apt update
+apt update -y
 self_install language-pack-zh-hans apt
 self_install wget apt
 self_install git apt
@@ -53,4 +51,8 @@ self_install jq apt
 self_install curl apt
 self_install bc apt
 rm -rf $0
+hcjx() {
+	echo -e "${GREEN}请按回车键继续下一条指令...${RES}"
+	read -r
+}
 exit

@@ -1,1 +1,1 @@
-git=gitee.com
+git=
