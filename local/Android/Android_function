@@ -1,0 +1,267 @@
+install_proot() {
+	case "$(uname -m)" in
+	aarch64)
+		archurl="arm64" 
+		;;
+	armv7l)
+		archurl="armhf" 
+		;;
+	x86_64)
+		archurl="amd64" 
+		;;
+	*)
+		echo -e "${ERROR}未知框架"; 
+		exit  
+		;;
+	esac
+
+	source ${HOME}/.gancm/config/config.sh
+	if [ "${Fastest_download_source}" = "" ]; then
+		echo -e "${WORRY}最快下载路线${RED}为空${RES}默认：https://mirrors.tuna.tsinghua.edu.cn"
+		Fastest_download_source="https://mirrors.tuna.tsinghua.edu.cn"
+	else
+	    echo -e "${WORRY}最快下载路线为${RED}${Fastest_download_source}${RES} shell爬虫只面前只支持https://mirrors.tuna.tsinghua.edu.cn 所以"
+		Fastest_download_source="https://mirrors.tuna.tsinghua.edu.cn"
+	fi
+	open_proot_os_list=$(
+		whiptail --title "选择功能" --menu "proot容器按自己需求来" 15 60 4 \
+			"1" "ubuntu18.04_${archurl}_rootfs" \
+			"2" "ubuntu20.04_${archurl}__rootfs" \
+			"3" "ubuntu22.04_${archurl}__rootfs" \
+			"0" "退出" 3>&1 1>&2 2>&3
+	)
+	case ${open_proot_os_list} in
+	1)
+		os_name=ubuntu18.04_${archurl}_rootfs
+		Download_proot_NAME=$(curl -s "${Fastest_download_source}/lxc-images/images/ubuntu/bionic/${archurl}/default/" | grep -oP '<td class="link"><a href=[^>]*>\K[^<]*' | sed -n '2p')
+		Download_proot_url=${Fastest_download_source}/lxc-images/images/ubuntu/bionic/${archurl}/default/20230829_07%3A43/rootfs.tar.xz
+		;;
+	2)
+		os_name=ubuntu20.04_${archurl}_rootfs
+		Download_proot_NAME=$(curl -s "${Fastest_download_source}/lxc-images/images/ubuntu/focal/${archurl}/default/" | grep -oP '<td class="link"><a href=[^>]*>\K[^<]*' | sed -n '2p')
+		Download_proot_url=${Fastest_download_source}/lxc-images/images/ubuntu/focal/${archurl}/default/${Download_proot_NAME}/rootfs.tar.xz
+		;;
+	3)
+		os_name=ubuntu22.04_${archurl}_rootfs
+		Download_proot_NAME=$(curl -s "${Fastest_download_source}/lxc-images/images/ubuntu/jammy/${archurl}/default/" | grep -oP '<td class="link"><a href=[^>]*>\K[^<]*' | sed -n '2p')
+		Download_proot_url=${Fastest_download_source}/lxc-images/images/ubuntu/jammy/${archurl}/default/${Download_proot_NAME}/rootfs.tar.xz
+		;;
+	*)
+		exit 1
+		;;
+	esac
+
+	if [ -f ${HOME}/.gancm/download/${os_name}.tar.xz ]; then
+		if [ $(du -b ${HOME}/.gancm/download/${os_name}.tar.xz | cut -f1) -lt 10485760 ]; then
+			echo -e "${WORRY}${RED}${HOME}/.gancm/download/${os_name}.tar.xz${RES}可能已经损坏"
+			if wget -q --show-progress "${Download_proot_url}" -O ${HOME}/.gancm/download/${os_name}.tar.xz; then
+				echo -e "${INFO}文件存储在${RED}${HOME}/.gancm/download/${os_name}.tar.xz${RES}"
+				echo -e "${INFO}您可以使用${RED}rm -rfv ${HOME}/.gancm/download/${os_name}.tar.xz${RES}来节省存储空间"
+				if [ ! -d ${HOME}/.gancm/proot/${os_name} ]; then
+					mkdir ${HOME}/.gancm/proot/${os_name}
+				fi
+			else
+				echo -e "${WORRY}请检查网络访问问题${RES}"
+				exit
+			fi
+		else
+			echo -e "${INFO}${RED}${HOME}/.gancm/download/${os_name}.tar.xz${RES}已存在 即将直接使用"
+		fi
+	else
+		if wget -q --show-progress "${Download_proot_url}" -O ${HOME}/.gancm/download/${os_name}.tar.xz; then
+			echo -e "${INFO}文件存储在${RED}${HOME}/.gancm/download/${os_name}.tar.xz${RES}"
+			echo -e "${INFO}您可以使用${RED}rm -rfv ${HOME}/.gancm/download/${os_name}.tar.xz${RES}来节省存储空间"
+			if [ ! -d ${HOME}/.gancm/proot/${os_name} ]; then
+				mkdir ${HOME}/.gancm/proot/${os_name}
+			fi	
+		else
+			echo -e "${WORRY}请检查网络访问问题${RES}"
+			exit
+		fi
+	fi
+	unset LD_PRELOAD
+	proot --link2symlink tar -xJf ${HOME}/.gancm/download/${os_name}.tar.xz -C ${HOME}/.gancm/proot/${os_name}/ --exclude='dev' || :
+	echo -e "${GREEN}复制脚本到容器${RES}"
+	mkdir ${HOME}/.gancm/proot/${os_name}/root/.gancm
+	cp -r ${HOME}/.gancm/config ${HOME}/.gancm/proot/${os_name}/root/.gancm
+	cp -r ${HOME}/.gancm/function ${HOME}/.gancm/proot/${os_name}/root/.gancm
+	cp -r ${HOME}/.gancm/local ${HOME}/.gancm/proot/${os_name}/root/.gancm
+	cp ${HOME}/.gancm/gancm.sh ${HOME}/.gancm/proot/${os_name}/root/.gancm
+	cp ${HOME}/.gancm/git_push.sh ${HOME}/.gancm/proot/${os_name}/root/.gancm
+	echo -e "${GREEN}复制优化脚本到容器${RES}"
+	cp ${HOME}/.gancm/function/proot_proc/.* ${HOME}/.gancm/proot/${os_name}/proc/
+	cp ${HOME}/.gancm/function/proot_optimization ${HOME}/.gancm/proot/${os_name}/root/优化.sh
+	proot \
+		--link2symlink -0 \
+		--rootfs=${HOME}/.gancm/proot/${os_name}/ \
+		--bind=/dev \
+		--bind=/sys \
+		--bind=/proc \
+		--bind="${HOME}/.gancm/proot/${os_name}/proc/.loadavg:/proc/loadavg" \
+		--bind="${HOME}/.gancm/proot/${os_name}/proc/.version:/proc/version" \
+		--bind="${HOME}/.gancm/proot/${os_name}/proc/.uptime:/proc/uptime" \
+		--bind="${HOME}/.gancm/proot/${os_name}/proc/.stat:/proc/stat" \
+		--kernel-release="5.15.0" \
+		-w /root /usr/bin/env \
+		-i HOME=/root \
+		PATH=/usr/local/sbin:/usr/local/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/games:/usr/local/games \
+		TERM=xterm-256color \
+		LANG=zh_CN.UTF-8 \
+		/bin/bash 优化.sh
+}
+start_proot() {
+	list_dir ${HOME}/.gancm/proot 
+	case $user_choice in
+	0)
+		echo -e "${RED}quit${RES}"
+		;;
+	*)
+		if [ ! $? = 0 ]; then
+			exit
+		fi
+		os_name=${list_items[$((user_choice-1))]}
+		unset LD_PRELOAD
+		proot \
+			--link2symlink -0 \
+			--rootfs=${HOME}/.gancm/proot/${os_name}/ \
+			--bind=/dev \
+			--bind=/sys \
+			--bind=/proc \
+			--bind="${HOME}/.gancm/proot/${os_name}/proc/.loadavg:/proc/loadavg" \
+			--bind="${HOME}/.gancm/proot/${os_name}/proc/.version:/proc/version" \
+			--bind="${HOME}/.gancm/proot/${os_name}/proc/.uptime:/proc/uptime" \
+			--bind="${HOME}/.gancm/proot/${os_name}/proc/.stat:/proc/stat" \
+			--kernel-release="5.15.0" \
+			-w /root /usr/bin/env \
+			-i HOME=/root \
+			PATH=/usr/local/sbin:/usr/local/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/games:/usr/local/games \
+			TERM=xterm-256color \
+			LANG=zh_CN.UTF-8 \
+			/bin/bash --login
+		;;
+	esac
+}
+rm_proot() {
+	list_dir ${HOME}/.gancm/proot
+	case $user_choice in
+	0)
+		echo -e "${RED}quit${RES}"
+		;;
+	*)
+		if [ ! $? = 0 ]; then
+			exit
+		fi
+		os_name=${list_items[$((user_choice-1))]}
+		num1=$((RANDOM % 100))
+		num2=$((RANDOM % 100))
+		# 读取用户输入
+		read -p "${num1}+${num2}=?" user_sum
+		# 计算正确的和
+		correct_sum=$(($num1 + $num2))
+		# 检查用户输入是否正确
+		if [ $user_sum -eq $correct_sum ]; then
+			echo -e "删除开始正确！你输入的和是正确的。"
+			rm -rfv "${HOME}/.gancm/proot/${os_name}/"
+			# 在这里添加你想要执行的命令
+		else
+			echo -e "错误！你输入的和不正确。删除程序将不执行。"
+		fi
+		;;
+	esac
+}
+Change_the_source() {
+	# 定义要下载的文件的URL数组
+	URLS=(
+	"https://mirrors.tuna.tsinghua.edu.cn" 
+	"https://mirrors.aliyun.com"
+	)
+
+	echo "测速取决于网速，一般持续5-8分钟"
+
+	# 用于存储每个文件的下载速度
+	declare -A SPEEDS
+
+	# 循环遍历所有URL
+	for URL in "${URLS[@]}"; do
+	# 开始时间
+	STARTTIME=$(date +%s)
+	
+	# 使用wget下载文件，这里使用随机生成的文件名以避免覆盖
+	FILENAME="download_$(date +%s).zip"
+	TEMPDIR=".gancm/TEM" # 确保目录存在
+	mkdir -p "$TEMPDIR"
+	
+	# 执行wget下载并检查是否成功
+	if wget -q --show-progress "$URL/ubuntu/ls-lR.gz" -O "$TEMPDIR/$FILENAME"; then
+		# 结束时间
+		ENDTIME=$(date +%s)
+		
+		# 计算时间差
+		DELTATIME=$((ENDTIME - STARTTIME))
+		
+		# 获取文件大小
+		FILESIZE=$(du -b "$TEMPDIR/$FILENAME" | cut -f1)
+		
+		# 计算下载速度
+		SPEED=$(echo "scale=2; $FILESIZE / $DELTATIME" | bc -l)
+		
+		# 存储速度
+		SPEEDS[$URL]=$SPEED
+		
+		# 输出结果
+		echo "URL: $URL"
+		echo "下载时间: $DELTATIME 秒"
+		echo "文件大小: $FILESIZE 字节"
+		echo "下载速度: $SPEED 字节/秒"
+		echo "---------------------------------------"
+		
+		# 清理下载的文件
+		rm "$TEMPDIR/$FILENAME"
+	else
+		echo "下载失败: $URL"
+	fi
+	done
+
+	# 打印所有下载速度的比较
+	echo "所有源的下载速度比较："
+	for URL in "${URLS[@]}"; do
+	if [ -n "${SPEEDS[$URL]}" ]; then
+		echo "$URL: ${SPEEDS[$URL]} 字节/秒"
+	fi
+	done
+
+	# 找出最快的下载速度
+	FASTEST_URL=""
+	FASTEST_SPEED=0
+	for URL in "${URLS[@]}"; do
+	if [ -n "${SPEEDS[$URL]}" ] && [ $(echo "${SPEEDS[$URL]} > $FASTEST_SPEED" | bc -l) -eq 1 ]; then
+		FASTEST_URL=$URL
+		FASTEST_SPEED=${SPEEDS[$URL]}
+	fi
+	done
+
+	if [ -n "$FASTEST_URL" ]; then
+	echo "最快的下载源是：$FASTEST_URL"
+	echo "最快的下载速度是：$FASTEST_SPEED 字节/秒"
+	else
+	echo "没有成功的下载速度可以比较。"
+	fi
+
+	read -p "是否更换下载源和最快下载路线为: ${FASTEST_URL} [Y/n]:" user_input
+
+	case ${user_input} in
+	YES| Yes | Y | y)
+		sed -i "s@^\(deb.*stable main\)$@#\1\ndeb ${FASTEST_URL}/termux/apt/termux-main stable main@" $PREFIX/etc/apt/sources.list
+		apt update && apt upgrade
+		source ${HOME}/.gancm/config/config.sh
+		if [ "${Fastest_download_source}" = "" ]; then
+			echo -e "${INFO}最快下载路线自动更新"
+			Modify_the_variable Fastest_download_source "$(echo -e "${FASTEST_URL}" | sed 's/\//\\\//g')" ${HOME}/.gancm/config/config.sh
+		fi
+		hcjx
+		;;
+	*)
+		hcjx
+		;;
+	esac
+}
