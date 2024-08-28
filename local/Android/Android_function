@@ -265,3 +265,23 @@ Change_the_source() {
 		;;
 	esac
 }
+
+install_start_desktop(){
+	open_proot=$(
+			whiptail --title "选择功能" --menu "termux按自己需求来" 15 60 4 \
+				"1" "安装桌面和vnc" \
+				"2" "启动vnc" \
+				"0" "退出" 3>&1 1>&2 2>&3
+		)
+		case $open_proot in
+		1)
+			bash ${HOME}/.gancm/function/desktop/desktop_menu
+			;;
+		2)
+			start_proot
+			;;
+		*)
+			echo -e "${RED}quit$RES"
+			;;
+		esac
+}

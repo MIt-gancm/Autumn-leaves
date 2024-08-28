@@ -34,7 +34,8 @@ start)
 		whiptail --title "选择功能" --menu "termux按自己需求来" 15 60 4 \
 			"1" "管理proot容器" \
 			"2" "换源" \
-			"3" "待添加" \
+			"3" "桌面没测试好误用" \
+			"4" "待添加" \
 			"0" "退出" 3>&1 1>&2 2>&3
 	)
 	case $Android_menu in
@@ -65,6 +66,9 @@ start)
 		;;
 	2)
 		Change_the_source
+		;;
+	3)
+		install_start_desktop
 		;;
 	*)
 		echo -e "待添加_Android_menu"

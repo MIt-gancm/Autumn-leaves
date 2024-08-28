@@ -119,6 +119,7 @@ apt_up() {
 	current_timestamp=$(date +%s)
 	if [ "${last_time_aptup}" = "" ] ;then
 		apt update -y & apt upgrade -y
+		hcjx
 		Modify_the_variable last_time_aptup ${current_timestamp} ${HOME}/.gancm/config/config.sh
 	else
 		time_difference=$(($current_timestamp - $last_time_aptup))
@@ -126,6 +127,7 @@ apt_up() {
         five_days_seconds=$((5 * 24 * 60 * 60))
 		if [ $five_days_seconds -le $time_difference  ]; then
             apt update -y & apt upgrade -y
+			hcjx
 			Modify_the_variable last_time_aptup ${current_timestamp} ${HOME}/.gancm/config/config.sh
         fi
 	fi
@@ -143,7 +145,6 @@ case ${1} in
 	;;
 *)
 	apt_up
-	hcjx
 	case $(uname -o) in
 	Android)
 		self_install jq pkg

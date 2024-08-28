@@ -1,0 +1,44 @@
+
+case $(uname -o) in
+	Android)
+		PATF_HOME=$PATH
+		;;
+	*)
+		PATF_HOME=/usr/bin/
+		;;
+	esac
+
+RED='\e[1;31m'    # 红 ${RED}
+GREEN='\e[1;32m'  # 绿 ${GREEN}
+YELLOW='\e[1;33m' # 黄 ${YELLOW}
+BLUE='\e[1;34m'   # 蓝 ${BLUE}
+PINK='\e[1;35m'   # 粉红 ${PINK}
+RES='\e[0m'       # 清除颜色 ${RES}
+##字体颜色
+
+ERROR="[${RED}错误${RES}]:" # ${ERROR}
+WORRY="[${YELLOW}警告${RES}]:" # ${WORRY 
+SUSSEC="[${GREEN}成功${RES}]:" # ${SUSSEC}
+INFO="[${BLUE}信息${RES}]:" # ${INFO}
+
+
+open_proot=$(
+		whiptail --title "选择功能" --menu "termux按自己需求来" 15 60 4 \
+			"1" "安装桌面和vnc" \
+			"2" "启动桌面和vnc" \
+			"0" "退出" 3>&1 1>&2 2>&3
+	)
+	case $open_proot in
+	1)
+		bash ${HOME}/.gancm/function/desktop/Xfce
+        cat ${HOME}/.gancm/function/desktop/start_desktop > $PATH_HOME/start_desktop
+        ln $PATH_HOME/start_desktop $PATH_HOME/std
+        echo -e "${INFO}可通过start_desktop或std快速启动"
+		;;
+	2)
+        bash ${HOME}/.gancm/function/desktop/start_desktop
+		;;
+	*)
+		echo -e "${RED}quit$RES"
+		;;
+	esac

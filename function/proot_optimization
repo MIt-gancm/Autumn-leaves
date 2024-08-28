@@ -61,6 +61,7 @@ touch ~/.hushlogin
 apt update -y & apt upgrade -y
 Modify_the_variable last_time_aptup $(date +%s) ${HOME}/.gancm/config/config.sh
 self_install language-pack-zh-hans apt
+self_install ttf-wqy-zenhei apt
 self_install wget apt
 self_install git apt
 self_install jq apt

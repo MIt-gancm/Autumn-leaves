@@ -136,9 +136,9 @@ install_MC_SERVER() {
 				mkdir ${HOME}/.gancm/MCserver/${Download_MC_SERVER_class_menu[$((user_choice_Download_MC_SERVER_class_menu-1))]}/${Download_MC_SERVER_versions_menu[$((user_choice_Download_MC_SERVER_versions_menu_list_names - 1))]}
 			fi
 			if wget -q --show-progress $Download_MC_SERVER_url_YES_with_and -O ${HOME}/.gancm/MCserver/${Download_MC_SERVER_class_menu[$((user_choice_Download_MC_SERVER_class_menu-1))]}/${Download_MC_SERVER_versions_menu[$((user_choice_Download_MC_SERVER_versions_menu_list_names - 1))]}/${Download_MC_SERVER_class_menu[$((user_choice_Download_MC_SERVER_class_menu-1))]}_${Download_MC_SERVER_versions_menu[$((user_choice_Download_MC_SERVER_versions_menu_list_names - 1))]}_server.jar ; then
-				source ${HOME}/.gancm/function/Start_Java_MC_SERVER
+				source ${HOME}/.gancm/function/Start_Java_MC_SERVER "${Download_MC_SERVER_class_menu[$((user_choice_Download_MC_SERVER_class_menu-1))]}" 
 			else
-				rmdir -p ${HOME}/.gancm/MCserver/${Download_MC_SERVER_class_menu[$((user_choice_Download_MC_SERVER_class_menu-1))]}/${Download_MC_SERVER_versions_menu[$((user_choice_Download_MC_SERVER_versions_menu_list_names - 1))]}
+				rmdir -p ${HOME}/.gancm/MCserver/${Download_MC_SERVER_class_menu[$((user_choice_Download_MC_SERVER_class_menu-1))]}/${Download_MC_SERVER_versions_menu[$((user_choice_Download_MC_SERVER_versions_menu_list_names - 1))]} "${Download_MC_SERVER_versions_menu[$((user_choice_Download_MC_SERVER_versions_menu_list_names - 1))]}"
 			fi	
 
 			
@@ -175,24 +175,7 @@ start_MC_SERVER() {
 				exit
 			fi
 			if [ ! -f ${HOME}/.gancm/MCserver/${start_MC_SERVER_class}/${list_items[$((user_choice-1))]}/start.sh ]; then
-				# 提示用户输入Java程序的jar文件路径
-			 	        read -p "请输入jar文件路径 已安装的有: 
-$(ls /usr/lib/jvm/*/bin/java) :"
-				
-				# 提示用户输入Java程序的最小内存
-				read -p "请输入Java程序的最小内存（例如：512m,2G）：" min_memory
-				
-				# 提示用户输入Java程序的最大内存
-				read -p "请输入Java程序的最大内存（例如：1024m,2G）：" max_memory
-				
-				# 合成并执行java -jar命令
-				echo -e "
-				cd ${HOME}/.gancm/MCserver/${start_MC_SERVER_class}/${list_items[$((user_choice-1))]}
-				echo -e "eula=true" > ${HOME}/.gancm/MCserver/${start_MC_SERVER_class}/${list_items[$((user_choice-1))]}/eula.txt
-				java -Xms"$min_memory" -Xmx"$max_memory"  -jar "${HOME}/.gancm/MCserver/${start_MC_SERVER_class}/${list_items[$((user_choice-1))]}/${start_MC_SERVER_class}_${list_items[$((user_choice-1))]}_server.jar" 
-				
-				" > ${HOME}/.gancm/MCserver/${start_MC_SERVER_class}/${list_items[$((user_choice-1))]}/start.sh
-				
+				source ${HOME}/.gancm/function/Start_Java_MC_SERVER  ${start_MC_SERVER_class} ${list_items[$((user_choice-1))]}
 			fi
 			bash ${HOME}/.gancm/MCserver/${start_MC_SERVER_class}/${list_items[$((user_choice-1))]}/start.sh
 			#核心
@@ -286,3 +269,25 @@ install_MC_SERVER_MENU() {
 # for i in ${tag[@]} ; do
 # 	curl -s https://download.fastmirror.net/api/v3 | jq .data.[$((${i}-1))].name
 # done
+
+
+
+install_start_desktop(){
+	open_proot=$(
+			whiptail --title "选择功能" --menu "termux按自己需求来" 15 60 4 \
+				"1" "安装桌面和vnc" \
+				"2" "启动vnc" \
+				"0" "退出" 3>&1 1>&2 2>&3
+		)
+		case $open_proot in
+		1)
+			bash ${HOME}/.gancm/function/desktop/desktop_menu
+			;;
+		2)
+			start_proot
+			;;
+		*)
+			echo -e "${RED}quit$RES"
+			;;
+		esac
+}

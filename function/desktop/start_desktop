@@ -1,0 +1,19 @@
+if [ ! -d ${HOME}/.gancm/ ]; then
+    echo "你的的vnc密码:"
+    read -s password
+    echo -e "${password}\n${password}\nn\n" | vncserver :1 localhost no
+fi
+if [ -f /data/data/com.termux/files/usr/tmp/.X1-lock ]; then
+    rm -rf /data/data/com.termux/files/usr/tmp/.X1-lock
+    rm -rf /data/data/com.termux/files/usr/tmp/.X11-unix/X1
+fi
+if [ -f /tmp/.X1-lock ]; then
+    rm -rf /tmp/.X1-lock
+fi
+export DISPLAY=:1
+vncserver :1 -localhost no -geometry 1280x720
+wait
+export DISPLAY=:1
+xhost +
+sleep 1
+startxfce4

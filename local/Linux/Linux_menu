@@ -9,7 +9,8 @@ case $1 in
 		whiptail --title "Linux_menu" --menu "按自己需求来" 15 60 4 \
 			"1" "管理mc Server" \
 			"2" "换源" \
-			"3" "待添加" \
+			"3" "桌面没测试好误用" \
+			"4" "咕咕咕" \
 			"0" "退出" 3>&1 1>&2 2>&3
 	)
 	case $Linux_menu in
@@ -45,6 +46,9 @@ case $1 in
 		;;
 	2)
 		echo -e "咕咕咕"
+		;;
+	3)
+		install_start_desktop
 		;;
 	*)
 		echo -e "待添加_Linux_menu"
