@@ -9,7 +9,7 @@ result=$(ls /usr/lib/jvm/*/bin/java)
 if [ -z "$result" ]; then
     echo "${ERROR}请先安装java启动"
     exit
-elif
+else
 
     if [ -z "$result" ]; then
         echo "${INFO}Forge核心执行额外安装步骤"
