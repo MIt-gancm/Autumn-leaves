@@ -18,7 +18,7 @@ install_proot() {
 	if [ ! -d ${HOME}/.termux]; then			
 		mkdir -p ${HOME}/.termux
 	fi
-	if
+	if [ ! -d ${HOME}/.termux/gancm]; then
 		if [ ! -d ${HOME}/.termux/gancm ]; then			
 		mkdir -p ${HOME}/.termux/gancm
 	fi
