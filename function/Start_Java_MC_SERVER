@@ -1,4 +1,15 @@
 #!/bin/bash
+RED='\e[1;31m'    # 红 ${RED}
+GREEN='\e[1;32m'  # 绿 ${GREEN}
+YELLOW='\e[1;33m' # 黄 ${YELLOW}
+BLUE='\e[1;34m'   # 蓝 ${BLUE}
+PINK='\e[1;35m'   # 粉红 ${PINK}
+RES='\e[0m'       # 清除颜色 ${RES}
+##字体颜色
+ERROR="[${RED}错误${RES}]:" # ${ERROR}
+WORRY="[${YELLOW}警告${RES}]:" # ${WORRY 
+SUSSEC="[${GREEN}成功${RES}]:" # ${SUSSEC}
+INFO="[${BLUE}信息${RES}]:" # ${INFO}
 
 Core_version="$1"
 Game_version="$2"
@@ -7,15 +18,16 @@ result=$(ls /usr/lib/jvm/*/bin/java)
 
 # 检查命令执行结果是否为空
 if [ -z "$result" ]; then
-    echo "${ERROR}请先安装java启动"
+    echo -e "${ERROR}请先安装java启动"
     exit
 else
-
-    if [ -z "$result" ]; then
-        echo "${INFO}Forge核心执行额外安装步骤"
+    cd ${HOME}/.gancm/MCserver/${Core_version}/${Game_version}
+    if [ "$Core_version" = "Forge" ] && [ ! -f "forge_server_yes.txt" ]; then
+        echo -e "${INFO}Forge核心执行额外安装步骤"
         if java -jar ${HOME}/.gancm/MCserver/${Core_version}/${Game_version}/${Core_version}_${Game_version}_server.jar nogui --installServer ; then
             rm -rfv ${HOME}/.gancm/MCserver/${Core_version}/${Game_version}/${Core_version}_${Game_version}_server.jar
             echo -e  "{INFO}forge安装服务器成功 转换脚本可识别的目录"
+            echo -e  "{INFO}forge安装服务器成功" > forge_server_yes.txt
         fi
         rm -rfv ${HOME}/.gancm/MCserver/${Core_version}/${Game_version}/run.sh
         mv $(ls ${HOME}/.gancm/MCserver/${Core_version}/${Game_version}/*.jar) ${HOME}/.gancm/MCserver/${Core_version}/${Game_version}/${Core_version}_${Game_version}_server.jar
@@ -53,11 +65,11 @@ else
             " > ${HOME}/.gancm/MCserver/${Core_version}/${Game_version}/start.sh
             ;;
         2)
-            echo "退出程序"
+            echo "${INFO}退出程序"
             exit 0
             ;;
         *)
-            echo "无效的选项，请重新运行脚本并选择1或2。"
+            echo -e "${ERROR}无效的选项，请重新运行脚本并选择1或2。"
             ;;
     esac
 fi

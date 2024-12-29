@@ -136,7 +136,7 @@ install_MC_SERVER() {
 				mkdir ${HOME}/.gancm/MCserver/${Download_MC_SERVER_class_menu[$((user_choice_Download_MC_SERVER_class_menu-1))]}/${Download_MC_SERVER_versions_menu[$((user_choice_Download_MC_SERVER_versions_menu_list_names - 1))]}
 			fi
 			if wget -q --show-progress $Download_MC_SERVER_url_YES_with_and -O ${HOME}/.gancm/MCserver/${Download_MC_SERVER_class_menu[$((user_choice_Download_MC_SERVER_class_menu-1))]}/${Download_MC_SERVER_versions_menu[$((user_choice_Download_MC_SERVER_versions_menu_list_names - 1))]}/${Download_MC_SERVER_class_menu[$((user_choice_Download_MC_SERVER_class_menu-1))]}_${Download_MC_SERVER_versions_menu[$((user_choice_Download_MC_SERVER_versions_menu_list_names - 1))]}_server.jar ; then
-				source ${HOME}/.gancm/function/Start_Java_MC_SERVER "${Download_MC_SERVER_class_menu[$((user_choice_Download_MC_SERVER_class_menu-1))]}" 
+				source ${HOME}/.gancm/function/Start_Java_MC_SERVER "${Download_MC_SERVER_class_menu[$((user_choice_Download_MC_SERVER_class_menu-1))]}" "${Download_MC_SERVER_versions_menu[$((user_choice_Download_MC_SERVER_versions_menu_list_names - 1))]}"	# 版本
 			else
 				rmdir -p ${HOME}/.gancm/MCserver/${Download_MC_SERVER_class_menu[$((user_choice_Download_MC_SERVER_class_menu-1))]}/${Download_MC_SERVER_versions_menu[$((user_choice_Download_MC_SERVER_versions_menu_list_names - 1))]} "${Download_MC_SERVER_versions_menu[$((user_choice_Download_MC_SERVER_versions_menu_list_names - 1))]}"
 			fi	

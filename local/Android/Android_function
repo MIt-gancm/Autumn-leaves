@@ -14,6 +14,17 @@ install_proot() {
 		exit  
 		;;
 	esac
+	PROOT_HOME=${HOME}/.termux/gancm/proot
+	if [ ! -d ${HOME}/.termux]; then			
+		mkdir -p ${HOME}/.termux
+	fi
+	fi
+		if [ ! -d ${HOME}/.termux/gancm ]; then			
+		mkdir -p ${HOME}/.termux/gancm
+	fi
+	if [ ! -d ${HOME}/.termux/gancm/proot ]; then			
+		mkdir -p ${HOME}/.termux/gancm/proot
+	fi
 
 	source ${HOME}/.gancm/config/config.sh
 	if [ "${Fastest_download_source}" = "" ]; then
@@ -57,8 +68,8 @@ install_proot() {
 			if wget -q --show-progress "${Download_proot_url}" -O ${HOME}/.gancm/download/${os_name}.tar.xz; then
 				echo -e "${INFO}文件存储在${RED}${HOME}/.gancm/download/${os_name}.tar.xz${RES}"
 				echo -e "${INFO}您可以使用${RED}rm -rfv ${HOME}/.gancm/download/${os_name}.tar.xz${RES}来节省存储空间"
-				if [ ! -d ${HOME}/.gancm/proot/${os_name} ]; then
-					mkdir ${HOME}/.gancm/proot/${os_name}
+				if [ ! -d ${PROOT_HOME}/${os_name} ]; then
+					mkdir ${PROOT_HOME}/${os_name}
 				fi
 			else
 				echo -e "${WORRY}请检查网络访问问题${RES}"
@@ -71,8 +82,8 @@ install_proot() {
 		if wget -q --show-progress "${Download_proot_url}" -O ${HOME}/.gancm/download/${os_name}.tar.xz; then
 			echo -e "${INFO}文件存储在${RED}${HOME}/.gancm/download/${os_name}.tar.xz${RES}"
 			echo -e "${INFO}您可以使用${RED}rm -rfv ${HOME}/.gancm/download/${os_name}.tar.xz${RES}来节省存储空间"
-			if [ ! -d ${HOME}/.gancm/proot/${os_name} ]; then
-				mkdir ${HOME}/.gancm/proot/${os_name}
+			if [ ! ${PROOT_HOME}/${os_name} ]; then
+				mkdir ${PROOT_HOME}/${os_name}
 			fi	
 		else
 			echo -e "${WORRY}请检查网络访问问题${RES}"
@@ -80,27 +91,28 @@ install_proot() {
 		fi
 	fi
 	unset LD_PRELOAD
-	proot --link2symlink tar -xJf ${HOME}/.gancm/download/${os_name}.tar.xz -C ${HOME}/.gancm/proot/${os_name}/ --exclude='dev' || :
+	proot --link2symlink tar -xJf ${HOME}/.gancm/download/${os_name}.tar.xz -C ${PROOT_HOME}/${os_name}/ --exclude='dev' || :
 	echo -e "${GREEN}复制脚本到容器${RES}"
-	mkdir ${HOME}/.gancm/proot/${os_name}/root/.gancm
-	cp -r ${HOME}/.gancm/config ${HOME}/.gancm/proot/${os_name}/root/.gancm
-	cp -r ${HOME}/.gancm/function ${HOME}/.gancm/proot/${os_name}/root/.gancm
-	cp -r ${HOME}/.gancm/local ${HOME}/.gancm/proot/${os_name}/root/.gancm
-	cp ${HOME}/.gancm/gancm.sh ${HOME}/.gancm/proot/${os_name}/root/.gancm
-	cp ${HOME}/.gancm/git_push.sh ${HOME}/.gancm/proot/${os_name}/root/.gancm
+	mkdir ${PROOT_HOME}/${os_name}/root/.gancm
+	cp -r ${HOME}/.gancm/config ${PROOT_HOME}/${os_name}/root/.gancm
+	cp -r ${HOME}/.gancm/function ${PROOT_HOME}/${os_name}/root/.gancm
+	cp -r ${HOME}/.gancm/local ${PROOT_HOME}/${os_name}/root/.gancm
+	cp ${HOME}/.gancm/gancm.sh ${PROOT_HOME}/${os_name}/root/.gancm
+	cp ${HOME}/.gancm/git_push.sh ${PROOT_HOME}/${os_name}/root/.gancm
+	cp ${HOME}/.gancm/install.sh ${PROOT_HOME}/${os_name}/root/.gancm
 	echo -e "${GREEN}复制优化脚本到容器${RES}"
-	cp ${HOME}/.gancm/function/proot_proc/.* ${HOME}/.gancm/proot/${os_name}/proc/
-	cp ${HOME}/.gancm/function/proot_optimization ${HOME}/.gancm/proot/${os_name}/root/优化.sh
+	cp ${HOME}/.gancm/function/proot_proc/.* ${PROOT_HOME}/${os_name}/proc/
+	cp ${HOME}/.gancm/function/proot_optimization ${PROOT_HOME}/${os_name}/root/优化.sh
 	proot \
 		--link2symlink -0 \
-		--rootfs=${HOME}/.gancm/proot/${os_name}/ \
+		--rootfs=${PROOT_HOME}/${os_name}/ \
 		--bind=/dev \
 		--bind=/sys \
 		--bind=/proc \
-		--bind="${HOME}/.gancm/proot/${os_name}/proc/.loadavg:/proc/loadavg" \
-		--bind="${HOME}/.gancm/proot/${os_name}/proc/.version:/proc/version" \
-		--bind="${HOME}/.gancm/proot/${os_name}/proc/.uptime:/proc/uptime" \
-		--bind="${HOME}/.gancm/proot/${os_name}/proc/.stat:/proc/stat" \
+		--bind="${PROOT_HOME}/${os_name}/proc/.loadavg:/proc/loadavg" \
+		--bind="${PROOT_HOME}/${os_name}/proc/.version:/proc/version" \
+		--bind="${PROOT_HOME}/${os_name}/proc/.uptime:/proc/uptime" \
+		--bind="${PROOT_HOME}/${os_name}/proc/.stat:/proc/stat" \
 		--kernel-release="5.15.0" \
 		-w /root /usr/bin/env \
 		-i HOME=/root \
@@ -110,7 +122,7 @@ install_proot() {
 		/bin/bash 优化.sh
 }
 start_proot() {
-	list_dir ${HOME}/.gancm/proot 
+	list_dir ${PROOT_HOME} 
 	case $user_choice in
 	0)
 		echo -e "${RED}quit${RES}"
@@ -123,14 +135,14 @@ start_proot() {
 		unset LD_PRELOAD
 		proot \
 			--link2symlink -0 \
-			--rootfs=${HOME}/.gancm/proot/${os_name}/ \
+			--rootfs=${PROOT_HOME}/${os_name}/ \
 			--bind=/dev \
 			--bind=/sys \
 			--bind=/proc \
-			--bind="${HOME}/.gancm/proot/${os_name}/proc/.loadavg:/proc/loadavg" \
-			--bind="${HOME}/.gancm/proot/${os_name}/proc/.version:/proc/version" \
-			--bind="${HOME}/.gancm/proot/${os_name}/proc/.uptime:/proc/uptime" \
-			--bind="${HOME}/.gancm/proot/${os_name}/proc/.stat:/proc/stat" \
+			--bind="${PROOT_HOME}/${os_name}/proc/.loadavg:/proc/loadavg" \
+			--bind="${PROOT_HOME}/${os_name}/proc/.version:/proc/version" \
+			--bind="${PROOT_HOME}/${os_name}/proc/.uptime:/proc/uptime" \
+			--bind="${PROOT_HOME}/${os_name}/proc/.stat:/proc/stat" \
 			--kernel-release="5.15.0" \
 			-w /root /usr/bin/env \
 			-i HOME=/root \
@@ -142,7 +154,7 @@ start_proot() {
 	esac
 }
 rm_proot() {
-	list_dir ${HOME}/.gancm/proot
+	list_dir ${PROOT_HOME}
 	case $user_choice in
 	0)
 		echo -e "${RED}quit${RES}"
@@ -161,7 +173,7 @@ rm_proot() {
 		# 检查用户输入是否正确
 		if [ $user_sum -eq $correct_sum ]; then
 			echo -e "删除开始正确！你输入的和是正确的。"
-			rm -rfv "${HOME}/.gancm/proot/${os_name}/"
+			rm -rfv "${PROOT_HOME}/${os_name}/"
 			# 在这里添加你想要执行的命令
 		else
 			echo -e "错误！你输入的和不正确。删除程序将不执行。"
@@ -264,4 +276,15 @@ Change_the_source() {
 		hcjx
 		;;
 	esac
+}
+garbage_collection() {
+	ls -la ${HOME}/.gancm/download
+	read -p "是否删除这些文件？[Y/n]: " delete_files
+	if [[ $delete_files =~ ^[Yy]$ ]]; then
+	    rm -rf ${HOME}/dowload/*
+	    echo -e "${SUSSEC}所有文件已删除。"
+	else
+	    echo -e "${INFO}文件未删除。"
+	fi
+
 }
