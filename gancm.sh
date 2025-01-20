@@ -146,7 +146,8 @@ apt_up() {
 	source ${HOME}/.gancm/config/config.sh
 	current_timestamp=$(date +%s)
 	if [ "${last_time_aptup}" = "" ] ;then
-		apt update -y & apt upgrade -y
+		apt update -y 
+		apt upgrade -y
 		Modify_the_variable last_time_aptup ${current_timestamp} ${HOME}/.gancm/config/config.sh
 	else
 		time_difference=$(($current_timestamp - $last_time_aptup))
