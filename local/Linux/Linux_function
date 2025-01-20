@@ -1,3 +1,19 @@
+# /**
+#  * 安装 Minecraft 服务器的函数集合
+#  * 
+#  * 这个脚本包含了多个函数，用于下载和安装不同类型的 Minecraft 服务器，
+#  * 包括纯净服务端、Mod 服务端、Bedrock 服务端和原版服务端。
+#  * 
+#  * 函数包括：
+#  * - download_JAVA: 下载并安装指定版本的 Java 运行环境。
+#  * - install_MC_SERVER: 根据用户选择下载并安装相应的 Minecraft 服务器。
+#  * - start_MC_SERVER: 启动已安装的 Minecraft 服务器。
+#  * - rm_MC_SERVER: 删除指定的 Minecraft 服务器实例，带有安全验证。
+#  * - install_MC_SERVER_MENU: 显示服务器类型选择菜单，并调用相应的安装函数。
+#  * 
+#  * 使用时，用户可以通过菜单选择所需的服务端类型，脚本将自动处理下载、安装和启动过程。
+#  */
+
 download_JAVA() {
 	echo "请选择要安装的java版本（支持多选，用空格分隔）:"
 	options=("quit" $(apt list openjdk-*-jdk  2>/dev/null  | awk -F'/' '{print $1}'  |  grep '^openjdk'))

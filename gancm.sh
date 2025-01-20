@@ -1,3 +1,19 @@
+# # 脚本功能概述
+# 该脚本主要用于系统管理和软件包的安装维护，支持 Linux 和 Android 系统。它包含了颜色定义、错误和信息提示、系统架构判断、软件包安装函数、目录有效性检查、Git 默认源设置、变量修改以及菜单选择等功能。
+
+# # 主要函数说明
+# - `variable`: 加载配置文件。
+# - `self_install`: 根据传入的参数，使用对应的包管理器安装指定的软件包。
+# - `hcjx`: 提示用户按回车键继续。
+# - `validity_git`: 设置 Git 默认源。
+# - `validity_dir`: 检查并创建必要的目录。
+# - `validity`: 执行目录和 Git 源的有效性检查。
+# - `Modify_the_variable`: 修改配置文件中的变量值。
+# - `list_dir`: 显示目录列表供用户选择。
+# - `apt_up`: 更新和升级 APT 包管理器的软件包。
+
+# # 使用说明
+# 脚本通过命令行参数执行不同的操作，支持 `-h` 或 `--help` 参数显示帮助信息。主要执行流程包括系统架构判断、软件包安装、目录和 Git 源检查，以及根据系统类型加载相应的菜单。
 #字体颜色
 ########################################################
 RED='\e[1;31m'    # 红 ${RED}
@@ -149,10 +165,31 @@ apt_up() {
 case ${1} in
 -h | --help)
 	echo -e "
-	待添加
-	"
+-h | --help\t\t\t\t显示帮助信息
+-s | --start [Android/Linux]\t启动脚本固定版本 [功能]
+
+\t\t\tAndroid:
+\t\t\t\tinstall proot\t\t安装proot工具
+\t\t\t\tstart proot\t\t启动proot服务
+
+\t\t\tLinux:
+\t\t\t\tdownload_JAVA|dj\t下载JAVA环境（别名dj）
+\t\t\t\tinstall_MC_SERVER|imcs\t安装MC_SERVER服务（别名imcs）
+\t\t\t\tstart_MC_SERVER|smcs\t启动MC_SERVER服务（别名smcs）
+\t\t\t\trm_MC_SERVER|rmcs\t移除MC_SERVER服务（别名rmcs）
+"
 	hcjx
 	;;
+-s | --start)
+	case $2 in
+		Android|A)
+		source ${HOME}/.gancm/local/Android/Android_menu $3 $4 $5
+		;;
+		Linux|L)
+		source ${HOME}/.gancm/local/Linux/Linux_menu $3 $4 $5
+		;;
+	esac
+;;
 *)
 	apt_up
 	case $(uname -o) in

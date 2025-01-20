@@ -1,3 +1,15 @@
+# /**
+#  * @file Android_function
+#  * @brief 该文件包含了一系列用于管理Proot容器的Shell脚本函数，主要支持Debian和Ubuntu系统的安装、启动、删除以及下载源更换等功能。
+#  * 
+#  * - install_proot: 安装Proot容器，根据用户选择下载并安装指定的Debian或Ubuntu系统版本。
+#  * - start_proot: 启动已安装的Proot容器，允许用户选择并启动特定的容器环境。
+#  * - rm_proot: 删除指定的Proot容器，在删除前会要求用户完成一个简单的数学题以防止误操作。
+#  * - Change_the_source: 测试并更换下载源，通过下载测试文件比较不同源的下载速度，然后询问用户是否更换为最快的下载源。
+#  * - garbage_collection: 清理下载目录中的文件，提供一个选项让用户决定是否删除这些文件以节省空间。
+#  * 
+#  * 使用这些脚本函数可以方便地在Termux环境中管理和使用Proot容器。
+#  */
 open_debian_os_list() {
 		debian_os_list=$(
 		whiptail --title "选择功能" --menu "debian容器按自己需求来" 15 60 6 \
