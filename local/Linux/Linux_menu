@@ -1,0 +1,54 @@
+if source $HOME/.gancm/local/Linux/Linux_function; then
+	echo -e "${SUSSEC}加载Linux功能成功"
+else
+	echo -e "${WORRY}加载Linux功能失败"
+fi
+case $1 in
+*)
+	Linux_menu=$(
+		whiptail --title "Linux_menu" --menu "按自己需求来" 15 60 4 \
+			"1" "管理mc Server" \
+			"2" "换源" \
+			"3" "咕咕咕" \
+			"0" "退出" 3>&1 1>&2 2>&3
+	)
+	case $Linux_menu in
+	1)
+		if [ ! -d ${HOME}/.gancm/MCserver ]; then
+			mkdir ${HOME}/.gancm/MCserver
+		fi
+		MC_Server=$(
+			whiptail --title "选择功能" --menu "termux按自己需求来" 15 60 4 \
+				"1" "安装MC SERVER" \
+				"2" "启动MC SERVER" \
+				"3" "删除MC SERVER" \
+				"4" "安装java" \
+				"0" "退出" 3>&1 1>&2 2>&3
+		)
+		case $MC_Server in
+		1)
+			install_MC_SERVER_MENU
+			;;
+		2)
+			start_MC_SERVER
+			;;
+		3)
+			rm_MC_SERVER
+			;;
+		4)
+			download_JAVA
+			;;
+		*)
+			echo -e "${RED}quit$RES"
+			;;
+		esac
+		;;
+	2)
+		echo -e "咕咕咕"
+		;;
+	*)
+		echo -e "待添加_Linux_menu"
+		;;
+	esac
+	;;
+esac

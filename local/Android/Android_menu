@@ -1,0 +1,78 @@
+if source $HOME/.gancm/local/Android/Android_function; then
+	echo -e "${SUSSEC}加载安卓功能成功"
+else
+	echo -e "${WORRY}加载安卓功能失败"
+fi
+if [ ! -d ${HOME}/.gancm/proot ]; then
+	mkdir ${HOME}/.gancm/proot
+fi
+case $1 in
+install)
+	case $2 in
+	proot)
+		install_proot
+		;;
+	*)
+		echo -e "\n$WORRY请输入完整命令\ninstall proot"
+		;;
+	esac
+
+	;;
+start)
+	case $2 in
+	proot)
+		start_proot
+		;;
+	*)
+		echo -e "\n$WORRY请输入完整命令\nstart proot"
+		;;
+	esac
+
+	;;
+*)
+	Android_menu=$(
+		whiptail --title "选择功能" --menu "termux按自己需求来" 15 60 4 \
+			"1" "管理proot容器" \
+			"2" "换源" \
+			"3" "垃圾清理" \
+			"4" "待添加" \
+			"0" "退出" 3>&1 1>&2 2>&3
+	)
+	case $Android_menu in
+	1)
+		self_install proot pkg
+		# 必要安装 proot功能实现的基础
+		open_proot=$(
+			whiptail --title "选择功能" --menu "termux按自己需求来" 15 60 4 \
+				"1" "安装proot容器" \
+				"2" "启动proot容器" \
+				"3" "删除proot容器" \
+				"0" "退出" 3>&1 1>&2 2>&3
+		)
+		case $open_proot in
+		1)
+			install_proot
+			;;
+		2)
+			start_proot
+			;;
+		3)
+			rm_proot
+			;;
+		*)
+			echo -e "${RED}quit$RES"
+			;;
+		esac
+		;;
+	2)
+		Change_the_source
+		;;
+	3)
+	    garbage_collection
+		;;
+	*)
+		echo -e "待添加_Android_menu"
+		;;
+	esac
+	;;
+esac

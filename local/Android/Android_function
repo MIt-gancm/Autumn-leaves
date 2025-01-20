@@ -1,0 +1,330 @@
+open_debian_os_list() {
+		debian_os_list=$(
+		whiptail --title "选择功能" --menu "debian容器按自己需求来" 15 60 6 \
+			"1" "Bookworm（Debian 12）" \
+			"2" "Bullseye（Debian 11）" \
+			"3" "Buster（Debian 10）" \
+			"0" "退出" 3>&1 1>&2 2>&3
+	)
+		case ${debian_os_list} in
+	1)
+		os_name=Bookworm_Debian_12
+		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/debian/bookworm/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2p')
+		Download_proot_url=${Proot_os_download_source}/debian/bookworm/${archurl}/default/${Download_proot_NAME}/rootfs.tar.xz
+		;;
+	2)
+		os_name=Bullseye_Debian_11
+		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/debian/bullseye/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2p')
+		Download_proot_url=${Proot_os_download_source}/debian/bullseye/${archurl}/default/${Download_proot_NAME}/rootfs.tar.xz
+		;;
+	3)
+		os_name=Buster_Debian_10
+		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/debian/buster/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2p')
+		Download_proot_url=${Proot_os_download_source}/debian/buster/${archurl}/default/${Download_proot_NAME}/rootfs.tar.xz
+		;;
+	*)
+		exit 1
+		;;
+	esac  
+}
+
+open_ubuntu_os_list() {
+		ubuntu_os_list=$(
+		whiptail --title "选择功能" --menu "ubuntu容器按自己需求来" 15 60 6 \
+			"1" "Focal（20.04 LTS）" \
+			"2" "Jammy（22.04 LTS）" \
+			"3" "Noble（24.04 LTS）" \
+			"4" "Oracular（24.10）" \
+			"0" "退出" 3>&1 1>&2 2>&3
+	)
+		case ${ubuntu_os_list} in
+	1)
+		os_name=Focal_Ubuntu_20.04
+		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/ubuntu/focal/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2p')
+		Download_proot_url=${Proot_os_download_source}/ubuntu/focal/${archurl}/default/${Download_proot_NAME}/rootfs.tar.xz
+		;;
+	2)
+		os_name=Jammy_Ubuntu_22.04
+		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/ubuntu/jammy/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2p')
+		Download_proot_url=${Proot_os_download_source}/ubuntu/jammy/${archurl}/default/${Download_proot_NAME}/rootfs.tar.xz
+		;;
+	3)
+		os_name=Noble_Ubuntu_24.04
+		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/ubuntu/noble/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2p')
+		Download_proot_url=${Proot_os_download_source}/ubuntu/noble/${archurl}/default/${Download_proot_NAME}/rootfs.tar.xz
+		;;
+	4)
+		os_name=Oracular_Ubuntu_24.10
+		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/ubuntu/oraculary/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2p')
+		Download_proot_url=${Proot_os_download_source}/ubuntu/oracular/${archurl}/default/${Download_proot_NAME}/rootfs.tar.xz
+		;;
+	*)
+		exit 1
+		;;
+	esac  
+}
+
+install_proot() {
+case "$(uname -m)" in
+	aarch64)
+		archurl="arm64" 
+		;;
+	armv7l)
+		archurl="armhf" 
+		;;
+	x86_64)
+		archurl="amd64" 
+		;;
+	*)
+		echo -e "${ERROR}未知框架"; 
+		exit  
+		;;
+esac
+	if [ ! -d "${HOME}/.termux" ]; then
+		mkdir -p "${HOME}/.termux"
+	fi
+	if [ ! -d "${HOME}/.termux/gancm" ]; then	
+		mkdir -p "${HOME}/.termux/gancm"
+	fi
+	if [ ! -d "${HOME}/.termux/gancm/proot" ]; then			
+		mkdir -p "${HOME}/.termux/gancm/proot"
+	fi
+
+	Proot_os_download_source="https://sgp1lxdmirror01.do.letsbuildthe.cloud/images"
+	open_proot_os_list=$(
+		whiptail --title "选择功能" --menu "proot容器按自己需求来" 15 60 7 \
+			"1" "debian" \
+			"2" "ubuntu" \
+			"0" "退出" 3>&1 1>&2 2>&3
+	)
+	case ${open_proot_os_list} in
+	1)
+		open_debian_os_list
+		;;
+	2)
+		open_ubuntu_os_list
+		;;
+	*)
+		exit 1
+		;;
+	esac
+
+	if [ -f ${HOME}/.gancm/download/${os_name}.tar.xz ]; then
+		if [ $(du -b ${HOME}/.gancm/download/${os_name}.tar.xz | cut -f1) -lt 10485760 ]; then
+			echo -e "${WORRY}${RED}${HOME}/.gancm/download/${os_name}.tar.xz${RES}可能已经损坏"
+			if wget -q --show-progress "${Download_proot_url}" -O ${HOME}/.gancm/download/${os_name}.tar.xz; then
+				echo -e "${INFO}文件存储在${RED}${HOME}/.gancm/download/${os_name}.tar.xz${RES}"
+				echo -e "${INFO}您可以使用${RED}rm -rfv ${HOME}/.gancm/download/${os_name}.tar.xz${RES}来节省存储空间"
+			else
+				echo -e "${WORRY}请检查网络访问问题${RES}"
+				exit
+			fi
+		else
+			echo -e "${INFO}${RED}${HOME}/.gancm/download/${os_name}.tar.xz${RES}已存在 即将直接使用"
+		fi
+	else
+		if wget -q --show-progress "${Download_proot_url}" -O ${HOME}/.gancm/download/${os_name}.tar.xz; then
+			echo -e "${INFO}文件存储在${RED}${HOME}/.gancm/download/${os_name}.tar.xz${RES}"
+			echo -e "${INFO}您可以使用${RED}rm -rfv ${HOME}/.gancm/download/${os_name}.tar.xz${RES}来节省存储空间"
+		else
+			echo -e "${WORRY}请检查网络访问问题${RES}"
+			exit
+		fi
+	fi
+	unset LD_PRELOAD
+	if [ ! -d ${HOME}/.termux/gancm/proot/${os_name} ]; then
+	    mkdir ${HOME}/.termux/gancm/proot/${os_name}
+	fi
+	proot --link2symlink tar -xJf ${HOME}/.gancm/download/${os_name}.tar.xz -C ${HOME}/.termux/gancm/proot/${os_name}/ --exclude='dev' || :
+	echo -e "${GREEN}复制脚本到容器${RES}"
+	mkdir ${HOME}/.termux/gancm/proot/${os_name}/root/.gancm
+	cp -r ${HOME}/.gancm/config ${HOME}/.termux/gancm/proot/${os_name}/root/.gancm
+	cp -r ${HOME}/.gancm/function ${HOME}/.termux/gancm/proot/${os_name}/root/.gancm
+	cp -r ${HOME}/.gancm/local ${HOME}/.termux/gancm/proot/${os_name}/root/.gancm
+	cp ${HOME}/.gancm/gancm.sh ${HOME}/.termux/gancm/proot/${os_name}/root/.gancm
+	cp ${HOME}/.gancm/git_push.sh ${HOME}/.termux/gancm/proot/${os_name}/root/.gancm
+	cp ${HOME}/.gancm/install.sh ${HOME}/.termux/gancm/proot/${os_name}/root/.gancm
+	echo -e "${GREEN}复制优化脚本到容器${RES}"
+	cp ${HOME}/.gancm/function/proot_proc/.* ${HOME}/.termux/gancm/proot/${os_name}/proc/
+	cp ${HOME}/.gancm/function/proot_optimization ${HOME}/.termux/gancm/proot/${os_name}/root/优化.sh
+	proot \
+		--link2symlink -0 \
+		--rootfs=${HOME}/.termux/gancm/proot/${os_name}/ \
+		--bind=/dev \
+		--bind=/sys \
+		--bind=/proc \
+		--bind="${HOME}/.termux/gancm/proot/${os_name}/proc/.loadavg:/proc/loadavg" \
+		--bind="${HOME}/.termux/gancm/proot/${os_name}/proc/.version:/proc/version" \
+		--bind="${HOME}/.termux/gancm/proot/${os_name}/proc/.uptime:/proc/uptime" \
+		--bind="${HOME}/.termux/gancm/proot/${os_name}/proc/.stat:/proc/stat" \
+		--kernel-release="5.15.0" \
+		-w /root /usr/bin/env \
+		-i HOME=/root \
+		PATH=/usr/local/sbin:/usr/local/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/games:/usr/local/games \
+		TERM=xterm-256color \
+		LANG=zh_CN.UTF-8 \
+		/bin/bash 优化.sh
+}
+start_proot() {
+	list_dir ${HOME}/.termux/gancm/proot 
+	case $user_choice in
+	0)
+		echo -e "${RED}quit${RES}"
+		;;
+	*)
+		if [ ! $? = 0 ]; then
+			exit
+		fi
+		os_name=${list_items[$((user_choice-1))]}
+		unset LD_PRELOAD
+		proot \
+			--link2symlink -0 \
+			--rootfs=${HOME}/.termux/gancm/proot/${os_name}/ \
+			--bind=/dev \
+			--bind=/sys \
+			--bind=/proc \
+			--bind="${HOME}/.termux/gancm/proot/${os_name}/proc/.loadavg:/proc/loadavg" \
+			--bind="${HOME}/.termux/gancm/proot/${os_name}/proc/.version:/proc/version" \
+			--bind="${HOME}/.termux/gancm/proot/${os_name}/proc/.uptime:/proc/uptime" \
+			--bind="${HOME}/.termux/gancm/proot/${os_name}/proc/.stat:/proc/stat" \
+			--kernel-release="5.15.0" \
+			-w /root /usr/bin/env \
+			-i HOME=/root \
+			PATH=/usr/local/sbin:/usr/local/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/games:/usr/local/games \
+			TERM=xterm-256color \
+			LANG=zh_CN.UTF-8 \
+			/bin/bash --login
+		;;
+	esac
+}
+rm_proot() {
+	list_dir ${HOME}/.termux/gancm/proot
+	case $user_choice in
+	0)
+		echo -e "${RED}quit${RES}"
+		;;
+	*)
+		if [ ! $? = 0 ]; then
+			exit
+		fi
+		os_name=${list_items[$((user_choice-1))]}
+		num1=$((RANDOM % 100))
+		num2=$((RANDOM % 100))
+		# 读取用户输入
+		read -p "${num1}+${num2}=?" user_sum
+		# 计算正确的和
+		correct_sum=$(($num1 + $num2))
+		# 检查用户输入是否正确
+		if [ $user_sum -eq $correct_sum ]; then
+			echo -e "删除开始正确！你输入的和是正确的。"
+			rm -rfv "${HOME}/.termux/gancm/proot/${os_name}/"
+			# 在这里添加你想要执行的命令
+		else
+			echo -e "错误！你输入的和不正确。删除程序将不执行。"
+		fi
+		;;
+	esac
+}
+Change_the_source() {
+	# 定义要下载的文件的URL数组
+	URLS=(
+	"https://mirrors.tuna.tsinghua.edu.cn" 
+	"https://mirrors.aliyun.com"
+	)
+
+	echo "测速取决于网速，一般持续5-8分钟"
+
+	# 用于存储每个文件的下载速度
+	declare -A SPEEDS
+
+	# 循环遍历所有URL
+	for URL in "${URLS[@]}"; do
+	# 开始时间
+	STARTTIME=$(date +%s)
+	
+	# 使用wget下载文件，这里使用随机生成的文件名以避免覆盖
+	FILENAME="download_$(date +%s).zip"
+	TEMPDIR=".gancm/TEM" # 确保目录存在
+	mkdir -p "$TEMPDIR"
+	
+	# 执行wget下载并检查是否成功
+	if wget -q --show-progress "$URL/ubuntu/ls-lR.gz" -O "$TEMPDIR/$FILENAME"; then
+		# 结束时间
+		ENDTIME=$(date +%s)
+		
+		# 计算时间差
+		DELTATIME=$((ENDTIME - STARTTIME))
+		
+		# 获取文件大小
+		FILESIZE=$(du -b "$TEMPDIR/$FILENAME" | cut -f1)
+		
+		# 计算下载速度
+		SPEED=$(echo "scale=2; $FILESIZE / $DELTATIME" | bc -l)
+		
+		# 存储速度
+		SPEEDS[$URL]=$SPEED
+		
+		# 输出结果
+		echo "URL: $URL"
+		echo "下载时间: $DELTATIME 秒"
+		echo "文件大小: $FILESIZE 字节"
+		echo "下载速度: $SPEED 字节/秒"
+		echo "---------------------------------------"
+		
+		# 清理下载的文件
+		rm "$TEMPDIR/$FILENAME"
+	else
+		echo "下载失败: $URL"
+	fi
+	done
+
+	# 打印所有下载速度的比较
+	echo "所有源的下载速度比较："
+	for URL in "${URLS[@]}"; do
+	if [ -n "${SPEEDS[$URL]}" ]; then
+		echo "$URL: ${SPEEDS[$URL]} 字节/秒"
+	fi
+	done
+
+	# 找出最快的下载速度
+	FASTEST_URL=""
+	FASTEST_SPEED=0
+	for URL in "${URLS[@]}"; do
+	if [ -n "${SPEEDS[$URL]}" ] && [ $(echo "${SPEEDS[$URL]} > $FASTEST_SPEED" | bc -l) -eq 1 ]; then
+		FASTEST_URL=$URL
+		FASTEST_SPEED=${SPEEDS[$URL]}
+	fi
+	done
+
+	if [ -n "$FASTEST_URL" ]; then
+	echo "最快的下载源是：$FASTEST_URL"
+	echo "最快的下载速度是：$FASTEST_SPEED 字节/秒"
+	else
+	echo "没有成功的下载速度可以比较。"
+	fi
+
+	read -p "是否更换下载源和最快下载路线为: ${FASTEST_URL} [Y/n]:" user_input
+
+	case ${user_input} in
+	YES| Yes | Y | y)
+		sed -i "s@^\(deb.*stable main\)$@#\1\ndeb ${FASTEST_URL}/termux/apt/termux-main stable main@" $PREFIX/etc/apt/sources.list
+		apt update && apt upgrade
+		source ${HOME}/.gancm/config/config.sh
+		hcjx
+		;;
+	*)
+		hcjx
+		;;
+	esac
+}
+garbage_collection() {
+	ls -la ${HOME}/.gancm/download
+	read -p "是否删除这些文件？[Y/n]: " delete_files
+	if [[ $delete_files =~ ^[Yy]$ ]]; then
+	    rm -rf ${HOME}/dowload/*
+	    echo -e "${SUSSEC}所有文件已删除。"
+	else
+	    echo -e "${INFO}文件未删除。"
+	fi
+
+}

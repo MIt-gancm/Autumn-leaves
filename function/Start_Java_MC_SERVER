@@ -1,0 +1,75 @@
+#!/bin/bash
+RED='\e[1;31m'    # 红 ${RED}
+GREEN='\e[1;32m'  # 绿 ${GREEN}
+YELLOW='\e[1;33m' # 黄 ${YELLOW}
+BLUE='\e[1;34m'   # 蓝 ${BLUE}
+PINK='\e[1;35m'   # 粉红 ${PINK}
+RES='\e[0m'       # 清除颜色 ${RES}
+##字体颜色
+ERROR="[${RED}错误${RES}]:" # ${ERROR}
+WORRY="[${YELLOW}警告${RES}]:" # ${WORRY 
+SUSSEC="[${GREEN}成功${RES}]:" # ${SUSSEC}
+INFO="[${BLUE}信息${RES}]:" # ${INFO}
+
+Core_version="$1"
+Game_version="$2"
+# 尝试执行ls命令
+result=$(ls /usr/lib/jvm/*/bin/java)
+
+# 检查命令执行结果是否为空
+if [ -z "$result" ]; then
+    echo -e "${ERROR}请先安装java启动"
+    exit
+else
+    cd ${HOME}/.gancm/MCserver/${Core_version}/${Game_version}
+    if [ "$Core_version" = "Forge" ] && [ ! -f "forge_server_yes.txt" ]; then
+        echo -e "${INFO}Forge核心执行额外安装步骤"
+        if java -jar ${HOME}/.gancm/MCserver/${Core_version}/${Game_version}/${Core_version}_${Game_version}_server.jar nogui --installServer ; then
+            rm -rfv ${HOME}/.gancm/MCserver/${Core_version}/${Game_version}/${Core_version}_${Game_version}_server.jar
+            echo -e  "{INFO}forge安装服务器成功 转换脚本可识别的目录"
+            echo -e  "{INFO}forge安装服务器成功" > forge_server_yes.txt
+        fi
+        rm -rfv ${HOME}/.gancm/MCserver/${Core_version}/${Game_version}/run.sh
+        mv $(ls ${HOME}/.gancm/MCserver/${Core_version}/${Game_version}/*.jar) ${HOME}/.gancm/MCserver/${Core_version}/${Game_version}/${Core_version}_${Game_version}_server.jar
+    fi  
+
+
+    # 显示菜单
+    echo "欢迎使用Java程序启动菜单"
+    echo "请输入选项："
+    echo "1. 配置Java程序"
+    echo "2. 退出"
+
+    # 读取用户输入
+    read -p "请输入选项（1-2）：" option
+
+    # 根据用户输入执行相应操作
+    case $option in
+        1)
+            # 提示用户输入Java程序的jar文件路径
+            read -p "请输入jar文件路径 已安装的有: 
+    $(ls /usr/lib/jvm/*/bin/java) :"
+            
+            # 提示用户输入Java程序的最小内存
+            read -p "请输入Java程序的最小内存（例如：512m,2G）：" min_memory
+            
+            # 提示用户输入Java程序的最大内存
+            read -p "请输入Java程序的最大内存（例如：1024m,2G）：" max_memory
+            
+            # 合成并执行java -jar命令
+            echo -e "
+            cd ${HOME}/.gancm/MCserver/${Core_version}/${Game_version}/
+            echo -e "eula=true" > ${HOME}/.gancm/MCserver/${Core_version}/${Game_version}/eula.txt
+            java -Xms"$min_memory" -Xmx"$max_memory" -jar "${HOME}/.gancm/MCserver/${Core_version}/${Game_version}/${Core_version}_${Game_version}_server.jar" 
+            
+            " > ${HOME}/.gancm/MCserver/${Core_version}/${Game_version}/start.sh
+            ;;
+        2)
+            echo "${INFO}退出程序"
+            exit 0
+            ;;
+        *)
+            echo -e "${ERROR}无效的选项，请重新运行脚本并选择1或2。"
+            ;;
+    esac
+fi
