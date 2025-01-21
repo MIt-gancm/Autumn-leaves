@@ -21,7 +21,7 @@ else
 fi
 case $1 in
 download_JAVA|dj)
-	install_java
+install_java
 ;;
 install_MC_SERVER|imcs)
 install_MC_SERVER_MENU
@@ -46,7 +46,7 @@ rm_MC_SERVER
 			mkdir ${HOME}/.gancm/MCserver
 		fi
 		MC_Server=$(
-			whiptail --title "选择功能" --menu "termux按自己需求来" 15 60 4 \
+			whiptail --title "选择功能" --menu "termux按自己需求来" 15 60 6 \
 				"1" "安装MC SERVER" \
 				"2" "启动MC SERVER" \
 				"3" "删除MC SERVER" \

@@ -89,16 +89,18 @@ validity_git() {
 		)
 		case ${wheregit} in
 		1)
-			Modify_the_variable git github.com ${HOME}/.gancm/config/config.sh
+			Modify_the_variable git "http:\/\/github.com\/" ${HOME}/.gancm/config/config.sh
+			Modify_the_variable rawgit "https:\/\/raw.githubusercontent.com\/MIt-gancm\/Autumn-leaves\/refs\/heads\/main\/" ${HOME}/.gancm/config/config.sh
 			return 0
 			;;
 		2)
-			Modify_the_variable git gitee.com ${HOME}/.gancm/config/config.sh
+			Modify_the_variable git "http:\/\/gitee.com\/" ${HOME}/.gancm/config/config.sh
+			Modify_the_variable rawgit "https:\/\/gitee.com\/MIt-gancm\/Autumn-leaves\/raw\/main\/" ${HOME}/.gancm/config/config.sh
 			return 0
 			;;
 		0)
 			echo -e " 未选择默认修改为 ${YELLOW}Github${RES} "
-			Modify_the_variable git github.com ${HOME}/.gancm/config/config.sh
+			Modify_the_variable rawgit "https:\/\/raw.githubusercontent.com\/MIt-gancm\/Autumn-leaves\/refs\/heads\/main\/" ${HOME}/.gancm/config/config.sh
 			return 0
 			;;
 		esac
@@ -114,8 +116,11 @@ validity_dir() {
 	if [ ! -d ${HOME}/.gancm/config ]; then
 		mkdir ${HOME}/.gancm/config
 	fi
-	if [ ! -d ${HOME}/.gancm/TEM ]; then
-		mkdir ${HOME}/.gancm/TEM
+	if [ ! -d ${HOME}/.back ]; then
+		mkdir ${HOME}/.back
+	fi
+	if [ ! -d ${HOME}/.TEMP ]; then
+		mkdir ${HOME}/.TEMP
 	fi
 }
 validity() {
@@ -156,6 +161,7 @@ apt_up() {
 		if [ $five_days_seconds -le $time_difference  ]; then
             apt update -y & apt upgrade -y
 			Modify_the_variable last_time_aptup ${current_timestamp} ${HOME}/.gancm/config/config.sh
+			bash ${HOME}/.gancm/function/update.sh
         fi
 	fi
 }

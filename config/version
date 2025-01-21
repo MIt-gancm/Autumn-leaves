@@ -1,0 +1,11 @@
+{
+    "version": "1.0.0",
+    "git_clone": "MIt-gancm/Autumn-leaves",
+    "description": "添加更新逻辑 日志记录 并用猫猫暖了一下脚脚qwq",
+    "mandatory": true,
+    "repair": [
+        "rm -rfv ${HOME}/.gancm/config/config.sh",
+        "echo 修复完成"
+    ],
+    "release_date": "2025-1-21"
+}

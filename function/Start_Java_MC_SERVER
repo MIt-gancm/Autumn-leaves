@@ -26,8 +26,8 @@ else
         echo -e "${INFO}Forge核心执行额外安装步骤"
         if java -jar ${HOME}/.gancm/MCserver/${Core_version}/${Game_version}/${Core_version}_${Game_version}_server.jar nogui --installServer ; then
             rm -rfv ${HOME}/.gancm/MCserver/${Core_version}/${Game_version}/${Core_version}_${Game_version}_server.jar
-            echo -e  "{INFO}forge安装服务器成功 转换脚本可识别的目录"
-            echo -e  "{INFO}forge安装服务器成功" > forge_server_yes.txt
+            echo -e  "${INFO}forge安装服务器成功 转换脚本可识别的文件"
+            echo -e  "${INFO}forge安装服务器成功" > forge_server_yes.txt
         fi
         rm -rfv ${HOME}/.gancm/MCserver/${Core_version}/${Game_version}/run.sh
         mv $(ls ${HOME}/.gancm/MCserver/${Core_version}/${Game_version}/*.jar) ${HOME}/.gancm/MCserver/${Core_version}/${Game_version}/${Core_version}_${Game_version}_server.jar
@@ -48,7 +48,7 @@ else
         1)
             # 提示用户输入Java程序的jar文件路径
             read -p "请输入jar文件路径 已安装的有: 
-    $(ls /usr/lib/jvm/*/bin/java) :"
+$(ls /usr/lib/jvm/*/bin/java) :"
             
             # 提示用户输入Java程序的最小内存
             read -p "请输入Java程序的最小内存（例如：512m,2G）：" min_memory
