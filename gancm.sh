@@ -46,6 +46,41 @@ esac
 variable() {
 	source ${HOME}/.gancm/config/config.sh
 }
+#!/bin/bash
+log(){
+	#log文件名
+	local fileName="${HOME}/.gancm/log.log"
+	#log文件最大存储log行数（此处设置最大存储log行数是100行）
+	local fileMaxLen=1000
+	#超过log最大存储行数后需要从顶部开始删除的行数（此处设置的是删除第1到第10行的数据）
+	local fileDeleteLen=10
+	if test $fileName
+	then
+		#记录log
+		echo "[`date +%y/%m/%d-%H:%M:%S`]:$*" >> $fileName
+		#获取log文件实际行数
+		loglen=`grep -c "" $fileName`
+		
+		if [ $loglen -gt $fileMaxLen ]
+		then
+			#从顶部开始删除对应行数的log
+			sed -i '1,'$fileDeleteLen'd' $fileName
+		fi
+	else
+		echo "[`date +%y/%m/%d-%H:%M:%S`]:$*" > $fileName
+	fi
+}
+
+# testdate=100
+# #记录输出的字符串
+# log "test string"
+# #记录输出的数据
+# log "testdate=$testdate"
+# #记录输出的运算
+# log $[1+2]
+# #记录命令输出的信息
+# log $(printf "this is cmd test %s\n" "this is cmd output string")
+
 self_install() {
 	case ${2} in
 	pip)
@@ -168,7 +203,8 @@ apt_up() {
 #函数
 
 #变量
-
+# rm -rf ${HOME}/.gancm/log.log
+# log "删除上次启动时的日志文件"
 case ${1} in
 -h | --help)
 	echo -e "
@@ -190,29 +226,34 @@ case ${1} in
 -s | --start)
 	case $2 in
 		Android|A)
+		log "指定加载安卓功能"
 		source ${HOME}/.gancm/local/Android/Android_menu $3 $4 $5
 		;;
 		Linux|L)
+		log "指定加载Linux功能"
 		source ${HOME}/.gancm/local/Linux/Linux_menu $3 $4 $5
 		;;
 	esac
 ;;
 *)
 	apt_up
+	log "初始化完成"
 	case $(uname -o) in
 	Android)
+		log "加载安卓功能"
 		self_install jq pkg
 		self_install git apt
 		self_install wget pkg
 		self_install whiptail pkg
 		self_install bc pkg
-		validityself_install git apt
+		validity
 		variable 
 		source ${HOME}/.gancm/local/Android/Android_menu $1 $2 $3
 		;;
 	*)
+		log "加载Linux功能"
 		self_install jq apt
-		
+		self_install git apt
 		self_install wget apt
 		self_install whiptail apt
 		self_install bc apt

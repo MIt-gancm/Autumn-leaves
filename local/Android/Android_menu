@@ -9,8 +9,10 @@
 # """
 if source $HOME/.gancm/local/Android/Android_function; then
 	echo -e "${SUSSEC}加载安卓功能成功"
+	log "加载安卓功能成功"
 else
 	echo -e "${WORRY}加载安卓功能失败"
+	log "加载安卓功能失败"
 fi
 if [ ! -d ${HOME}/.gancm/proot ]; then
 	mkdir ${HOME}/.gancm/proot
@@ -19,6 +21,7 @@ case $1 in
 install)
 	case $2 in
 	proot)
+	log "安装proot容器"
 		install_proot
 		;;
 	*)
@@ -30,6 +33,7 @@ install)
 start)
 	case $2 in
 	proot)
+		log "启动proot容器"
 		start_proot
 		;;
 	*)
@@ -49,6 +53,7 @@ start)
 	)
 	case $Android_menu in
 	1)
+		log "管理proot容器"
 		self_install proot pkg
 		# 必要安装 proot功能实现的基础
 		open_proot=$(
@@ -60,23 +65,29 @@ start)
 		)
 		case $open_proot in
 		1)
+			log "安装proot容器"
 			install_proot
 			;;
 		2)
+			log "启动proot容器"
 			start_proot
 			;;
 		3)
+			log "删除proot容器"
 			rm_proot
 			;;
 		*)
+			log "退出"
 			echo -e "${RED}quit$RES"
 			;;
 		esac
 		;;
 	2)
+		log "换源"
 		Change_the_source
 		;;
 	3)
+		log "垃圾清理"
 	    garbage_collection
 		;;
 	*)

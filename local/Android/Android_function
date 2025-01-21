@@ -112,34 +112,46 @@ esac
 	case ${open_proot_os_list} in
 	1)
 		open_debian_os_list
+		log “debian系列“
 		;;
 	2)
 		open_ubuntu_os_list
+		log “安装ubuntu系列“
 		;;
 	*)
+		log “未选择退出“
 		exit 1
 		;;
 	esac
-
+	log "os_name: ${os_name}"
+	log "Download_proot_NAME: ${Download_proot_NAME}"
+	log "Download_proot_url: ${Download_proot_url}"
 	if [ -f ${HOME}/.gancm/download/${os_name}.tar.xz ]; then
 		if [ $(du -b ${HOME}/.gancm/download/${os_name}.tar.xz | cut -f1) -lt 10485760 ]; then
 			echo -e "${WORRY}${RED}${HOME}/.gancm/download/${os_name}.tar.xz${RES}可能已经损坏"
+			log "文件存储在:/.gancm/download/${os_name}.tar.xz  但已损坏"
 			if wget -q --show-progress "${Download_proot_url}" -O ${HOME}/.gancm/download/${os_name}.tar.xz; then
 				echo -e "${INFO}文件存储在${RED}${HOME}/.gancm/download/${os_name}.tar.xz${RES}"
 				echo -e "${INFO}您可以使用${RED}rm -rfv ${HOME}/.gancm/download/${os_name}.tar.xz${RES}来节省存储空间"
+				log "重下文件/.gancm/download/${os_name}.tar.xz成功"
 			else
 				echo -e "${WORRY}请检查网络访问问题${RES}"
+				log "重下文件/.gancm/download/${os_name}.tar.xz失败"
 				exit
 			fi
 		else
 			echo -e "${INFO}${RED}${HOME}/.gancm/download/${os_name}.tar.xz${RES}已存在 即将直接使用"
+			log "文件存储在/.gancm/download/${os_name}.tar.xz 已存在直接使用"
 		fi
 	else
 		if wget -q --show-progress "${Download_proot_url}" -O ${HOME}/.gancm/download/${os_name}.tar.xz; then
 			echo -e "${INFO}文件存储在${RED}${HOME}/.gancm/download/${os_name}.tar.xz${RES}"
+			log "下载/.gancm/download/${os_name}.tar.xz 成功"
 			echo -e "${INFO}您可以使用${RED}rm -rfv ${HOME}/.gancm/download/${os_name}.tar.xz${RES}来节省存储空间"
+			log "文件存储在:${HOME}/.gancm/download/${os_name}.tar.xz"
 		else
 			echo -e "${WORRY}请检查网络访问问题${RES}"
+			log "下载/.gancm/download/${os_name}.tar.xz 失败"
 			exit
 		fi
 	fi
@@ -147,8 +159,10 @@ esac
 	if [ ! -d ${HOME}/.termux/gancm/proot/${os_name} ]; then
 	    mkdir ${HOME}/.termux/gancm/proot/${os_name}
 	fi
+	log "解压\"${HOME}/.gancm/download/${os_name}.tar.xz\""
 	proot --link2symlink tar -xJf ${HOME}/.gancm/download/${os_name}.tar.xz -C ${HOME}/.termux/gancm/proot/${os_name}/ --exclude='dev' || :
 	echo -e "${GREEN}复制脚本到容器${RES}"
+	log "复制脚本到容器"
 	mkdir ${HOME}/.termux/gancm/proot/${os_name}/root/.gancm
 	cp -r ${HOME}/.gancm/config ${HOME}/.termux/gancm/proot/${os_name}/root/.gancm
 	cp -r ${HOME}/.gancm/function ${HOME}/.termux/gancm/proot/${os_name}/root/.gancm
@@ -176,18 +190,23 @@ esac
 		TERM=xterm-256color \
 		LANG=zh_CN.UTF-8 \
 		/bin/bash 优化.sh
+		log "优化脚本执行成功"
+		log "退出容器"
+
 }
 start_proot() {
 	list_dir ${HOME}/.termux/gancm/proot 
 	case $user_choice in
 	0)
 		echo -e "${RED}quit${RES}"
+		log "退出"
 		;;
 	*)
 		if [ ! $? = 0 ]; then
 			exit
 		fi
 		os_name=${list_items[$((user_choice-1))]}
+		log "进入容器${os_name}"
 		unset LD_PRELOAD
 		proot \
 			--link2symlink -0 \
@@ -206,6 +225,7 @@ start_proot() {
 			TERM=xterm-256color \
 			LANG=zh_CN.UTF-8 \
 			/bin/bash --login
+		log "退出${os_name}"
 		;;
 	esac
 }
@@ -214,6 +234,7 @@ rm_proot() {
 	case $user_choice in
 	0)
 		echo -e "${RED}quit${RES}"
+		log "退出"
 		;;
 	*)
 		if [ ! $? = 0 ]; then
@@ -222,8 +243,10 @@ rm_proot() {
 		os_name=${list_items[$((user_choice-1))]}
 		num1=$((RANDOM % 100))
 		num2=$((RANDOM % 100))
+		log "num1=$num1 num2=$num2"
 		# 读取用户输入
 		read -p "${num1}+${num2}=?" user_sum
+		log "user_sum=$user_sum"
 		# 计算正确的和
 		correct_sum=$(($num1 + $num2))
 		# 检查用户输入是否正确
@@ -335,8 +358,10 @@ garbage_collection() {
 	if [[ $delete_files =~ ^[Yy]$ ]]; then
 	    rm -rf ${HOME}/dowload/*
 	    echo -e "${SUSSEC}所有文件已删除。"
+		log "所有文件已删除。"
 	else
 	    echo -e "${INFO}文件未删除。"
+		log "文件未删除。"
 	fi
 
 }

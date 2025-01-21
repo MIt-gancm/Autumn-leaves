@@ -55,15 +55,19 @@ rm_MC_SERVER
 		)
 		case $MC_Server in
 		1)
+			log "安装MC SERVER"
 			install_MC_SERVER_MENU
 			;;
 		2)
+		    log "启动MC SERVER"
 			start_MC_SERVER
 			;;
 		3)
+		 log "删除MC SERVER"
 			rm_MC_SERVER
 			;;
 		4)
+		 log "安装java"
 			download_JAVA
 			;;
 		*)
