@@ -28,7 +28,6 @@ fi
 REMOTE_VERSION=$(echo $RESPONSE | jq -r .version)
 GIT_CLONE=$(echo $RESPONSE | jq -r .git_clone)
 DESCRIPTION=$(echo $RESPONSE | jq -r .description)
-MANDATORY=$(echo $RESPONSE | jq -r .mandatory)
 REPAIR_COMMANDS=$(echo $RESPONSE | jq -r '.repair[]')
 RELEASE_DATE=$(echo $RESPONSE | jq -r .release_date)
 
@@ -36,11 +35,10 @@ RELEASE_DATE=$(echo $RESPONSE | jq -r .release_date)
 echo "本地版本: $LOCAL_VERSION"
 echo "云端版本: $REMOTE_VERSION"
 echo "公告: $DESCRIPTION"
-echo "强制更新: $MANDATORY"
 echo "发布日期: $RELEASE_DATE"
 
 # 比较版本
-if [ "$(printf '%s\n' "$REMOTE_VERSION" "$LOCAL_VERSION" | sort -V | head -n1)" != "$LOCAL_VERSION" ]; then
+if [ "$(printf '%s\n' "$REMOTE_VERSION" "$LOCAL_VERSION" | sort -V | tail -n1)" != "$LOCAL_VERSION" ]; then
     echo "发现新版本，准备更新..."
     
     # 执行修复命令

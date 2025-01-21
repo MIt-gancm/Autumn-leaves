@@ -202,15 +202,17 @@ case ${1} in
 	case $(uname -o) in
 	Android)
 		self_install jq pkg
+		self_install git apt
 		self_install wget pkg
 		self_install whiptail pkg
 		self_install bc pkg
-		validity
+		validityself_install git apt
 		variable 
 		source ${HOME}/.gancm/local/Android/Android_menu $1 $2 $3
 		;;
 	*)
 		self_install jq apt
+		
 		self_install wget apt
 		self_install whiptail apt
 		self_install bc apt
