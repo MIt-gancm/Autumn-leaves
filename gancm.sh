@@ -51,7 +51,7 @@ log(){
 	#log文件名
 	local fileName="${HOME}/.gancm/log.log"
 	#log文件最大存储log行数（此处设置最大存储log行数是100行）
-	local fileMaxLen=1000
+	local fileMaxLen=100
 	#超过log最大存储行数后需要从顶部开始删除的行数（此处设置的是删除第1到第10行的数据）
 	local fileDeleteLen=10
 	if test $fileName
@@ -194,17 +194,14 @@ apt_up() {
         # 5天的秒数
         five_days_seconds=$((5 * 24 * 60 * 60))
 		if [ $five_days_seconds -le $time_difference  ]; then
-            apt update -y & apt upgrade -y
+            apt update -y 
+			apt upgrade -y
 			Modify_the_variable last_time_aptup ${current_timestamp} ${HOME}/.gancm/config/config.sh
-			bash ${HOME}/.gancm/function/update.sh
         fi
 	fi
 }
 #函数
 
-#变量
-# rm -rf ${HOME}/.gancm/log.log
-# log "删除上次启动时的日志文件"
 case ${1} in
 -h | --help)
 	echo -e "
@@ -248,6 +245,8 @@ case ${1} in
 		self_install bc pkg
 		validity
 		variable 
+		source ${HOME}/.gancm/function/update.sh
+		log "检查更新"
 		source ${HOME}/.gancm/local/Android/Android_menu $1 $2 $3
 		;;
 	*)
@@ -259,6 +258,8 @@ case ${1} in
 		self_install bc apt
 		validity
 		variable 
+		source ${HOME}/.gancm/function/update.sh
+		log "检查更新"
 		source ${HOME}/.gancm/local/Linux/Linux_menu $1 $2 $3
 		;;
 	esac

@@ -1,4 +1,3 @@
-source ${HOME}/.gancm/config/config.sh
 # 设置变量
 A_DIR="${HOME}/.gancm"                   # A分区路径
 B_DIR="${HOME}/.back"                   # B分区路径
@@ -17,6 +16,7 @@ fi
 # 获取最新的云端版本信息
 echo "正在获取最新版本信息..."
 RESPONSE=$(curl -s $REMOTE_URL)
+log "更新源信息:$RESPONSE"
 
 # 检查curl命令是否成功
 if [ $? -ne 0 ]; then
@@ -31,14 +31,19 @@ DESCRIPTION=$(echo $RESPONSE | jq -r .description)
 REPAIR_COMMANDS=$(echo $RESPONSE | jq -r '.repair[]')
 RELEASE_DATE=$(echo $RESPONSE | jq -r .release_date)
 
-# 输出获取的信息
-echo "本地版本: $LOCAL_VERSION"
-echo "云端版本: $REMOTE_VERSION"
-echo "公告: $DESCRIPTION"
-echo "发布日期: $RELEASE_DATE"
+    log "本地版本: $LOCAL_VERSION"
+    log "云端版本: $REMOTE_VERSION"
+    log "公告: $DESCRIPTION"
+    log "发布日期: $RELEASE_DATE"
 
 # 比较版本
 if [ "$(printf '%s\n' "$REMOTE_VERSION" "$LOCAL_VERSION" | sort -V | tail -n1)" != "$LOCAL_VERSION" ]; then
+    # 输出获取的信息
+    echo "本地版本: $LOCAL_VERSION"
+    echo "云端版本: $REMOTE_VERSION"
+    echo "公告: $DESCRIPTION"
+    echo "发布日期: $RELEASE_DATE"
+
     echo "发现新版本，准备更新..."
     
     # 执行修复命令
