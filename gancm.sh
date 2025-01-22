@@ -25,7 +25,7 @@ RES='\e[0m'       # 清除颜色 ${RES}
 ##字体颜色
 
 ERROR="[${RED}错误${RES}]:" # ${ERROR}
-WORRY="[${YELLOW}警告${RES}]:" # ${WORRY 
+WORRY="[${YELLOW}警告${RES}]:" # ${WORRY} 
 SUSSEC="[${GREEN}成功${RES}]:" # ${SUSSEC}
 INFO="[${BLUE}信息${RES}]:" # ${INFO}
 
