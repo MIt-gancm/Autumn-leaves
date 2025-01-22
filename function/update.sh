@@ -46,7 +46,7 @@ if [ "$(printf '%s\n' "$REMOTE_VERSION" "$LOCAL_VERSION" | sort -V | tail -n1)" 
     echo "发现新版本，准备更新..."
 
     log 进行git克隆
-    echo "${INFO}正在下载更新..."
+    echo -e "${INFO}正在下载更新..."
     git clone ${git}$GIT_CLONE $TEMP_DIR
 
     if [ $? -ne 0 ]; then
