@@ -28,7 +28,6 @@ fi
 REMOTE_VERSION=$(echo $RESPONSE | jq -r .version)
 GIT_CLONE=$(echo $RESPONSE | jq -r .git_clone)
 DESCRIPTION=$(echo $RESPONSE | jq -r .description)
-REPAIR_COMMANDS=$(echo $RESPONSE | jq -r '.repair[]')
 RELEASE_DATE=$(echo $RESPONSE | jq -r .release_date)
 
     log "本地版本: $LOCAL_VERSION"
@@ -45,12 +44,6 @@ if [ "$(printf '%s\n' "$REMOTE_VERSION" "$LOCAL_VERSION" | sort -V | tail -n1)" 
     echo "发布日期: $RELEASE_DATE"
 
     echo "发现新版本，准备更新..."
-    
-    # 执行修复命令
-    echo "执行修复命令..."
-    for cmd in ${REPAIR_COMMANDS}; do
-        eval $cmd
-    done
 
     # 进行git克隆
     echo "正在下载更新..."
@@ -73,8 +66,18 @@ if [ "$(printf '%s\n' "$REMOTE_VERSION" "$LOCAL_VERSION" | sort -V | tail -n1)" 
 
     # 清理临时目录
     rm -rf $TEMP_DIR
+    if [ "${git}" = "http://gitee.com/" ]; then
+        Modify_the_variable git "http:\/\/gitee.com\/" ${HOME}/.gancm/config/config.sh
+	    Modify_the_variable rawgit "https:\/\/raw.giteeusercontent.com\/MIt-gancm\/Autumn-leaves\/raw/main\/" ${HOME}/.gancm/config/config.sh
 
+    elif [ "${git}" = "http://github.com/" ]; then
+        Modify_the_variable git "http:\/\/github.com\/" ${HOME}/.gancm/config/config.sh
+		Modify_the_variable rawgit "https:\/\/raw.githubusercontent.com\/MIt-gancm\/Autumn-leaves\/refs\/heads\/main\/" ${HOME}/.gancm/config/config.sh
+    fi
+    
     echo "更新完成！当前版本: $REMOTE_VERSION"
+    log 更新成功
 else
     echo "本地版本是最新版本，无需更新。"
+    log 已是最新版本
 fi

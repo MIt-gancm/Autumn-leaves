@@ -130,7 +130,7 @@ validity_git() {
 			;;
 		2)
 			Modify_the_variable git "http:\/\/gitee.com\/" ${HOME}/.gancm/config/config.sh
-			Modify_the_variable rawgit "https:\/\/gitee.com\/MIt-gancm\/Autumn-leaves\/raw\/main\/" ${HOME}/.gancm/config/config.sh
+			Modify_the_variable rawgit "https:\/\/raw.giteeusercontent.com\/MIt-gancm\/Autumn-leaves\/raw/main\/" ${HOME}/.gancm/config/config.sh
 			return 0
 			;;
 		0)
