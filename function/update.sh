@@ -58,13 +58,11 @@ if [ "$(printf '%s\n' "$REMOTE_VERSION" "$LOCAL_VERSION" | sort -V | tail -n1)" 
     # 备份当前A分区
     echo -e "${INFO}备份当前A分区..."
     log 创建备份的 tar.gz 压缩包
-    log "BACKUP_FILE="${A_DIR}/backup_$(date +%Y%m%d_%H%M%S)_${$LOCAL_VERSION}_to_${$REMOTE_VERSION}.tar.gz""
-    BACKUP_FILE="${A_DIR}/backup_$(date +%Y%m%d_%H%M%S)_${$LOCAL_VERSION}_to_${$REMOTE_VERSION}.tar.gz"
+    log "BACKUP_FILE=".back/backup_$(date +%Y%m%d_%H%M%S)_${LOCAL_VERSION}_to_${REMOTE_VERSION}.tar.gz""
+    BACKUP_FILE=".back/backup_$(date +%Y%m%d_%H%M%S)_${LOCAL_VERSION}_to_${REMOTE_VERSION}.tar.gz"
     log "正在创建备份的压缩文件: $BACKUP_FILE"
-    if tar -czf "$BACKUP_FILE" -C "$B_DIR" . ; then
-        log "备份成功！"
-        cp -r ${BACKUP_FILE} $B_DIR/
-    else
+    if ! tar -czf "$BACKUP_FILE" -C "$HOME" .gancm ; then
+
         echo -e "${ERROR}备份失败！"
     fi
     
