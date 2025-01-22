@@ -4,7 +4,8 @@ B_DIR="${HOME}/.back"                   # B分区路径
 TEMP_DIR="${HOME}/.TEMP"        # 临时目录
 REMOTE_URL="${rawgit}config/version"
 LOCAL_VERSION_FILE="${HOME}/.gancm/config/version"
-
+log  清理临时目录
+rm -rf $TEMP_DIR
 # 获取本地版本
 if [ -f "$LOCAL_VERSION_FILE" ]; then
     LOCAL_VERSION=$(cat "$LOCAL_VERSION_FILE" | jq -r .version)
@@ -57,6 +58,7 @@ if [ "$(printf '%s\n' "$REMOTE_VERSION" "$LOCAL_VERSION" | sort -V | tail -n1)" 
     # 备份当前A分区
     echo -e "${INFO}备份当前A分区..."
     log 创建备份的 tar.gz 压缩包
+    log "BACKUP_FILE="${A_DIR}/backup_$(date +%Y%m%d_%H%M%S)_${$LOCAL_VERSION}_to_${$REMOTE_VERSION}.tar.gz""
     BACKUP_FILE="${A_DIR}/backup_$(date +%Y%m%d_%H%M%S)_${$LOCAL_VERSION}_to_${$REMOTE_VERSION}.tar.gz"
     log "正在创建备份的压缩文件: $BACKUP_FILE"
     if tar -czf "$BACKUP_FILE" -C "$B_DIR" . ; then
