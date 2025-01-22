@@ -169,7 +169,6 @@ esac
 	cp -r ${HOME}/.gancm/local ${HOME}/.termux/gancm/proot/${os_name}/root/.gancm
 	cp ${HOME}/.gancm/gancm.sh ${HOME}/.termux/gancm/proot/${os_name}/root/.gancm
 	cp ${HOME}/.gancm/git_push.sh ${HOME}/.termux/gancm/proot/${os_name}/root/.gancm
-	cp ${HOME}/.gancm/install.sh ${HOME}/.termux/gancm/proot/${os_name}/root/.gancm
 	echo -e "${GREEN}复制优化脚本到容器${RES}"
 	cp ${HOME}/.gancm/function/proot_proc/.* ${HOME}/.termux/gancm/proot/${os_name}/proc/
 	cp ${HOME}/.gancm/function/proot_optimization ${HOME}/.termux/gancm/proot/${os_name}/root/优化.sh
