@@ -23,7 +23,6 @@ RESPONSE=$(curl -s $REMOTE_URL)
 # 检查curl命令是否成功
 if [ $? -ne 0 ]; then
     echo -e "${WORRY} 无法获取版本信息，请检查网络连接！"
-    exit 1
 fi
 
 # 使用jq解析JSON信息
