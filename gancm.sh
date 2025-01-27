@@ -208,15 +208,15 @@ case ${1} in
 -h | --help\t\t\t\t显示帮助信息
 -s | --start [Android/Linux]\t启动脚本固定版本 [功能]
 
-\t\t\tAndroid:
-\t\t\t\tinstall proot\t\t安装proot工具
-\t\t\t\tstart proot\t\t启动proot服务
+\t\tAndroid:
+\t\t\tinstall proot\t\t安装proot工具
+\t\t\tstart proot\t\t启动proot服务
 
-\t\t\tLinux:
-\t\t\t\tdownload_JAVA|dj\t下载JAVA环境（别名dj）
-\t\t\t\tinstall_MC_SERVER|imcs\t安装MC_SERVER服务（别名imcs）
-\t\t\t\tstart_MC_SERVER|smcs\t启动MC_SERVER服务（别名smcs）
-\t\t\t\trm_MC_SERVER|rmcs\t移除MC_SERVER服务（别名rmcs）
+\t\tLinux:
+\t\t\tdownload_JAVA|dj\t下载JAVA环境（别名dj）
+\t\t\tinstall_MC_SERVER|imcs\t安装MC_SERVER服务（别名imcs）
+\t\t\tstart_MC_SERVER|smcs\t启动MC_SERVER服务（别名smcs）
+\t\t\trm_MC_SERVER|rmcs\t移除MC_SERVER服务（别名rmcs）
 "
 	hcjx
 	;;
