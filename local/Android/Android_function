@@ -67,7 +67,7 @@ open_ubuntu_os_list() {
 		;;
 	4)
 		os_name=Oracular_Ubuntu_24.10
-		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/ubuntu/oraculary/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2p')
+		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/ubuntu/oracular/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2p')
 		Download_proot_url=${Proot_os_download_source}/ubuntu/oracular/${archurl}/default/${Download_proot_NAME}/rootfs.tar.xz
 		;;
 	*)
