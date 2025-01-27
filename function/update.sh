@@ -78,7 +78,7 @@ if [ "$(printf '%s\n' "$REMOTE_VERSION" "$LOCAL_VERSION" | sort -V | tail -n1)" 
     rm -rf $TEMP_DIR
     if [ "${git}" = "http://gitee.com/" ]; then
         Modify_the_variable git "http:\/\/gitee.com\/" ${HOME}/.gancm/config/config.sh
-	    Modify_the_variable rawgit "https:\/\/raw.giteeusercontent.com\/MIt-gancm\/Autumn-leaves\/raw/main\/" ${HOME}/.gancm/config/config.sh
+	    Modify_the_variable rawgit "https:\/\/raw.giteeusercontent.com\/MIt-gancm\/Autumn-leaves\/raw\/main\/" ${HOME}/.gancm/config/config.sh
 
     elif [ "${git}" = "http://github.com/" ]; then
         Modify_the_variable git "http:\/\/github.com\/" ${HOME}/.gancm/config/config.sh
