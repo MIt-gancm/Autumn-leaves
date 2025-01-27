@@ -16,8 +16,9 @@ fi
 
 # 获取最新的云端版本信息
 echo -e "${INFO} 正在获取最新版本信息..."
-RESPONSE=$(curl -s $REMOTE_URL)
 log "更新源信息:$RESPONSE"
+log "更新地址: $REMOTE_URL"
+RESPONSE=$(curl -s $REMOTE_URL)
 
 # 检查curl命令是否成功
 if [ $? -ne 0 ]; then
