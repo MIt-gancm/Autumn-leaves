@@ -14,14 +14,11 @@ else
 	echo -e "${WORRY}加载安卓功能失败"
 	log "加载安卓功能失败"
 fi
-if [ ! -d ${HOME}/.gancm/proot ]; then
-	mkdir ${HOME}/.gancm/proot
-fi
 case $1 in
 install)
 	case $2 in
 	proot)
-	log "安装proot容器"
+		log "安装proot容器"
 		install_proot
 		;;
 	*)
@@ -88,7 +85,7 @@ start)
 		;;
 	3)
 		log "垃圾清理"
-	    garbage_collection
+		garbage_collection
 		;;
 	*)
 		echo -e "待添加_Android_menu"

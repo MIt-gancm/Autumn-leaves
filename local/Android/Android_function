@@ -1,24 +1,24 @@
 # /**
 #  * @file Android_function
 #  * @brief 该文件包含了一系列用于管理Proot容器的Shell脚本函数，主要支持Debian和Ubuntu系统的安装、启动、删除以及下载源更换等功能。
-#  * 
+#  *
 #  * - install_proot: 安装Proot容器，根据用户选择下载并安装指定的Debian或Ubuntu系统版本。
 #  * - start_proot: 启动已安装的Proot容器，允许用户选择并启动特定的容器环境。
 #  * - rm_proot: 删除指定的Proot容器，在删除前会要求用户完成一个简单的数学题以防止误操作。
 #  * - Change_the_source: 测试并更换下载源，通过下载测试文件比较不同源的下载速度，然后询问用户是否更换为最快的下载源。
 #  * - garbage_collection: 清理下载目录中的文件，提供一个选项让用户决定是否删除这些文件以节省空间。
-#  * 
+#  *
 #  * 使用这些脚本函数可以方便地在Termux环境中管理和使用Proot容器。
 #  */
 open_debian_os_list() {
-		debian_os_list=$(
+	debian_os_list=$(
 		whiptail --title "选择功能" --menu "debian容器按自己需求来" 15 60 6 \
 			"1" "Bookworm（Debian 12）" \
 			"2" "Bullseye（Debian 11）" \
 			"3" "Buster（Debian 10）" \
 			"0" "退出" 3>&1 1>&2 2>&3
 	)
-		case ${debian_os_list} in
+	case ${debian_os_list} in
 	1)
 		os_name=Bookworm_Debian_12
 		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/debian/bookworm/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2p')
@@ -37,11 +37,11 @@ open_debian_os_list() {
 	*)
 		exit 1
 		;;
-	esac  
+	esac
 }
 
 open_ubuntu_os_list() {
-		ubuntu_os_list=$(
+	ubuntu_os_list=$(
 		whiptail --title "选择功能" --menu "ubuntu容器按自己需求来" 15 60 6 \
 			"1" "Focal（20.04 LTS）" \
 			"2" "Jammy（22.04 LTS）" \
@@ -49,7 +49,7 @@ open_ubuntu_os_list() {
 			"4" "Oracular（24.10）" \
 			"0" "退出" 3>&1 1>&2 2>&3
 	)
-		case ${ubuntu_os_list} in
+	case ${ubuntu_os_list} in
 	1)
 		os_name=Focal_Ubuntu_20.04
 		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/ubuntu/focal/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2p')
@@ -73,34 +73,26 @@ open_ubuntu_os_list() {
 	*)
 		exit 1
 		;;
-	esac  
+	esac
 }
 
 install_proot() {
-case "$(uname -m)" in
+	case "$(uname -m)" in
 	aarch64)
-		archurl="arm64" 
+		archurl="arm64"
 		;;
 	armv7l)
-		archurl="armhf" 
+		archurl="armhf"
 		;;
 	x86_64)
-		archurl="amd64" 
+		archurl="amd64"
 		;;
 	*)
-		echo -e "${ERROR}未知框架"; 
-		exit  
+		echo -e "${ERROR}未知框架"
+		exit
 		;;
-esac
-	if [ ! -d "${HOME}/.termux" ]; then
-		mkdir -p "${HOME}/.termux"
-	fi
-	if [ ! -d "${HOME}/.termux/gancm" ]; then	
-		mkdir -p "${HOME}/.termux/gancm"
-	fi
-	if [ ! -d "${HOME}/.termux/gancm/proot" ]; then			
-		mkdir -p "${HOME}/.termux/gancm/proot"
-	fi
+	esac
+	mkdir -p "${HOME}/.termux/gancm/proot"
 
 	Proot_os_download_source="https://dl.gancm.us.kg/https://sgp1lxdmirror01.do.letsbuildthe.cloud/images"
 	open_proot_os_list=$(
@@ -126,44 +118,34 @@ esac
 	log "os_name: ${os_name}"
 	log "Download_proot_NAME: ${Download_proot_NAME}"
 	log "Download_proot_url: ${Download_proot_url}"
-	if [ -f ${HOME}/.gancm/download/${os_name}.tar.xz ]; then
-		if [ $(du -b ${HOME}/.gancm/download/${os_name}.tar.xz | cut -f1) -lt 10485760 ]; then
-			echo -e "${WORRY}${RED}${HOME}/.gancm/download/${os_name}.tar.xz${RES}可能已经损坏"
-			log "文件存储在:/.gancm/download/${os_name}.tar.xz  但已损坏"
-			if wget -q --show-progress "${Download_proot_url}" -O ${HOME}/.gancm/download/${os_name}.tar.xz; then
-				echo -e "${INFO}文件存储在${RED}${HOME}/.gancm/download/${os_name}.tar.xz${RES}"
-				echo -e "${INFO}您可以使用${RED}rm -rfv ${HOME}/.gancm/download/${os_name}.tar.xz${RES}来节省存储空间"
-				log "重下文件/.gancm/download/${os_name}.tar.xz成功"
-			else
-				echo -e "${WORRY}请检查网络访问问题${RES}"
-				log "重下文件/.gancm/download/${os_name}.tar.xz失败"
-				exit
-			fi
-		else
-			echo -e "${INFO}${RED}${HOME}/.gancm/download/${os_name}.tar.xz${RES}已存在 即将直接使用"
-			log "文件存储在/.gancm/download/${os_name}.tar.xz 已存在直接使用"
-		fi
-	else
-		if wget -q --show-progress "${Download_proot_url}" -O ${HOME}/.gancm/download/${os_name}.tar.xz; then
-			echo -e "${INFO}文件存储在${RED}${HOME}/.gancm/download/${os_name}.tar.xz${RES}"
-			log "下载/.gancm/download/${os_name}.tar.xz 成功"
-			echo -e "${INFO}您可以使用${RED}rm -rfv ${HOME}/.gancm/download/${os_name}.tar.xz${RES}来节省存储空间"
-			log "文件存储在:${HOME}/.gancm/download/${os_name}.tar.xz"
+
+	download_file="${HOME}/.gancm/download/${os_name}.tar.xz"
+	# 检查文件是否存在并且文件大小是否小于10MB
+	if [ -f "$download_file" ] && [ $(du -b "$download_file" | cut -f1) -lt 10485760 ]; then
+		echo -e "${WORRY}${RED}${download_file}${RES}可能已经损坏"
+		log "文件损坏，重新下载"
+		if wget -q --show-progress "${Download_proot_url}" -O "$download_file"; then
+			echo -e "${INFO}文件存储在${RED}$download_file${RES}"
+			log "下载成功：$download_file"
 		else
 			echo -e "${WORRY}请检查网络访问问题${RES}"
-			log "下载/.gancm/download/${os_name}.tar.xz 失败"
+			log "下载失败：$download_file"
 			exit
 		fi
 	fi
+
+	# 提示清理空间
+	echo -e "${INFO}您可以使用${RED}rm -rfv $download_file${RES}来节省存储空间"
+
 	unset LD_PRELOAD
-	if [ ! -d ${HOME}/.termux/gancm/proot/${os_name} ]; then
-	    mkdir ${HOME}/.termux/gancm/proot/${os_name}
-	fi
+	mkdir -p ${HOME}/.termux/gancm/proot/${os_name}
 	log "解压\"${HOME}/.gancm/download/${os_name}.tar.xz\""
 	proot --link2symlink tar -xJf ${HOME}/.gancm/download/${os_name}.tar.xz -C ${HOME}/.termux/gancm/proot/${os_name}/ --exclude='dev' || :
 	echo -e "${GREEN}复制脚本到容器${RES}"
 	log "复制脚本到容器"
-	mkdir ${HOME}/.termux/gancm/proot/${os_name}/root/.gancm
+	mkdir -p ${HOME}/.termux/gancm/proot/${os_name}/root/.gancm
+	mkdir -p ${HOME}/.termux/gancm/sys/.empty
+	mkdir -p ${HOME}/.termux/gancm/dev/shm
 	cp -r ${HOME}/.gancm/config ${HOME}/.termux/gancm/proot/${os_name}/root/.gancm
 	cp -r ${HOME}/.gancm/function ${HOME}/.termux/gancm/proot/${os_name}/root/.gancm
 	cp -r ${HOME}/.gancm/local ${HOME}/.termux/gancm/proot/${os_name}/root/.gancm
@@ -182,19 +164,33 @@ esac
 		--bind="${HOME}/.termux/gancm/proot/${os_name}/proc/.version:/proc/version" \
 		--bind="${HOME}/.termux/gancm/proot/${os_name}/proc/.uptime:/proc/uptime" \
 		--bind="${HOME}/.termux/gancm/proot/${os_name}/proc/.stat:/proc/stat" \
+		--bind="${HOME}/.termux/gancm/proot/${os_name}/proc/.vmstat:/proc/vmstat" \
+		--bind="${HOME}/.termux/gancm/proot/${os_name}/proc/.sysctl_entry_cap_last_cap:/proc/sysctl_entry_cap_last_cap" \
 		--kernel-release="5.15.0" \
 		-w /root /usr/bin/env \
 		-i HOME=/root \
 		PATH=/usr/local/sbin:/usr/local/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/games:/usr/local/games \
 		TERM=xterm-256color \
 		LANG=zh_CN.UTF-8 \
+		LC_CTYPE="zh_CN.UTF-8" \
+		LC_NUMERIC="zh_CN.UTF-8" \
+		LC_TIME="zh_CN.UTF-8" \
+		LC_COLLATE="zh_CN.UTF-8" \
+		LC_MONETARY="zh_CN.UTF-8" \
+		LC_MESSAGES="zh_CN.UTF-8" \
+		LC_PAPER="zh_CN.UTF-8" \
+		LC_NAME="zh_CN.UTF-8" \
+		LC_ADDRESS="zh_CN.UTF-8" \
+		LC_TELEPHONE="zh_CN.UTF-8" \
+		LC_MEASUREMENT="zh_CN.UTF-8" \
+		LC_IDENTIFICATION="zh_CN.UTF-8" \
 		/bin/bash 优化.sh
-		log "优化脚本执行成功"
-		log "退出容器"
+	log "优化脚本执行成功"
+	log "退出容器"
 
 }
 start_proot() {
-	list_dir ${HOME}/.termux/gancm/proot 
+	list_dir ${HOME}/.termux/gancm/proot
 	case $user_choice in
 	0)
 		echo -e "${RED}quit${RES}"
@@ -204,25 +200,85 @@ start_proot() {
 		if [ ! $? = 0 ]; then
 			exit
 		fi
-		os_name=${list_items[$((user_choice-1))]}
+		os_name=${list_items[$((user_choice - 1))]}
 		log "进入容器${os_name}"
 		unset LD_PRELOAD
 		proot \
-			--link2symlink -0 \
-			--rootfs=${HOME}/.termux/gancm/proot/${os_name}/ \
-			--bind=/dev \
+			--bind=/data/data/com.termux/files/usr \
+			--bind=/vendor \
+			--bind=/system \
+			--bind=/system/product \
+			--bind=/odm \
+			--bind=/apex \
+			--bind=/storage \
+			--bind=/data/data/com.termux/files/home \
+			--bind=/data/data/com.termux/cache \
+			--bind=/data/dalvik-cache \
+			--bind=/data/app \
+			--bind=${HOME}/.termux/gancm/proot/${os_name}/proc/.sysctl_inotify_max_user_watches:/proc/sys/fs/inotify/max_user_watches \
+			--bind=${HOME}/.termux/gancm/proot/${os_name}/proc/.sysctl_entry_cap_last_cap:/proc/sys/kernel/cap_last_cap \
+			--bind=${HOME}/.termux/gancm/proot/${os_name}/proc/.vmstat:/proc/vmstat \
+			--bind=${HOME}/.termux/gancm/proot/${os_name}/proc/.version:/proc/version \
+			--bind=${HOME}/.termux/gancm/proot/${os_name}/proc/.uptime:/proc/uptime \
+			--bind=${HOME}/.termux/gancm/proot/${os_name}/proc/.stat:/proc/stat \
+			--bind=${HOME}/.termux/gancm/proot/${os_name}/proc/.loadavg:/proc/loadavg \
+			--bind=${HOME}/.termux/gancm/sys/.empty:/sys/fs/selinux \
+			--bind=${HOME}/.termux/gancm/dev/shm:/dev/shm \
 			--bind=/sys \
+			--bind=/proc/self/fd/2:/dev/stderr \
+			--bind=/proc/self/fd/1:/dev/stdout \
+			--bind=/proc/self/fd/0:/dev/stdin \
+			--bind=/proc/self/fd:/dev/fd \
 			--bind=/proc \
-			--bind="${HOME}/.termux/gancm/proot/${os_name}/proc/.loadavg:/proc/loadavg" \
-			--bind="${HOME}/.termux/gancm/proot/${os_name}/proc/.version:/proc/version" \
-			--bind="${HOME}/.termux/gancm/proot/${os_name}/proc/.uptime:/proc/uptime" \
-			--bind="${HOME}/.termux/gancm/proot/${os_name}/proc/.stat:/proc/stat" \
-			--kernel-release="5.15.0" \
-			-w /root /usr/bin/env \
-			-i HOME=/root \
+			--bind=/dev/urandom:/dev/random \
+			--bind=/dev \
+			-L \
+			--kernel-release=6.2.1-PRoot-Distro \
+			--sysvipc \
+			--link2symlink \
+			--kill-on-exit \
+			--cwd=/root \
+			--change-id=0:0 \
+			--rootfs=${HOME}/.termux/gancm/proot/${os_name}/ \
+			/usr/bin/env -i \
 			PATH=/usr/local/sbin:/usr/local/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/games:/usr/local/games \
 			TERM=xterm-256color \
 			LANG=zh_CN.UTF-8 \
+			LC_CTYPE="zh_CN.UTF-8" \
+			LC_NUMERIC="zh_CN.UTF-8" \
+			LC_TIME="zh_CN.UTF-8" \
+			LC_COLLATE="zh_CN.UTF-8" \
+			LC_MONETARY="zh_CN.UTF-8" \
+			LC_MESSAGES="zh_CN.UTF-8" \
+			LC_PAPER="zh_CN.UTF-8" \
+			LC_NAME="zh_CN.UTF-8" \
+			LC_ADDRESS="zh_CN.UTF-8" \
+			LC_TELEPHONE="zh_CN.UTF-8" \
+			LC_MEASUREMENT="zh_CN.UTF-8" \
+			LC_IDENTIFICATION="zh_CN.UTF-8" \
+			ANDROID_DATA=/data \
+			ANDROID_ROOT=/system \
+			ANDROID_RUNTIME_ROOT=/apex/com.android.runtime \
+			ANDROID_TZDATA_ROOT=/apex/com.android.tzdata \
+			BOOTCLASSPATH=/apex/com.android.runtime/javalib/core-oj.jar:/apex/com.android.runtime/javalib/core-libart.jar:/apex/com.android.runtime/javalib/okhttp.jar:/apex/com.android.runtime/javalib/bouncycastle.jar:/apex/com.android.runtime/javalib/apache-xml.jar:/system/framework/framework.jar:/system/framework/ext.jar:/system/framework/telephony-common.jar:/system/framework/voip-common.jar:/system/framework/ims-common.jar:/system/framework/android.test.base.jar:/system/framework/tcmiface.jar:/system/framework/qcom.fmradio.jar:/system/framework/QPerformance.jar:/system/framework/UxPerformance.jar:/system/framework/WfdCommon.jar:/system/framework/vivo-framework.jar:/system/framework/vivo-media.jar:/system/framework/framework-adapter.jar:/system/framework/soc-framework.jar:/system/framework/vendor.factory.hardware.vivoem-V1.0-java.jar:/system/framework/vivo-vgcclient.jar:/system/framework/telephony-ext.jar:/system/framework/com.qti.location.sdk.jar:/apex/com.android.conscrypt/javalib/conscrypt.jar:/apex/com.android.media/javalib/updatable-media.jar \
+			DEX2OATBOOTCLASSPATH=/apex/com.android.runtime/javalib/core-oj.jar:/apex/com.android.runtime/javalib/core-libart.jar:/apex/com.android.runtime/javalib/okhttp.jar:/apex/com.android.runtime/javalib/bouncycastle.jar:/apex/com.android.runtime/javalib/apache-xml.jar:/system/framework/framework.jar:/system/framework/ext.jar:/system/framework/telephony-common.jar:/system/framework/voip-common.jar:/system/framework/ims-common.jar:/system/framework/android.test.base.jar:/system/framework/tcmiface.jar:/system/framework/qcom.fmradio.jar:/system/framework/QPerformance.jar:/system/framework/UxPerformance.jar:/system/framework/WfdCommon.jar:/system/framework/vivo-framework.jar:/system/framework/vivo-media.jar:/system/framework/framework-adapter.jar:/system/framework/soc-framework.jar:/system/framework/vendor.factory.hardware.vivoem-V1.0-java.jar:/system/framework/vivo-vgcclient.jar:/system/framework/telephony-ext.jar:/system/framework/com.qti.location.sdk.jar \
+			COLORTERM=truecolor \
+			LANG=en_US.UTF-8 \
+			MOZ_FAKE_NO_SANDBOX=1 \
+			PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/games:/usr/games:/data/data/com.termux/files/usr/bin:/system/bin:/system/xbin \
+			PULSE_SERVER=127.0.0.1 \
+			TERM=xterm-256color \
+			TMPDIR=/tmp \
+			ANDROID_DATA=/data \
+			ANDROID_ROOT=/system \
+			ANDROID_RUNTIME_ROOT=/apex/com.android.runtime \
+			ANDROID_TZDATA_ROOT=/apex/com.android.tzdata \
+			BOOTCLASSPATH=/apex/com.android.runtime/javalib/core-oj.jar:/apex/com.android.runtime/javalib/core-libart.jar:/apex/com.android.runtime/javalib/okhttp.jar:/apex/com.android.runtime/javalib/bouncycastle.jar:/apex/com.android.runtime/javalib/apache-xml.jar:/system/framework/framework.jar:/system/framework/ext.jar:/system/framework/telephony-common.jar:/system/framework/voip-common.jar:/system/framework/ims-common.jar:/system/framework/android.test.base.jar:/system/framework/tcmiface.jar:/system/framework/qcom.fmradio.jar:/system/framework/QPerformance.jar:/system/framework/UxPerformance.jar:/system/framework/WfdCommon.jar:/system/framework/vivo-framework.jar:/system/framework/vivo-media.jar:/system/framework/framework-adapter.jar:/system/framework/soc-framework.jar:/system/framework/vendor.factory.hardware.vivoem-V1.0-java.jar:/system/framework/vivo-vgcclient.jar:/system/framework/telephony-ext.jar:/system/framework/com.qti.location.sdk.jar:/apex/com.android.conscrypt/javalib/conscrypt.jar:/apex/com.android.media/javalib/updatable-media.jar \
+			DEX2OATBOOTCLASSPATH=/apex/com.android.runtime/javalib/core-oj.jar:/apex/com.android.runtime/javalib/core-libart.jar:/apex/com.android.runtime/javalib/okhttp.jar:/apex/com.android.runtime/javalib/bouncycastle.jar:/apex/com.android.runtime/javalib/apache-xml.jar:/system/framework/framework.jar:/system/framework/ext.jar:/system/framework/telephony-common.jar:/system/framework/voip-common.jar:/system/framework/ims-common.jar:/system/framework/android.test.base.jar:/system/framework/tcmiface.jar:/system/framework/qcom.fmradio.jar:/system/framework/QPerformance.jar:/system/framework/UxPerformance.jar:/system/framework/WfdCommon.jar:/system/framework/vivo-framework.jar:/system/framework/vivo-media.jar:/system/framework/framework-adapter.jar:/system/framework/soc-framework.jar:/system/framework/vendor.factory.hardware.vivoem-V1.0-java.jar:/system/framework/vivo-vgcclient.jar:/system/framework/telephony-ext.jar:/system/framework/com.qti.location.sdk.jar \
+			COLORTERM=truecolor \
+			HOME=/root \
+			USER=root \
+			TERM=xterm-256color \
 			/bin/bash --login
 		log "退出${os_name}"
 		;;
@@ -239,7 +295,7 @@ rm_proot() {
 		if [ ! $? = 0 ]; then
 			exit
 		fi
-		os_name=${list_items[$((user_choice-1))]}
+		os_name=${list_items[$((user_choice - 1))]}
 		num1=$((RANDOM % 100))
 		num2=$((RANDOM % 100))
 		log "num1=$num1 num2=$num2"
@@ -251,6 +307,7 @@ rm_proot() {
 		# 检查用户输入是否正确
 		if [ $user_sum -eq $correct_sum ]; then
 			echo -e "删除开始正确！你输入的和是正确的。"
+			chmod 777 -R "${HOME}/.termux/gancm/proot/${os_name}/"
 			rm -rfv "${HOME}/.termux/gancm/proot/${os_name}/"
 			# 在这里添加你想要执行的命令
 		else
@@ -262,8 +319,8 @@ rm_proot() {
 Change_the_source() {
 	# 定义要下载的文件的URL数组
 	URLS=(
-	"https://mirrors.tuna.tsinghua.edu.cn" 
-	"https://mirrors.aliyun.com"
+		"https://mirrors.tuna.tsinghua.edu.cn"
+		"https://mirrors.aliyun.com"
 	)
 
 	echo "测速取决于网速，一般持续5-8分钟"
@@ -273,74 +330,74 @@ Change_the_source() {
 
 	# 循环遍历所有URL
 	for URL in "${URLS[@]}"; do
-	# 开始时间
-	STARTTIME=$(date +%s)
-	
-	# 使用wget下载文件，这里使用随机生成的文件名以避免覆盖
-	FILENAME="download_$(date +%s).zip"
-	TEMPDIR=".gancm/TEM" # 确保目录存在
-	mkdir -p "$TEMPDIR"
-	
-	# 执行wget下载并检查是否成功
-	if wget -q --show-progress "$URL/ubuntu/ls-lR.gz" -O "$TEMPDIR/$FILENAME"; then
-		# 结束时间
-		ENDTIME=$(date +%s)
-		
-		# 计算时间差
-		DELTATIME=$((ENDTIME - STARTTIME))
-		
-		# 获取文件大小
-		FILESIZE=$(du -b "$TEMPDIR/$FILENAME" | cut -f1)
-		
-		# 计算下载速度
-		SPEED=$(echo "scale=2; $FILESIZE / $DELTATIME" | bc -l)
-		
-		# 存储速度
-		SPEEDS[$URL]=$SPEED
-		
-		# 输出结果
-		echo "URL: $URL"
-		echo "下载时间: $DELTATIME 秒"
-		echo "文件大小: $FILESIZE 字节"
-		echo "下载速度: $SPEED 字节/秒"
-		echo "---------------------------------------"
-		
-		# 清理下载的文件
-		rm "$TEMPDIR/$FILENAME"
-	else
-		echo "下载失败: $URL"
-	fi
+		# 开始时间
+		STARTTIME=$(date +%s)
+
+		# 使用wget下载文件，这里使用随机生成的文件名以避免覆盖
+		FILENAME="download_$(date +%s).zip"
+		TEMPDIR=".gancm/TEM" # 确保目录存在
+		mkdir -p "$TEMPDIR"
+
+		# 执行wget下载并检查是否成功
+		if wget -q --show-progress "$URL/ubuntu/ls-lR.gz" -O "$TEMPDIR/$FILENAME"; then
+			# 结束时间
+			ENDTIME=$(date +%s)
+
+			# 计算时间差
+			DELTATIME=$((ENDTIME - STARTTIME))
+
+			# 获取文件大小
+			FILESIZE=$(du -b "$TEMPDIR/$FILENAME" | cut -f1)
+
+			# 计算下载速度
+			SPEED=$(echo "scale=2; $FILESIZE / $DELTATIME" | bc -l)
+
+			# 存储速度
+			SPEEDS[$URL]=$SPEED
+
+			# 输出结果
+			echo "URL: $URL"
+			echo "下载时间: $DELTATIME 秒"
+			echo "文件大小: $FILESIZE 字节"
+			echo "下载速度: $SPEED 字节/秒"
+			echo "---------------------------------------"
+
+			# 清理下载的文件
+			rm "$TEMPDIR/$FILENAME"
+		else
+			echo "下载失败: $URL"
+		fi
 	done
 
 	# 打印所有下载速度的比较
 	echo "所有源的下载速度比较："
 	for URL in "${URLS[@]}"; do
-	if [ -n "${SPEEDS[$URL]}" ]; then
-		echo "$URL: ${SPEEDS[$URL]} 字节/秒"
-	fi
+		if [ -n "${SPEEDS[$URL]}" ]; then
+			echo "$URL: ${SPEEDS[$URL]} 字节/秒"
+		fi
 	done
 
 	# 找出最快的下载速度
 	FASTEST_URL=""
 	FASTEST_SPEED=0
 	for URL in "${URLS[@]}"; do
-	if [ -n "${SPEEDS[$URL]}" ] && [ $(echo "${SPEEDS[$URL]} > $FASTEST_SPEED" | bc -l) -eq 1 ]; then
-		FASTEST_URL=$URL
-		FASTEST_SPEED=${SPEEDS[$URL]}
-	fi
+		if [ -n "${SPEEDS[$URL]}" ] && [ $(echo "${SPEEDS[$URL]} > $FASTEST_SPEED" | bc -l) -eq 1 ]; then
+			FASTEST_URL=$URL
+			FASTEST_SPEED=${SPEEDS[$URL]}
+		fi
 	done
 
 	if [ -n "$FASTEST_URL" ]; then
-	echo "最快的下载源是：$FASTEST_URL"
-	echo "最快的下载速度是：$FASTEST_SPEED 字节/秒"
+		echo "最快的下载源是：$FASTEST_URL"
+		echo "最快的下载速度是：$FASTEST_SPEED 字节/秒"
 	else
-	echo "没有成功的下载速度可以比较。"
+		echo "没有成功的下载速度可以比较。"
 	fi
 
 	read -p "是否更换下载源和最快下载路线为: ${FASTEST_URL} [Y/n]:" user_input
 
 	case ${user_input} in
-	YES| Yes | Y | y)
+	YES | Yes | Y | y)
 		sed -i "s@^\(deb.*stable main\)$@#\1\ndeb ${FASTEST_URL}/termux/apt/termux-main stable main@" $PREFIX/etc/apt/sources.list
 		apt update && apt upgrade
 		source ${HOME}/.gancm/config/config.sh
@@ -355,11 +412,11 @@ garbage_collection() {
 	ls -la ${HOME}/.gancm/download
 	read -p "是否删除这些文件？[Y/n]: " delete_files
 	if [[ $delete_files =~ ^[Yy]$ ]]; then
-	    rm -rf ${HOME}/dowload/*
-	    echo -e "${SUSSEC}所有文件已删除。"
+		rm -rf ${HOME}/dowload/*
+		echo -e "${SUSSEC}所有文件已删除。"
 		log "所有文件已删除。"
 	else
-	    echo -e "${INFO}文件未删除。"
+		echo -e "${INFO}文件未删除。"
 		log "文件未删除。"
 	fi
 

@@ -16,58 +16,47 @@
 # 脚本通过命令行参数执行不同的操作，支持 `-h` 或 `--help` 参数显示帮助信息。主要执行流程包括系统架构判断、软件包安装、目录和 Git 源检查，以及根据系统类型加载相应的菜单。
 #字体颜色
 ########################################################
-RED='\e[1;31m'    # 红 ${RED}
-GREEN='\e[1;32m'  # 绿 ${GREEN}
-YELLOW='\e[1;33m' # 黄 ${YELLOW}
-BLUE='\e[1;34m'   # 蓝 ${BLUE}
-PINK='\e[1;35m'   # 粉红 ${PINK}
-RES='\e[0m'       # 清除颜色 ${RES}
+RED='\e[1;31m'                   # 红 ${RED}
+GREEN='\e[1;32m'                 # 绿 ${GREEN}
+YELLOW='\e[1;33m'                # 黄 ${YELLOW}
+BLUE='\e[1;34m'                  # 蓝 ${BLUE}
+PINK='\e[1;35m'                  # 粉红 ${PINK}
+RES='\e[0m'                      # 清除颜色 ${RES}
 ##字体颜色
 
-ERROR="[${RED}错误${RES}]:" # ${ERROR}
-WORRY="[${YELLOW}警告${RES}]:" # ${WORRY} 
+ERROR="[${RED}错误${RES}]:"    # ${ERROR}
+WORRY="[${YELLOW}警告${RES}]:" # ${WORRY}
 SUSSEC="[${GREEN}成功${RES}]:" # ${SUSSEC}
-INFO="[${BLUE}信息${RES}]:" # ${INFO}
+INFO="[${BLUE}信息${RES}]:"    # ${INFO}
 
 #常用变量和函数
 ########################################################
-case "$(uname -m)" in
-	aarch64)
-		archurl="arm64" 
-		;;
-	armv7l)
-		archurl="armhf" 
-		;;
-	x86_64)
-		archurl="amd64" 
-		;;
-esac
+declare -A arch_map=(["aarch64"]="arm64" ["armv7l"]="armhf" ["x86_64"]="amd64")
+archurl="${arch_map[$(uname -m)]}"
 
 variable() {
 	source ${HOME}/.gancm/config/config.sh
 }
 #!/bin/bash
-log(){
+log() {
 	#log文件名
 	local fileName="${HOME}/.gancm/log.log"
 	#log文件最大存储log行数（此处设置最大存储log行数是100行）
 	local fileMaxLen=100
 	#超过log最大存储行数后需要从顶部开始删除的行数（此处设置的是删除第1到第10行的数据）
 	local fileDeleteLen=10
-	if test $fileName
-	then
+	if test $fileName; then
 		#记录log
-		echo "[`date +%y/%m/%d-%H:%M:%S`]:$*" >> $fileName
+		echo "[$(date +%y/%m/%d-%H:%M:%S)]:$*" >>$fileName
 		#获取log文件实际行数
-		loglen=`grep -c "" $fileName`
-		
-		if [ $loglen -gt $fileMaxLen ]
-		then
+		loglen=$(grep -c "" $fileName)
+
+		if [ $loglen -gt $fileMaxLen ]; then
 			#从顶部开始删除对应行数的log
 			sed -i '1,'$fileDeleteLen'd' $fileName
 		fi
 	else
-		echo "[`date +%y/%m/%d-%H:%M:%S`]:$*" > $fileName
+		echo "[$(date +%y/%m/%d-%H:%M:%S)]:$*" >$fileName
 	fi
 }
 
@@ -82,32 +71,13 @@ log(){
 # log $(printf "this is cmd test %s\n" "this is cmd output string")
 
 self_install() {
-	case ${2} in
-	pip)
-		if [ ! -f "$(command -v ${1})" ]; then
-			echo -e "${RED}目前并没有安装 ${1} 正在安装${RES}"
-			pip install -y ${1}
-		fi
-		;;
-	pip3)
-		if [ ! -f "$(command -v ${1})" ]; then
-			echo -e "${RED}目前并没有安装 ${1} 正在安装${RES}"
-			pip3 install -y ${1}
-		fi
-		;;
-	apt)
-		if [ ! -f "$(command -v ${1})" ]; then
-			echo -e "${RED}目前并没有安装 ${1} 正在安装${RES}"
-			apt install -y ${1}
-		fi
-		;;
-	pkg)
-		if [ ! -f "$(command -v ${1})" ]; then
-			echo -e "${RED}目前并没有安装 ${1} 正在安装${RES}"
-			pkg install -y ${1}
-		fi
-		;;
-	esac
+	if ! command -v "$1" &>/dev/null; then
+		echo -e "${RED}未安装 $1，正在安装...${RES}"
+		case $2 in
+		pip | pip3 | apt | pkg) $2 install -y "$1" ;;
+		*) echo -e "${YELLOW}未知的安装方式: $2${RES}" ;;
+		esac
+	fi
 }
 hcjx() {
 	echo -e "${GREEN}请按回车键继续下一条指令...${RES}"
@@ -148,21 +118,9 @@ validity_git() {
 	fi
 }
 validity_dir() {
-	if [ ! -d ${HOME}/.gancm/ ]; then
-		mkdir ${HOME}/.gancm/
-	fi
-	if [ ! -d ${HOME}/.gancm/download ]; then
-		mkdir ${HOME}/.gancm/download
-	fi
-	if [ ! -d ${HOME}/.gancm/config ]; then
-		mkdir ${HOME}/.gancm/config
-	fi
-	if [ ! -d ${HOME}/.back ]; then
-		mkdir ${HOME}/.back
-	fi
-	if [ ! -d ${HOME}/.TEMP ]; then
-		mkdir ${HOME}/.TEMP
-	fi
+	mkdir -p ${HOME}/.gancm/{download,config}
+	mkdir -p ${HOME}/.back
+	mkdir -p ${HOME}/.TEMP
 }
 validity() {
 	validity_dir
@@ -176,34 +134,24 @@ Modify_the_variable() {
 	#更改变量
 }
 list_dir() {
-    current_index=1
-    list=$(ls $1)
-    list_items=($list)
-    list_names=""
+	current_index=1
+	list=$(ls $1)
+	list_items=($list)
+	list_names=""
 
-    for item in $list; do
-        list_names+=" ${current_index} ${item}"
-        let current_index++
-    done
-    user_choice=$(whiptail --title "选择" --menu "选择功能" 15 70 8 0 返回上级 ${list_names} 3>&1 1>&2 2>&3)
-    # 选择结果 ${list_items[$((user_choice-1))]}
+	for item in $list; do
+		list_names+=" ${current_index} ${item}"
+		let current_index++
+	done
+	user_choice=$(whiptail --title "选择" --menu "选择功能" 15 70 8 0 返回上级 ${list_names} 3>&1 1>&2 2>&3)
+	# 选择结果 ${list_items[$((user_choice-1))]}
 }
 apt_up() {
 	source ${HOME}/.gancm/config/config.sh
 	current_timestamp=$(date +%s)
-	if [ "${last_time_aptup}" = "" ] ;then
-		apt update -y 
-		apt upgrade -y
+	if [[ -z "${last_time_aptup}" || $((current_timestamp - last_time_aptup)) -ge $((5 * 24 * 60 * 60)) ]]; then
+		apt update -y && apt upgrade -y
 		Modify_the_variable last_time_aptup ${current_timestamp} ${HOME}/.gancm/config/config.sh
-	else
-		time_difference=$(($current_timestamp - $last_time_aptup))
-        # 5天的秒数
-        five_days_seconds=$((5 * 24 * 60 * 60))
-		if [ $five_days_seconds -le $time_difference  ]; then
-            apt update -y 
-			apt upgrade -y
-			Modify_the_variable last_time_aptup ${current_timestamp} ${HOME}/.gancm/config/config.sh
-        fi
 	fi
 }
 #函数
@@ -228,16 +176,16 @@ case ${1} in
 	;;
 -s | --start)
 	case $2 in
-		Android|A)
+	Android | A)
 		log "指定加载安卓功能"
 		source ${HOME}/.gancm/local/Android/Android_menu $3 $4 $5
 		;;
-		Linux|L)
+	Linux | L)
 		log "指定加载Linux功能"
 		source ${HOME}/.gancm/local/Linux/Linux_menu $3 $4 $5
 		;;
 	esac
-;;
+	;;
 *)
 	apt_up
 	log "初始化完成"
@@ -248,9 +196,10 @@ case ${1} in
 		self_install git apt
 		self_install wget pkg
 		self_install whiptail pkg
+		self_install tmux pkg
 		self_install bc pkg
 		validity
-		variable 
+		variable
 		source ${HOME}/.gancm/function/update.sh
 		log "检查更新"
 		source ${HOME}/.gancm/local/Android/Android_menu $1 $2 $3
@@ -261,9 +210,10 @@ case ${1} in
 		self_install git apt
 		self_install wget apt
 		self_install whiptail apt
+		self_install tmux apt
 		self_install bc apt
 		validity
-		variable 
+		variable
 		source ${HOME}/.gancm/function/update.sh
 		log "检查更新"
 		source ${HOME}/.gancm/local/Linux/Linux_menu $1 $2 $3

@@ -60,7 +60,8 @@ echo -e "${GREEN}尝试禁用无用检测${RES}"
 ln -s ~/.gancm/gancm.sh /usr/bin/gancm
 chmod 777 /usr/bin/gancm
 touch ~/.hushlogin
-apt update -y & apt upgrade -y
+apt update -y &
+apt upgrade -y
 Modify_the_variable last_time_aptup $(date +%s) ${HOME}/.gancm/config/config.sh
 self_install language-pack-zh-hans apt
 self_install fonts-wqy-microhei apt

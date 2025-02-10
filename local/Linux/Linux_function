@@ -1,22 +1,22 @@
 # /**
 #  * 安装 Minecraft 服务器的函数集合
-#  * 
+#  *
 #  * 这个脚本包含了多个函数，用于下载和安装不同类型的 Minecraft 服务器，
 #  * 包括纯净服务端、Mod 服务端、Bedrock 服务端和原版服务端。
-#  * 
+#  *
 #  * 函数包括：
 #  * - download_JAVA: 下载并安装指定版本的 Java 运行环境。
 #  * - install_MC_SERVER: 根据用户选择下载并安装相应的 Minecraft 服务器。
 #  * - start_MC_SERVER: 启动已安装的 Minecraft 服务器。
 #  * - rm_MC_SERVER: 删除指定的 Minecraft 服务器实例，带有安全验证。
 #  * - install_MC_SERVER_MENU: 显示服务器类型选择菜单，并调用相应的安装函数。
-#  * 
+#  *
 #  * 使用时，用户可以通过菜单选择所需的服务端类型，脚本将自动处理下载、安装和启动过程。
 #  */
-
+mkdir -p "${HOME}/.termux/gancm/MCserver"
 download_JAVA() {
 	echo "请选择要安装的java版本（支持多选，用空格分隔）:"
-	options=("quit" $(apt list openjdk-*-jdk  2>/dev/null  | awk -F'/' '{print $1}'  |  grep '^openjdk'))
+	options=("quit" $(apt list openjdk-*-jdk 2>/dev/null | awk -F'/' '{print $1}' | grep '^openjdk'))
 	for i in ${!options[@]}; do
 		echo "$i. ${options[$i]}"
 	done
@@ -33,257 +33,254 @@ download_JAVA() {
 		fi
 	done
 	# 输出用户选择的选项
-	if [ "${opt}" = "0" ] ;then
+	if [ "${opt}" = "0" ]; then
 		exit
-	fi	
+	fi
 	echo "您选择了：${selected[*]}"
 	apt install ${selected[*]} -y
 	log "选择的Java:${selected[*]}"
 }
 install_MC_SERVER() {
 	log "准备安装MC_SERVER"
-    while true; do
-	if [ $(tput cols) -lt 55 ]; then
-		echo "双指捏合屏幕缩小屏幕"
-		echo "当前只有$(tput cols)列"
-	else
-		break
-	fi
+	while true; do
+		if [ $(tput cols) -lt 55 ]; then
+			echo "双指捏合屏幕缩小屏幕"
+			echo "当前只有$(tput cols)列"
+		else
+			break
+		fi
 		sleep 1
-    done
-	
+	done
+
 	download_fastmirror_net_api_v3=$(curl -s https://download.fastmirror.net/api/v3)
 
 	case $1 in
-			0)
-				exit
-				;;
-			pure)
-				log "选择核心类型:插件"
-				tag=$(echo "${download_fastmirror_net_api_v3}" | jq '.data[].tag' | grep -n "pure" | cut -d: -f1)
-				;;
-			mod)
-				log "选择核心类型:模组"
-				tag=$(echo "${download_fastmirror_net_api_v3}" | jq -r '.data[].tag' | grep -n "mod" | cut -d: -f1)
-				;;
-			bedrock)
-				log "选择核心类型:Bedrock"
-				tag=$(echo "${download_fastmirror_net_api_v3}" | jq -r '.data[].name' | grep -n "NukkitX" | cut -d: -f1)
-				;;
-			vanilla)
-				log "选择核心类型:原版"
-				tag=$(echo "${download_fastmirror_net_api_v3}" | jq '.data[].tag' | grep -n "vanilla" | cut -d: -f1)
-				;;						
-			esac
+	0)
+		exit
+		;;
+	pure)
+		log "选择核心类型:插件"
+		tag=$(echo "${download_fastmirror_net_api_v3}" | jq '.data[].tag' | grep -n "pure" | cut -d: -f1)
+		;;
+	mod)
+		log "选择核心类型:模组"
+		tag=$(echo "${download_fastmirror_net_api_v3}" | jq -r '.data[].tag' | grep -n "mod" | cut -d: -f1)
+		;;
+	bedrock)
+		log "选择核心类型:Bedrock"
+		tag=$(echo "${download_fastmirror_net_api_v3}" | jq -r '.data[].name' | grep -n "NukkitX" | cut -d: -f1)
+		;;
+	vanilla)
+		log "选择核心类型:原版"
+		tag=$(echo "${download_fastmirror_net_api_v3}" | jq '.data[].tag' | grep -n "vanilla" | cut -d: -f1)
+		;;
+	esac
 
-			Download_MC_SERVER_class_menu=($(
-			for i in ${tag[@]} ; do
-				echo -e "$(echo "${download_fastmirror_net_api_v3}"| jq -r .data[$((${i}-1))].name)"
-			done))
-			current_index=1
-			Download_MC_SERVER_class_menu_list_names=""
+	Download_MC_SERVER_class_menu=($(
+		for i in ${tag[@]}; do
+			echo -e "$(echo "${download_fastmirror_net_api_v3}" | jq -r .data[$((${i} - 1))].name)"
+		done
+	))
+	current_index=1
+	Download_MC_SERVER_class_menu_list_names=""
 
-			for item in "${Download_MC_SERVER_class_menu[@]}"; do
-				Download_MC_SERVER_class_menu_list_names+=" ${current_index} ${item}"
-				let current_index++
-			done
-			user_choice_Download_MC_SERVER_class_menu=$(whiptail --title "选择" --menu "选择功能" 15 70 8 0 返回上级 ${Download_MC_SERVER_class_menu_list_names} 3>&1 1>&2 2>&3)
-			# echo Paper
-			#核心
-			# 核心菜单
-			case $user_choice_Download_MC_SERVER_class_menu in
-			0)
-				echo -e "${RED}quit${RES}"
-				exit
-				;;
-			*)
-				if [ ! $? = 0 ]; then
-					exit
-				fi
-				;;
-			esac
-
-
-
-			Sort_download_minecraft_version=$(($(echo $tag | awk -v n="$user_choice_Download_MC_SERVER_class_menu" '{print $n}')-1))
-			# echo $tag | awk -v n="$user_choice_Download_MC_SERVER_class_menu" '{print $n}'
-			# echo "---------------------------------------"
-			# echo "$tag     $user_choice_Download_MC_SERVER_class_menu"
-
-
-			Download_MC_SERVER_versions_menu=$(echo "${download_fastmirror_net_api_v3}"| jq -r .data[${Sort_download_minecraft_version}].mc_versions[])
-			# echo 1.18.2 1.16.5 1.12.2
-
-			# 使用tr和sort命令进行转换和排序
-			Download_MC_SERVER_versions_menu=$(echo $Download_MC_SERVER_versions_menu | tr ' ' '\n' | sort -t. -k1,1n -k2,2n -k3,3n -k4,4n | tac)
-
-			# 打印排序后的版本号列表
-			# echo $Download_MC_SERVER_versions_menu
-
-			Download_MC_SERVER_versions_menu=(${Download_MC_SERVER_versions_menu})
-			current_index=1
-			Download_MC_SERVER_versions_menu_list_names=""
-			for item in "${Download_MC_SERVER_versions_menu[@]}"; do
-				Download_MC_SERVER_versions_menu_list_names+=" ${current_index} ${item}"
-				let current_index++
-			done
-			user_choice_Download_MC_SERVER_versions_menu_list_names=$(whiptail --title "选择" --menu "选择功能" 15 70 8 0 返回上级 ${Download_MC_SERVER_versions_menu_list_names} 3>&1 1>&2 2>&3)
-			case $user_choice_Download_MC_SERVER_versions_menu_list_names in
-			0)
-				echo -e "${RED}quit${RES}"
-				exit
-				;;
-			*)
-				if [ ! $? = 0 ]; then
-					exit
-				fi
-				log "核心:${Download_MC_SERVER_class_menu[$((user_choice_Download_MC_SERVER_class_menu-1))]}"
-				log "版本:${Download_MC_SERVER_versions_menu[$((user_choice_Download_MC_SERVER_versions_menu_list_names - 1))]}"
-				;;
-			esac
-
-
-			Download_MC_SERVER_url_NO_with_and=$(curl -s "https://download.fastmirror.net/api/v3/${Download_MC_SERVER_class_menu[$((user_choice_Download_MC_SERVER_class_menu-1))]}/${Download_MC_SERVER_versions_menu[$((user_choice_Download_MC_SERVER_versions_menu_list_names - 1))]}?offset=0&limit=1")
-			Download_MC_SERVER_Get_core_version=$(echo $Download_MC_SERVER_url_NO_with_and | jq -r .data.builds[].core_version )
-			Download_MC_SERVER_url_YES_with_and=https://download.fastmirror.net/download/${Download_MC_SERVER_class_menu[$((user_choice_Download_MC_SERVER_class_menu-1))]}/${Download_MC_SERVER_versions_menu[$((user_choice_Download_MC_SERVER_versions_menu_list_names - 1))]}/${Download_MC_SERVER_Get_core_version}
-			log "组成的mcserver地址:$Download_MC_SERVER_url_YES_with_and"
-			if [ ! -d ${HOME}/.gancm/MCserver/${Download_MC_SERVER_class_menu[$((user_choice_Download_MC_SERVER_class_menu-1))]} ]; then
-				mkdir ${HOME}/.gancm/MCserver/${Download_MC_SERVER_class_menu[$((user_choice_Download_MC_SERVER_class_menu-1))]}
-			fi		
-			if [ ! -d ${HOME}/.gancm/MCserver/${Download_MC_SERVER_class_menu[$((user_choice_Download_MC_SERVER_class_menu-1))]}/${Download_MC_SERVER_versions_menu[$((user_choice_Download_MC_SERVER_versions_menu_list_names - 1))]} ]; then
-				mkdir ${HOME}/.gancm/MCserver/${Download_MC_SERVER_class_menu[$((user_choice_Download_MC_SERVER_class_menu-1))]}/${Download_MC_SERVER_versions_menu[$((user_choice_Download_MC_SERVER_versions_menu_list_names - 1))]}
-			fi
-			if wget -q --show-progress $Download_MC_SERVER_url_YES_with_and -O ${HOME}/.gancm/MCserver/${Download_MC_SERVER_class_menu[$((user_choice_Download_MC_SERVER_class_menu-1))]}/${Download_MC_SERVER_versions_menu[$((user_choice_Download_MC_SERVER_versions_menu_list_names - 1))]}/${Download_MC_SERVER_class_menu[$((user_choice_Download_MC_SERVER_class_menu-1))]}_${Download_MC_SERVER_versions_menu[$((user_choice_Download_MC_SERVER_versions_menu_list_names - 1))]}_server.jar ; then
-				log "下载成功"
-				source ${HOME}/.gancm/function/Start_Java_MC_SERVER "${Download_MC_SERVER_class_menu[$((user_choice_Download_MC_SERVER_class_menu-1))]}" "${Download_MC_SERVER_versions_menu[$((user_choice_Download_MC_SERVER_versions_menu_list_names - 1))]}"	# 版本
-			else
-				log "下载失败"
-				rmdir -p ${HOME}/.gancm/MCserver/${Download_MC_SERVER_class_menu[$((user_choice_Download_MC_SERVER_class_menu-1))]}/${Download_MC_SERVER_versions_menu[$((user_choice_Download_MC_SERVER_versions_menu_list_names - 1))]} "${Download_MC_SERVER_versions_menu[$((user_choice_Download_MC_SERVER_versions_menu_list_names - 1))]}"
-			fi	
-
-			
-}
-start_MC_SERVER() {
-		log "准备启动mcserver"
-		if [ ! -f "$(command -v java)" ]; then
-			echo -e "${RED}目前并没有任何安装 java ${RES}"
-			echo -e "没有安装java"
-			download_JAVA
+	for item in "${Download_MC_SERVER_class_menu[@]}"; do
+		Download_MC_SERVER_class_menu_list_names+=" ${current_index} ${item}"
+		let current_index++
+	done
+	user_choice_Download_MC_SERVER_class_menu=$(whiptail --title "选择" --menu "选择功能" 15 70 8 0 返回上级 ${Download_MC_SERVER_class_menu_list_names} 3>&1 1>&2 2>&3)
+	# echo Paper
+	#核心
+	# 核心菜单
+	case $user_choice_Download_MC_SERVER_class_menu in
+	0)
+		echo -e "${RED}quit${RES}"
+		exit
+		;;
+	*)
+		if [ ! $? = 0 ]; then
+			exit
 		fi
+		;;
+	esac
 
-		list_dir ${HOME}/.gancm/MCserver/
-		case $user_choice in
-		0)
-			echo -e "${RED}quit${RES}"
+	Sort_download_minecraft_version=$(($(echo $tag | awk -v n="$user_choice_Download_MC_SERVER_class_menu" '{print $n}') - 1))
+	# echo $tag | awk -v n="$user_choice_Download_MC_SERVER_class_menu" '{print $n}'
+	# echo "---------------------------------------"
+	# echo "$tag     $user_choice_Download_MC_SERVER_class_menu"
+
+	Download_MC_SERVER_versions_menu=$(echo "${download_fastmirror_net_api_v3}" | jq -r .data[${Sort_download_minecraft_version}].mc_versions[])
+	# echo 1.18.2 1.16.5 1.12.2
+
+	# 使用tr和sort命令进行转换和排序
+	Download_MC_SERVER_versions_menu=$(echo $Download_MC_SERVER_versions_menu | tr ' ' '\n' | sort -t. -k1,1n -k2,2n -k3,3n -k4,4n | tac)
+
+	# 打印排序后的版本号列表
+	# echo $Download_MC_SERVER_versions_menu
+
+	Download_MC_SERVER_versions_menu=(${Download_MC_SERVER_versions_menu})
+	current_index=1
+	Download_MC_SERVER_versions_menu_list_names=""
+	for item in "${Download_MC_SERVER_versions_menu[@]}"; do
+		Download_MC_SERVER_versions_menu_list_names+=" ${current_index} ${item}"
+		let current_index++
+	done
+	user_choice_Download_MC_SERVER_versions_menu_list_names=$(whiptail --title "选择" --menu "选择功能" 15 70 8 0 返回上级 ${Download_MC_SERVER_versions_menu_list_names} 3>&1 1>&2 2>&3)
+	case $user_choice_Download_MC_SERVER_versions_menu_list_names in
+	0)
+		echo -e "${RED}quit${RES}"
+		exit
+		;;
+	*)
+		if [ ! $? = 0 ]; then
 			exit
-			;;
-		*)
-			if [ ! $? = 0 ]; then
-				exit
-			fi
-			start_MC_SERVER_class=${list_items[$((user_choice-1))]}
-			log "选择核心类型:${start_MC_SERVER_class}"
-			#核心
-			;;
-		esac
-		
-		list_dir ${HOME}/.gancm/MCserver/${start_MC_SERVER_class}
-		case $user_choice in
-		0)
-			echo -e "${RED}quit${RES}"
+		fi
+		log "核心:${Download_MC_SERVER_class_menu[$((user_choice_Download_MC_SERVER_class_menu - 1))]}"
+		log "版本:${Download_MC_SERVER_versions_menu[$((user_choice_Download_MC_SERVER_versions_menu_list_names - 1))]}"
+		;;
+	esac
+
+	Download_MC_SERVER_url_NO_with_and=$(curl -s "https://download.fastmirror.net/api/v3/${Download_MC_SERVER_class_menu[$((user_choice_Download_MC_SERVER_class_menu - 1))]}/${Download_MC_SERVER_versions_menu[$((user_choice_Download_MC_SERVER_versions_menu_list_names - 1))]}?offset=0&limit=1")
+	Download_MC_SERVER_Get_core_version=$(echo $Download_MC_SERVER_url_NO_with_and | jq -r .data.builds[].core_version)
+	Download_MC_SERVER_url_YES_with_and=https://download.fastmirror.net/download/${Download_MC_SERVER_class_menu[$((user_choice_Download_MC_SERVER_class_menu - 1))]}/${Download_MC_SERVER_versions_menu[$((user_choice_Download_MC_SERVER_versions_menu_list_names - 1))]}/${Download_MC_SERVER_Get_core_version}
+	log "组成的mcserver地址:$Download_MC_SERVER_url_YES_with_and"
+	if [ ! -d ${HOME}/.termux/gancm/MCserver/${Download_MC_SERVER_class_menu[$((user_choice_Download_MC_SERVER_class_menu - 1))]} ]; then
+		mkdir -p ${HOME}/.termux/gancm/MCserver/${Download_MC_SERVER_class_menu[$((user_choice_Download_MC_SERVER_class_menu - 1))]}
+	fi
+	if [ ! -d ${HOME}/.termux/gancm/MCserver/${Download_MC_SERVER_class_menu[$((user_choice_Download_MC_SERVER_class_menu - 1))]}/${Download_MC_SERVER_versions_menu[$((user_choice_Download_MC_SERVER_versions_menu_list_names - 1))]} ]; then
+		mkdir -p ${HOME}/.termux/gancm/MCserver/${Download_MC_SERVER_class_menu[$((user_choice_Download_MC_SERVER_class_menu - 1))]}/${Download_MC_SERVER_versions_menu[$((user_choice_Download_MC_SERVER_versions_menu_list_names - 1))]}
+	fi
+	if wget -q --show-progress $Download_MC_SERVER_url_YES_with_and -O ${HOME}/.termux/gancm/MCserver/${Download_MC_SERVER_class_menu[$((user_choice_Download_MC_SERVER_class_menu - 1))]}/${Download_MC_SERVER_versions_menu[$((user_choice_Download_MC_SERVER_versions_menu_list_names - 1))]}/${Download_MC_SERVER_class_menu[$((user_choice_Download_MC_SERVER_class_menu - 1))]}_${Download_MC_SERVER_versions_menu[$((user_choice_Download_MC_SERVER_versions_menu_list_names - 1))]}_server.jar; then
+		log "下载成功"
+		source ${HOME}/.gancm/function/Start_Java_MC_SERVER "${Download_MC_SERVER_class_menu[$((user_choice_Download_MC_SERVER_class_menu - 1))]}" "${Download_MC_SERVER_versions_menu[$((user_choice_Download_MC_SERVER_versions_menu_list_names - 1))]}" # 版本
+	else
+		log "下载失败"
+		rmdir -p ${HOME}/.termux/gancm/MCserver/${Download_MC_SERVER_class_menu[$((user_choice_Download_MC_SERVER_class_menu - 1))]}/${Download_MC_SERVER_versions_menu[$((user_choice_Download_MC_SERVER_versions_menu_list_names - 1))]} "${Download_MC_SERVER_versions_menu[$((user_choice_Download_MC_SERVER_versions_menu_list_names - 1))]}"
+	fi
+
+}
+
+start_MC_SERVER() {
+	log "准备启动mcserver"
+	if [ ! -f "$(command -v java)" ]; then
+		echo -e "${RED}目前并没有任何安装 java ${RES}"
+		echo -e "没有安装java"
+		download_JAVA
+	fi
+
+	list_dir ${HOME}/.termux/gancm/MCserver/
+	case $user_choice in
+	0)
+		echo -e "${RED}quit${RES}"
+		exit
+		;;
+	*)
+		if [ ! $? = 0 ]; then
 			exit
-			;;
-		*)
-			if [ ! $? = 0 ]; then
-				exit
-			fi
-			if [ ! -f ${HOME}/.gancm/MCserver/${start_MC_SERVER_class}/${list_items[$((user_choice-1))]}/start.sh ]; then
-				log "未寻找到启动脚本启动配置程序"
-				source ${HOME}/.gancm/function/Start_Java_MC_SERVER  ${start_MC_SERVER_class} ${list_items[$((user_choice-1))]}
-			fi
-			log "启动mcserver"
-			bash ${HOME}/.gancm/MCserver/${start_MC_SERVER_class}/${list_items[$((user_choice-1))]}/start.sh
-			#核心
-			;;
-		esac
+		fi
+		start_MC_SERVER_class=${list_items[$((user_choice - 1))]}
+		log "选择核心类型:${start_MC_SERVER_class}"
+		#核心
+		;;
+	esac
+
+	list_dir ${HOME}/.termux/gancm/MCserver/${start_MC_SERVER_class}
+	case $user_choice in
+	0)
+		echo -e "${RED}quit${RES}"
+		exit
+		;;
+	*)
+		if [ ! $? = 0 ]; then
+			exit
+		fi
+		if [ ! -f ${HOME}/.termux/gancm/MCserver/${start_MC_SERVER_class}/${list_items[$((user_choice - 1))]}/start.sh ]; then
+			log "未寻找到启动脚本启动配置程序"
+			source ${HOME}/.gancm/function/Start_Java_MC_SERVER ${start_MC_SERVER_class} ${list_items[$((user_choice - 1))]}
+		fi
+		log "启动mcserver"
+		bash ${HOME}/.termux/gancm/MCserver/${start_MC_SERVER_class}/${list_items[$((user_choice - 1))]}/start.sh
+		#核心
+		;;
+	esac
 }
 rm_MC_SERVER() {
-log "准备删除mcserver"
-list_dir ${HOME}/.gancm/MCserver/
-		case $user_choice in
-		0)
-			echo -e "${RED}quit${RES}"
+	log "准备删除mcserver"
+	list_dir ${HOME}/.termux/gancm/MCserver/
+	case $user_choice in
+	0)
+		echo -e "${RED}quit${RES}"
+		exit
+		;;
+	*)
+		if [ ! $? = 0 ]; then
 			exit
-			;;
-		*)
-			if [ ! $? = 0 ]; then
-				exit
-			fi
-			rm_MC_SERVER_class=${list_items[$((user_choice-1))]}
-			#核心
-			;;
-		esac
-		list_dir ${HOME}/.gancm/MCserver/${rm_MC_SERVER_class}
-		case $user_choice in
-		0)
-			echo -e "${RED}quit${RES}"
+		fi
+		rm_MC_SERVER_class=${list_items[$((user_choice - 1))]}
+		#核心
+		;;
+	esac
+	list_dir ${HOME}/.termux/gancm/MCserver/${rm_MC_SERVER_class}
+	case $user_choice in
+	0)
+		echo -e "${RED}quit${RES}"
+		exit
+		;;
+	*)
+		if [ ! $? = 0 ]; then
 			exit
-			;;
-		*)
-			if [ ! $? = 0 ]; then
-				exit
-			fi
-			num1=$((RANDOM % 100))
-			num2=$((RANDOM % 100))
-			# 读取用户输入
-			read -p "${num1}+${num2}=?" user_sum
-			# 计算正确的和
-			correct_sum=$(($num1 + $num2))
-			# 检查用户输入是否正确
-			if [ $user_sum -eq $correct_sum ]; then
-				echo -e "删除开始正确！你输入的和是正确的。"
-				rm -rfv "${HOME}/.gancm/MCserver/${rm_MC_SERVER_class}/${list_items[$((user_choice-1))]}"
-				# 在这里添加你想要执行的命令
-				log "删除完成"
-			else
-				echo -e "错误！你输入的和不正确。删除程序将不执行。"
-				log "取消失败"
-			fi
-			;;
-		esac
-
+		fi
+		num1=$((RANDOM % 100))
+		num2=$((RANDOM % 100))
+		# 读取用户输入
+		read -p "${num1}+${num2}=?" user_sum
+		# 计算正确的和
+		correct_sum=$(($num1 + $num2))
+		# 检查用户输入是否正确
+		if [ $user_sum -eq $correct_sum ]; then
+			echo -e "删除开始正确！你输入的和是正确的。"
+			rm -rfv "${HOME}/.termux/gancm/MCserver/${rm_MC_SERVER_class}/${list_items[$((user_choice - 1))]}"
+			# 在这里添加你想要执行的命令
+			log "删除完成"
+		else
+			echo -e "错误！你输入的和不正确。删除程序将不执行。"
+			log "取消失败"
+		fi
+		;;
+	esac
 
 }
+
 install_MC_SERVER_MENU() {
 	install_MC_SERVER_MENU=$(
-		whiptail --title "服务器核心种类选择" --menu "按自己需求来" 15 60 4 \
+		whiptail --title "服务器核心种类选择" --menu "按自己需求来" 15 60 7 \
 			"1" "纯净服务端——插件" \
 			"2" "mod服务端" \
-			"3" "pe服务端" \
+			"3" "基岩版服务端" \
 			'4' '原版服务端' \
 			"0" "退出" 3>&1 1>&2 2>&3
 	)
 	case $install_MC_SERVER_MENU in
-		0)
-			return
-			;;
-		1)
-			log "准备安装纯净服务端"
-			install_MC_SERVER pure
-			;;
-		2)
-			log "准备安装mod服务端"
-			install_MC_SERVER mod
-			;;
-		3)
-			log "准备安装pe服务端"
-			install_MC_SERVER bedrock
-			;;
-		4)
-			log "准备安装原版服务端"
-			install_MC_SERVER vanilla
-			;;						
-		esac
+	0)
+		return
+		;;
+	1)
+		log "准备安装纯净服务端"
+		install_MC_SERVER pure
+		;;
+	2)
+		log "准备安装mod服务端"
+		install_MC_SERVER mod
+		;;
+	3)
+		log "准备安装pe服务端"
+		install_MC_SERVER bedrock
+		;;
+	4)
+		log "准备安装原版服务端"
+		install_MC_SERVER vanilla
+		;;
+	esac
 }
 # curl -s https://download.fastmirror.net/api/v3 | jq -r '.data[].tag' | grep -n "pure" | cut -d: -f1
 # 纯净服务端
@@ -300,5 +297,3 @@ install_MC_SERVER_MENU() {
 # for i in ${tag[@]} ; do
 # 	curl -s https://download.fastmirror.net/api/v3 | jq .data.[$((${i}-1))].name
 # done
-
-

@@ -1,17 +1,17 @@
 # /**
 #  * @file Linux_menu
 #  * @brief 该脚本提供了一个Linux菜单系统，允许用户通过命令行界面执行一系列与Minecraft服务器相关的操作。
-#  * 
+#  *
 #  * 功能包括：
 #  * - 加载Linux功能模块
 #  * - 下载和安装Java运行环境
 #  * - 安装、启动和删除Minecraft服务器
 #  * - 提供一个交互式菜单，让用户选择不同的操作
-#  * 
+#  *
 #  * 使用方法：
 #  * - 通过传递不同的参数（如download_JAVA, install_MC_SERVER, start_MC_SERVER, rm_MC_SERVER）来执行特定操作
 #  * - 如果没有提供参数，则显示主菜单供用户选择
-#  * 
+#  *
 #  * 脚本使用了whiptail工具来创建交互式菜单，并根据用户的选择执行相应的函数。
 #  */
 if source $HOME/.gancm/local/Linux/Linux_function; then
@@ -20,18 +20,18 @@ else
 	echo -e "${WORRY}加载Linux功能失败"
 fi
 case $1 in
-download_JAVA|dj)
-install_java
-;;
-install_MC_SERVER|imcs)
-install_MC_SERVER_MENU
-;;
-start_MC_SERVER|smcs)
-start_MC_SERVER
-;;
-rm_MC_SERVER|rmcs)
-rm_MC_SERVER
-;;
+download_JAVA | dj)
+	install_java
+	;;
+install_MC_SERVER | imcs)
+	install_MC_SERVER_MENU
+	;;
+start_MC_SERVER | smcs)
+	start_MC_SERVER
+	;;
+rm_MC_SERVER | rmcs)
+	rm_MC_SERVER
+	;;
 *)
 	Linux_menu=$(
 		whiptail --title "Linux_menu" --menu "按自己需求来" 15 60 4 \
@@ -42,15 +42,13 @@ rm_MC_SERVER
 	)
 	case $Linux_menu in
 	1)
-		if [ ! -d ${HOME}/.gancm/MCserver ]; then
-			mkdir ${HOME}/.gancm/MCserver
-		fi
 		MC_Server=$(
 			whiptail --title "选择功能" --menu "termux按自己需求来" 15 60 6 \
 				"1" "安装MC SERVER" \
 				"2" "启动MC SERVER" \
-				"3" "删除MC SERVER" \
-				"4" "安装java" \
+				"3" "后台启动MC SERVER 至少直接启动过一次防止错误" \
+				"4" "删除MC SERVER" \
+				"5" "安装java" \
 				"0" "退出" 3>&1 1>&2 2>&3
 		)
 		case $MC_Server in
@@ -59,15 +57,19 @@ rm_MC_SERVER
 			install_MC_SERVER_MENU
 			;;
 		2)
-		    log "启动MC SERVER"
+			log "启动MC SERVER"
 			start_MC_SERVER
 			;;
 		3)
-		 log "删除MC SERVER"
-			rm_MC_SERVER
+			log "后台启动MC SERVER"
+			start_MC_SERVER ht
 			;;
 		4)
-		 log "安装java"
+			log "删除MC SERVER"
+			rm_MC_SERVER
+			;;
+		5)
+			log "安装java"
 			download_JAVA
 			;;
 		*)
