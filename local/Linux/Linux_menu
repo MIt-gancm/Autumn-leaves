@@ -31,12 +31,14 @@ rm_MC_SERVER | rmcs)
 	case $Linux_menu in
 	1)
 		MC_Server=$(
-			whiptail --title "选择功能" --menu "termux按自己需求来" 15 60 6 \
+			whiptail --title "选择功能" --menu "termux按自己需求来" 15 60 8 \
 				"1" "安装MC SERVER" \
 				"2" "启动MC SERVER" \
-				"3" "后台启动MC SERVER 至少直接启动过一次防止错误" \
-				"4" "删除MC SERVER" \
-				"5" "安装java" \
+				"3" "删除MC SERVER" \
+				"4" "启动我的世界面板" \
+				"5" "停止我的世界面板" \
+				"6" "安装我的世界面板" \
+				"7" "安装java" \
 				"0" "退出" 3>&1 1>&2 2>&3
 		)
 		case $MC_Server in
@@ -49,14 +51,22 @@ rm_MC_SERVER | rmcs)
 			start_MC_SERVER
 			;;
 		3)
-			log "后台启动MC SERVER"
-			start_MC_SERVER ht
-			;;
-		4)
 			log "删除MC SERVER"
 			rm_MC_SERVER
 			;;
+		4)
+			log "启动我的世界面板"
+			startMCSManager
+			;;
 		5)
+			log "启动我的世界面板"
+			stopMCSManager
+			;;
+		6)
+			log "安装我的世界面板"
+			installMCSManager
+			;;
+		7)
 			log "安装java"
 			download_JAVA
 			;;
