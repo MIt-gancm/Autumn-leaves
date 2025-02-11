@@ -48,7 +48,17 @@ if [ "$(printf '%s\n' "$REMOTE_VERSION" "$LOCAL_VERSION" | sort -V | tail -n1)" 
 
 	log 进行git克隆
 	echo -e "${INFO}正在下载更新..."
-	git clone ${git}$GIT_CLONE $TEMP_DIR
+	if git clone --depth 1 ${git}$GIT_CLONE $TEMP_DIR ; then
+	    log 仓库拉取成功
+	else
+	    git config --global http.postBuffer 524288000  # 设置缓冲区为 500MB  
+	    git config --global http.maxRequestBuffer 100M
+		log 设置缓冲区
+		log 重新拉取
+		git clone --depth 1 ${git}$GIT_CLONE $TEMP_DIR
+	fi
+
+
 
 	if [ $? -ne 0 ]; then
 		echo -e "${ERROR}更新失败，无法克隆仓库！"
