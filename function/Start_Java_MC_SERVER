@@ -40,20 +40,20 @@ else
 	echo "2. 退出"
 
 	# 读取用户输入
-	read -p "请输入选项（1-2）：" option
+	read -e -p "请输入选项（1-2）：" option
 
 	# 根据用户输入执行相应操作
 	case $option in
 	1)
 		# 提示用户输入Java程序的jar文件路径
-		read -p "请输入jar文件路径 已安装的有: 
+		read -e -p "请输入jar文件路径 已安装的有: 
 $(ls /usr/lib/jvm/*/bin/java) :"
 
 		# 提示用户输入Java程序的最小内存
-		read -p "请输入Java程序的最小内存（例如：512m,2G）：" min_memory
+		read -e -p "请输入Java程序的最小内存（例如：512m,2G）：" min_memory
 
 		# 提示用户输入Java程序的最大内存
-		read -p "请输入Java程序的最大内存（例如：1024m,2G）：" max_memory
+		read -e -p "请输入Java程序的最大内存（例如：1024m,2G）：" max_memory
 
 		# 合成并执行java -jar命令
 		echo -e "

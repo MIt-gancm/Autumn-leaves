@@ -1,19 +1,15 @@
-# """
-# 此段代码是一个用于 Android 相关功能管理的脚本。
-# 它首先尝试加载安卓功能，并根据结果输出相应的提示信息。
-# 然后检查特定目录是否存在，如果不存在则创建。
-# 接着通过 case 语句处理不同的命令参数：
-# - 对于“install”命令，进一步根据第二个参数执行安装 proot 容器的相关操作或提示输入完整命令。
-# - 对于“start”命令，同样依据第二个参数决定启动 proot 容器或提示输入正确命令。
-# - 对于其他情况，通过 whiptail 弹出菜单供用户选择功能，如管理 proot 容器、换源、垃圾清理等，并根据用户的选择执行相应操作。
-# """
-if source $HOME/.gancm/local/Android/Android_function; then
-	echo -e "${SUSSEC}加载安卓功能成功"
-	log "加载安卓功能成功"
-else
-	echo -e "${WORRY}加载安卓功能失败"
-	log "加载安卓功能失败"
-fi
+#!/data/data/com.termux/files/usr/bin/bash
+# if source $HOME/.gancm/local/Android/Android_function; then
+# 	echo -e "${SUSSEC}加载安卓功能成功"
+# 	log "加载安卓功能成功"
+# else
+# 	echo -e "${WORRY}加载安卓功能失败"
+# 	log "加载安卓功能失败"
+# fi
+for script in $HOME/.gancm/local/Android/function/* ; do
+	source "$script" 
+	log "加载:$script"
+done
 case $1 in
 install)
 	case $2 in

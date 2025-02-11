@@ -1,18 +1,3 @@
-# /**
-#  * 安装 Minecraft 服务器的函数集合
-#  *
-#  * 这个脚本包含了多个函数，用于下载和安装不同类型的 Minecraft 服务器，
-#  * 包括纯净服务端、Mod 服务端、Bedrock 服务端和原版服务端。
-#  *
-#  * 函数包括：
-#  * - download_JAVA: 下载并安装指定版本的 Java 运行环境。
-#  * - install_MC_SERVER: 根据用户选择下载并安装相应的 Minecraft 服务器。
-#  * - start_MC_SERVER: 启动已安装的 Minecraft 服务器。
-#  * - rm_MC_SERVER: 删除指定的 Minecraft 服务器实例，带有安全验证。
-#  * - install_MC_SERVER_MENU: 显示服务器类型选择菜单，并调用相应的安装函数。
-#  *
-#  * 使用时，用户可以通过菜单选择所需的服务端类型，脚本将自动处理下载、安装和启动过程。
-#  */
 mkdir -p "${HOME}/.termux/gancm/MCserver"
 download_JAVA() {
 	echo "请选择要安装的java版本（支持多选，用空格分隔）:"
@@ -21,7 +6,7 @@ download_JAVA() {
 		echo "$i. ${options[$i]}"
 	done
 	# 读取用户输入
-	read -p "请输入您的选择：" user_input
+	read -e -p "请输入您的选择：" user_input
 	# 初始化选中的选项数组
 	selected=()
 	# 处理用户输入的选项
@@ -233,7 +218,7 @@ rm_MC_SERVER() {
 		num1=$((RANDOM % 100))
 		num2=$((RANDOM % 100))
 		# 读取用户输入
-		read -p "${num1}+${num2}=?" user_sum
+		read -e -p "${num1}+${num2}=?" user_sum
 		# 计算正确的和
 		correct_sum=$(($num1 + $num2))
 		# 检查用户输入是否正确

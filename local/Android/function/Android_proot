@@ -1,15 +1,3 @@
-# /**
-#  * @file Android_function
-#  * @brief 该文件包含了一系列用于管理Proot容器的Shell脚本函数，主要支持Debian和Ubuntu系统的安装、启动、删除以及下载源更换等功能。
-#  *
-#  * - install_proot: 安装Proot容器，根据用户选择下载并安装指定的Debian或Ubuntu系统版本。
-#  * - start_proot: 启动已安装的Proot容器，允许用户选择并启动特定的容器环境。
-#  * - rm_proot: 删除指定的Proot容器，在删除前会要求用户完成一个简单的数学题以防止误操作。
-#  * - Change_the_source: 测试并更换下载源，通过下载测试文件比较不同源的下载速度，然后询问用户是否更换为最快的下载源。
-#  * - garbage_collection: 清理下载目录中的文件，提供一个选项让用户决定是否删除这些文件以节省空间。
-#  *
-#  * 使用这些脚本函数可以方便地在Termux环境中管理和使用Proot容器。
-#  */
 open_debian_os_list() {
 	debian_os_list=$(
 		whiptail --title "选择功能" --menu "debian容器按自己需求来" 15 60 6 \
@@ -104,14 +92,14 @@ install_proot() {
 	case ${open_proot_os_list} in
 	1)
 		open_debian_os_list
-		log “debian系列“
+		log "debian系列"
 		;;
 	2)
 		open_ubuntu_os_list
-		log “安装ubuntu系列“
+		log "安装ubuntu系列"
 		;;
 	*)
-		log “未选择退出“
+		log "未选择退出"
 		exit 1
 		;;
 	esac
@@ -120,10 +108,24 @@ install_proot() {
 	log "Download_proot_url: ${Download_proot_url}"
 
 	download_file="${HOME}/.gancm/download/${os_name}.tar.xz"
-	# 检查文件是否存在并且文件大小是否小于10MB
-	if [ -f "$download_file" ] && [ $(du -b "$download_file" | cut -f1) -lt 10485760 ]; then
+	# 检查文件是否存在并且文件大小是否小于40MB
+	if [ -f "$download_file" ] && [ $(du -b "$download_file" | cut -f1) -lt 41943040 ]; then
 		echo -e "${WORRY}${RED}${download_file}${RES}可能已经损坏"
-		log "文件损坏，重新下载"
+		log "\"${HOME}/.gancm/download/${os_name}.tar.xz\"文件损坏，重新下载"
+		log "下载url:\"${Download_proot_url}\" 保存到 \"$download_file\""
+		if wget -q --show-progress "${Download_proot_url}" -O "$download_file"; then
+			echo -e "${INFO}文件存储在${RED}$download_file${RES}"
+			log "下载成功：$download_file"
+		else
+			echo -e "${WORRY}请检查网络访问问题${RES}"
+			log "下载失败：$download_file"
+			exit
+		fi
+	elif [ -f "$download_file" ]; then
+		log "\"${HOME}/.gancm/download/${os_name}.tar.xz\"存在且大于40MBB"
+	else
+		log "\"${HOME}/.gancm/download/${os_name}.tar.xz\"不存在"
+		log "下载url:\"${Download_proot_url}\" 保存到 \"$download_file\""
 		if wget -q --show-progress "${Download_proot_url}" -O "$download_file"; then
 			echo -e "${INFO}文件存储在${RED}$download_file${RES}"
 			log "下载成功：$download_file"
@@ -300,7 +302,7 @@ rm_proot() {
 		num2=$((RANDOM % 100))
 		log "num1=$num1 num2=$num2"
 		# 读取用户输入
-		read -p "${num1}+${num2}=?" user_sum
+		read -e -p "${num1}+${num2}=?" user_sum
 		log "user_sum=$user_sum"
 		# 计算正确的和
 		correct_sum=$(($num1 + $num2))
@@ -315,109 +317,4 @@ rm_proot() {
 		fi
 		;;
 	esac
-}
-Change_the_source() {
-	# 定义要下载的文件的URL数组
-	URLS=(
-		"https://mirrors.tuna.tsinghua.edu.cn"
-		"https://mirrors.aliyun.com"
-	)
-
-	echo "测速取决于网速，一般持续5-8分钟"
-
-	# 用于存储每个文件的下载速度
-	declare -A SPEEDS
-
-	# 循环遍历所有URL
-	for URL in "${URLS[@]}"; do
-		# 开始时间
-		STARTTIME=$(date +%s)
-
-		# 使用wget下载文件，这里使用随机生成的文件名以避免覆盖
-		FILENAME="download_$(date +%s).zip"
-		TEMPDIR=".gancm/TEM" # 确保目录存在
-		mkdir -p "$TEMPDIR"
-
-		# 执行wget下载并检查是否成功
-		if wget -q --show-progress "$URL/ubuntu/ls-lR.gz" -O "$TEMPDIR/$FILENAME"; then
-			# 结束时间
-			ENDTIME=$(date +%s)
-
-			# 计算时间差
-			DELTATIME=$((ENDTIME - STARTTIME))
-
-			# 获取文件大小
-			FILESIZE=$(du -b "$TEMPDIR/$FILENAME" | cut -f1)
-
-			# 计算下载速度
-			SPEED=$(echo "scale=2; $FILESIZE / $DELTATIME" | bc -l)
-
-			# 存储速度
-			SPEEDS[$URL]=$SPEED
-
-			# 输出结果
-			echo "URL: $URL"
-			echo "下载时间: $DELTATIME 秒"
-			echo "文件大小: $FILESIZE 字节"
-			echo "下载速度: $SPEED 字节/秒"
-			echo "---------------------------------------"
-
-			# 清理下载的文件
-			rm "$TEMPDIR/$FILENAME"
-		else
-			echo "下载失败: $URL"
-		fi
-	done
-
-	# 打印所有下载速度的比较
-	echo "所有源的下载速度比较："
-	for URL in "${URLS[@]}"; do
-		if [ -n "${SPEEDS[$URL]}" ]; then
-			echo "$URL: ${SPEEDS[$URL]} 字节/秒"
-		fi
-	done
-
-	# 找出最快的下载速度
-	FASTEST_URL=""
-	FASTEST_SPEED=0
-	for URL in "${URLS[@]}"; do
-		if [ -n "${SPEEDS[$URL]}" ] && [ $(echo "${SPEEDS[$URL]} > $FASTEST_SPEED" | bc -l) -eq 1 ]; then
-			FASTEST_URL=$URL
-			FASTEST_SPEED=${SPEEDS[$URL]}
-		fi
-	done
-
-	if [ -n "$FASTEST_URL" ]; then
-		echo "最快的下载源是：$FASTEST_URL"
-		echo "最快的下载速度是：$FASTEST_SPEED 字节/秒"
-	else
-		echo "没有成功的下载速度可以比较。"
-	fi
-
-	read -p "是否更换下载源和最快下载路线为: ${FASTEST_URL} [Y/n]:" user_input
-
-	case ${user_input} in
-	YES | Yes | Y | y)
-		sed -i "s@^\(deb.*stable main\)$@#\1\ndeb ${FASTEST_URL}/termux/apt/termux-main stable main@" $PREFIX/etc/apt/sources.list
-		apt update && apt upgrade
-		source ${HOME}/.gancm/config/config.sh
-		hcjx
-		;;
-	*)
-		hcjx
-		;;
-	esac
-}
-garbage_collection() {
-	ls -la ${HOME}/.gancm/download
-	read -p "是否删除这些文件？[Y/n]: " delete_files
-	if [[ $delete_files =~ ^[Yy]$ ]]; then
-		rm -rf ${HOME}/dowload/*
-		echo -e "${SUSSEC}所有文件已删除。"
-		log "所有文件已删除。"
-	else
-		echo -e "${INFO}文件未删除。"
-		log "文件未删除。"
-	fi
-
 }

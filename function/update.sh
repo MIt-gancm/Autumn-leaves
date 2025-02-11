@@ -81,7 +81,6 @@ if [ "$(printf '%s\n' "$REMOTE_VERSION" "$LOCAL_VERSION" | sort -V | tail -n1)" 
 		Modify_the_variable git "http:\/\/github.com\/" ${HOME}/.gancm/config/config.sh
 		Modify_the_variable rawgit "https:\/\/raw.githubusercontent.com\/MIt-gancm\/Autumn-leaves\/refs\/heads\/main\/" ${HOME}/.gancm/config/config.sh
 	fi
-
 	echo "更新完成！当前版本: $REMOTE_VERSION"
 	log 更新成功
 else

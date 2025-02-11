@@ -6,6 +6,12 @@ PINK='\e[1;35m'   # 粉红
 RES='\e[0m'       # 清除颜色
 ##字体颜色
 
+ERROR="[${RED}错误${RES}]:"
+WORRY="[${YELLOW}警告${RES}]:"
+SUSSEC="[${GREEN}成功${RES}]:"
+INFO="[${BLUE}信息${RES}]:"
+
+
 Modify_the_variable() {
 	sed -i "s/^${1}=.*/${1}=${2}/" ${3}
 	#使用格式
@@ -13,11 +19,6 @@ Modify_the_variable() {
 	#Modify_the_variable git github.com ${HOME}/.gancm/config/config.sh
 	#更改变量
 }
-
-ERROR="[${RED}错误${RES}]:"
-WORRY="[${YELLOW}警告${RES}]:"
-SUSSEC="[${GREEN}成功${RES}]:"
-INFO="[${BLUE}信息${RES}]:"
 
 self_install() {
 	case ${2} in
@@ -47,6 +48,7 @@ self_install() {
 		;;
 	esac
 }
+
 echo -e "${INFO}优化系统请勿退出"
 echo -e "${GREEN}尝试修复时区${RES}"
 echo "127.0.0.1 localhost" >/etc/hosts
