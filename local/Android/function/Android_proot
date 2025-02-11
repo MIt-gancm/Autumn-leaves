@@ -1,6 +1,6 @@
 open_debian_os_list() {
 	debian_os_list=$(
-		whiptail --title "选择功能" --menu "debian容器按自己需求来" 15 60 6 \
+		whiptail --title "选择功能" --menu "debian容器推荐QQ机器人" 15 60 6 \
 			"1" "Bookworm（Debian 12）" \
 			"2" "Bullseye（Debian 11）" \
 			"3" "Buster（Debian 10）" \
@@ -30,7 +30,7 @@ open_debian_os_list() {
 
 open_ubuntu_os_list() {
 	ubuntu_os_list=$(
-		whiptail --title "选择功能" --menu "ubuntu容器按自己需求来" 15 60 6 \
+		whiptail --title "选择功能" --menu "ubuntu容器推荐MC开服" 15 60 6 \
 			"1" "Focal（20.04 LTS）" \
 			"2" "Jammy（22.04 LTS）" \
 			"3" "Noble（24.04 LTS）" \
