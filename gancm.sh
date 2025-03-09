@@ -171,6 +171,15 @@ case ${1} in
 \t\t\tinstall_MC_SERVER|imcs\t安装MC_SERVER服务（别名imcs）
 \t\t\tstart_MC_SERVER|smcs\t启动MC_SERVER服务（别名smcs）
 \t\t\trm_MC_SERVER|rmcs\t移除MC_SERVER服务（别名rmcs）
+
+\t\t\tinstallMCSManager | imcsm安装我的世界面板（别名imcsm）
+\t\t\tstartMCSManager | startcsm\t启动我的世界面板（别名startcsm）
+\t\t\tstopMCSManager | stopcsm\t停止我的世界面板（别名stopcsm）
+
+\t\t\tinstallNapCatQQ | inQQ\t安装NapCatQQ（别名inQQ）
+\t\t\tstartNapCatQQ | startnQQ\t启动NapCatQQ（别名startnQQ）
+\t\t\tstartNapCatQQB | startnQQB\t后台启动NapCatQQ（后台）（别名startnQQB）
+\t\t\tstopNapCatQQ | stopnQQ\t停止NapCatQQ（别名stopnQQ）
 "
 	hcjx
 	;;

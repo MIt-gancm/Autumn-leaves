@@ -267,6 +267,65 @@ install_MC_SERVER_MENU() {
 		;;
 	esac
 }
+
+startMCSManager() {
+	log "启动mcsmanager"
+	if [ -d /opt/mcsmanager/ ]; then
+		log "mcsmanager已安装"
+		# mcsmanager
+		if [ ${system_os_type} = proot ]; then
+			log "系统为proot容器"
+			rm -rf /run/screen/S-root
+			start_mcsmanager
+		else
+			log "系统为非proot容器"
+			systemctl start mcsm-daemon.service
+			systemctl start mcsm-web.service
+		fi
+	else
+		log "mcsmanager未安装"
+		log "安装mcsmanager"
+		installMCSManager
+	fi
+}
+
+stopMCSManager() {
+	log "启动mcsmanager"
+	if [ -d /opt/mcsmanager/ ]; then
+		log "mcsmanager已安装"
+		# mcsmanager
+		if [ ${system_os_type} = proot ]; then
+			log "系统为proot容器"
+			rm -rf /run/screen/S-root
+			stop_mcsmanager
+		else
+			log "系统为非proot容器"
+			systemctl stop mcsm-web.service
+			systemctl stop mcsm-daemon.service
+		fi
+	else
+		log "mcsmanager未安装"
+		echo -e "${WARNING}没安装点到天荒地老也没用${RES}"
+	fi
+}
+
+installMCSManager() {
+		if [ ${system_os_type} = proot ]; then
+			log "系统为proot容器"
+			if bash <(curl -sL https://gitee.com/moze_sz/MCSMFP/raw/master/setup_cn.sh); then
+				log "安装成功"
+			else
+				log "安装失败"
+			fi
+		else
+			log "系统为非proot容器"
+			if wget -qO- https://script.mcsmanager.com/setup_cn.sh | bash; then
+				log "安装成功"
+			else
+				log "安装失败"
+			fi
+		fi
+}
 # curl -s https://download.fastmirror.net/api/v3 | jq -r '.data[].tag' | grep -n "pure" | cut -d: -f1
 # 纯净服务端
 # curl -s https://download.fastmirror.net/api/v3 | jq -r '.data[].tag' | grep -n "mod" | cut -d: -f1

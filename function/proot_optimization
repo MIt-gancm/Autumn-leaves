@@ -21,32 +21,13 @@ Modify_the_variable() {
 }
 
 self_install() {
-	case ${2} in
-	pip)
-		if [ ! -f "$(command -v ${1})" ]; then
-			echo -e "${RED}目前并没有安装 ${1} 正在安装${RES}"
-			pip install -y ${1}
-		fi
-		;;
-	pip3)
-		if [ ! -f "$(command -v ${1})" ]; then
-			echo -e "${RED}目前并没有安装 ${1} 正在安装${RES}"
-			pip3 install -y ${1}
-		fi
-		;;
-	apt)
-		if [ ! -f "$(command -v ${1})" ]; then
-			echo -e "${RED}目前并没有安装 ${1} 正在安装${RES}"
-			apt install -y ${1}
-		fi
-		;;
-	pkg)
-		if [ ! -f "$(command -v ${1})" ]; then
-			echo -e "${RED}目前并没有安装 ${1} 正在安装${RES}"
-			pkg install -y ${1}
-		fi
-		;;
-	esac
+	if ! command -v "$1" &>/dev/null; then
+		echo -e "${RED}未安装 $1，正在安装...${RES}"
+		case $2 in
+		pip | pip3 | apt | pkg) $2 install -y "$1" ;;
+		*) echo -e "${YELLOW}未知的安装方式: $2${RES}" ;;
+		esac
+	fi
 }
 
 echo -e "${INFO}优化系统请勿退出"
@@ -74,5 +55,6 @@ self_install git apt
 self_install jq apt
 self_install curl apt
 self_install bc apt
+dpkg-reconfigure locales
 rm -rf $0
 exit
