@@ -245,10 +245,6 @@ start_proot() {
 			PATH=/usr/local/sbin:/usr/local/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/games:/usr/local/games \
 			TERM=xterm-256color \
 			system_os_type=proot \
-<<<<<<< HEAD
-			system_os_type2=${os_name} \
-=======
->>>>>>> 1e3ef46316e3fde5ad5149e32701c33bcf1d5a6b
 			LANG=zh_CN.UTF-8 \
 			LC_CTYPE="zh_CN.UTF-8" \
 			LC_NUMERIC="zh_CN.UTF-8" \

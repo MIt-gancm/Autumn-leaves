@@ -49,11 +49,7 @@ startNapCatQQB| startnQQB)
 	case $Linux_menu in
 	1)
 		MC_Server=$(
-<<<<<<< HEAD
 			whiptail --title "选择功能" --menu "我的世界服务器按自己需求来" 15 60 8 \
-=======
-			whiptail --title "选择功能" --menu "termux按自己需求来" 15 60 8 \
->>>>>>> 1e3ef46316e3fde5ad5149e32701c33bcf1d5a6b
 				"1" "安装MC SERVER" \
 				"2" "启动MC SERVER" \
 				"3" "删除MC SERVER" \
@@ -77,11 +73,7 @@ startNapCatQQB| startnQQB)
 			rm_MC_SERVER
 			;;
 		4)
-<<<<<<< HEAD
 			log "停止我的世界面板"
-=======
-			log "启动我的世界面板"
->>>>>>> 1e3ef46316e3fde5ad5149e32701c33bcf1d5a6b
 			startMCSManager
 			;;
 		5)
