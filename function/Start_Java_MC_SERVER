@@ -29,9 +29,10 @@ else
 			echo -e "${INFO}forge安装服务器成功 转换脚本可识别的文件"
 			echo -e "${INFO}forge安装服务器成功" >forge_server_yes.txt
 		fi
-		rm -rfv ${HOME}/.termux/gancm/MCserver/${Core_version}/${Game_version}/run.sh
-		mv $(ls ${HOME}/.termux/gancm/MCserver/${Core_version}/${Game_version}/*.jar) ${HOME}/.termux/gancm/MCserver/${Core_version}/${Game_version}/${Core_version}_${Game_version}_server.jar
-	fi
+		if [ -f "run.sh" ]; then
+			mv ${HOME}/.termux/gancm/MCserver/${Core_version}/${Game_version}/run.sh ${HOME}/.termux/gancm/MCserver/${Core_version}/${Game_version}/start.sh
+			exit 0
+		fi 
 
 	# 显示菜单
 	echo "欢迎使用Java程序启动菜单"
@@ -57,11 +58,10 @@ $(ls /usr/lib/jvm/*/bin/java) :"
 
 		# 合成并执行java -jar命令
 		echo -e "
-            cd ${HOME}/.termux/gancm/MCserver/${Core_version}/${Game_version}/
-            echo -e "eula=true" > ${HOME}/.termux/gancm/MCserver/${Core_version}/${Game_version}/eula.txt
-            java -Xms"$min_memory" -Xmx"$max_memory" -jar "${HOME}/.termux/gancm/MCserver/${Core_version}/${Game_version}/${Core_version}_${Game_version}_server.jar" 
-            
-            " >${HOME}/.termux/gancm/MCserver/${Core_version}/${Game_version}/start.sh
+cd ${HOME}/.termux/gancm/MCserver/${Core_version}/${Game_version}/
+echo -e "eula=true" > ${HOME}/.termux/gancm/MCserver/${Core_version}/${Game_version}/eula.txt
+java -Xms"$min_memory" -Xmx"$max_memory" -jar "${HOME}/.termux/gancm/MCserver/${Core_version}/${Game_version}/${Core_version}_${Game_version}_server.jar" 
+" >${HOME}/.termux/gancm/MCserver/${Core_version}/${Game_version}/start.sh
 		;;
 	2)
 		echo "${INFO}退出程序"
