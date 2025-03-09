@@ -55,6 +55,8 @@ self_install git apt
 self_install jq apt
 self_install curl apt
 self_install bc apt
+echo -e "${GREEN}自己选择语言${RES}"
+hcjx
 dpkg-reconfigure locales
 rm -rf $0
 exit

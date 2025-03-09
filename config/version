@@ -1,6 +1,13 @@
 {
+<<<<<<< HEAD
     "version": "1.1.5",
     "git_clone": "MIt-gancm/Autumn-leaves",
     "description": "QQ机器人",
     "release_date": "2025-3-9-24-15"
+=======
+    "version": "1.1.3",
+    "git_clone": "MIt-gancm/Autumn-leaves",
+    "description": "修复亿点点问题 添加适配proot的MCSManager By墨泽 和官方MCSManager",
+    "release_date": "2025-2-10-22-06"
+>>>>>>> 1e3ef46316e3fde5ad5149e32701c33bcf1d5a6b
 }
