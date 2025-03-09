@@ -209,7 +209,7 @@ case ${1} in
 		self_install bc pkg
 		validity
 		variable
-		source ${HOME}/.gancm/function/update.sh
+		bash ${HOME}/.gancm/function/update.sh
 		log "检查更新"
 		source ${HOME}/.gancm/local/Android/Android_menu $1 $2 $3
 		;;
@@ -223,7 +223,7 @@ case ${1} in
 		self_install bc apt
 		validity
 		variable
-		source ${HOME}/.gancm/function/update.sh
+		bash ${HOME}/.gancm/function/update.sh
 		log "检查更新"
 		source ${HOME}/.gancm/local/Linux/Linux_menu $1 $2 $3
 		;;

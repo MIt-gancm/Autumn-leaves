@@ -1,4 +1,56 @@
 # 设置变量
+source ${HOME}/.gancm/config/config.sh
+RED='\e[1;31m'                   # 红 ${RED}
+GREEN='\e[1;32m'                 # 绿 ${GREEN}
+YELLOW='\e[1;33m'                # 黄 ${YELLOW}
+BLUE='\e[1;34m'                  # 蓝 ${BLUE}
+PINK='\e[1;35m'                  # 粉红 ${PINK}
+RES='\e[0m'                      # 清除颜色 ${RES}
+##字体颜色
+
+ERROR="[${RED}错误${RES}]:"    # ${ERROR}
+WORRY="[${YELLOW}警告${RES}]:" # ${WORRY}
+SUSSEC="[${GREEN}成功${RES}]:" # ${SUSSEC}
+INFO="[${BLUE}信息${RES}]:"    # ${INFO}
+
+#常用变量和函数
+########################################################
+declare -A arch_map=(["aarch64"]="arm64" ["armv7l"]="armhf" ["x86_64"]="amd64")
+archurl="${arch_map[$(uname -m)]}"
+
+log() {
+	#log文件名
+	local fileName="${HOME}/.gancm/log.log"
+	#log文件最大存储log行数（此处设置最大存储log行数是100行）
+	local fileMaxLen=100
+	#超过log最大存储行数后需要从顶部开始删除的行数（此处设置的是删除第1到第10行的数据）
+	local fileDeleteLen=10
+	if test $fileName; then
+		#记录log
+		echo "[$(date +%y/%m/%d-%H:%M:%S)]:$*" >>$fileName
+		#获取log文件实际行数
+		loglen=$(grep -c "" $fileName)
+
+		if [ $loglen -gt $fileMaxLen ]; then
+			#从顶部开始删除对应行数的log
+			sed -i '1,'$fileDeleteLen'd' $fileName
+		fi
+	else
+		echo "[$(date +%y/%m/%d-%H:%M:%S)]:$*" >$fileName
+	fi
+}
+
+# testdate=100
+# #记录输出的字符串
+# log "test string"
+# #记录输出的数据
+# log "testdate=$testdate"
+# #记录输出的运算
+# log $[1+2]
+# #记录命令输出的信息
+# log $(printf "this is cmd test %s\n" "this is cmd output string")
+
+#函数
 A_DIR="${HOME}/.gancm"   # A分区路径
 B_DIR="${HOME}/.back"    # B分区路径
 TEMP_DIR="${HOME}/.TEMP" # 临时目录
@@ -61,6 +113,8 @@ if [ "$(printf '%s\n' "$REMOTE_VERSION" "$LOCAL_VERSION" | sort -V | tail -n1)" 
 
 	if [ $? -ne 0 ]; then
 		echo -e "${ERROR}更新失败，无法克隆仓库！"
+		log 拉取失败
+		exit 1
 	fi
 
 	# 备份当前A分区
