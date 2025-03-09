@@ -30,6 +30,11 @@ self_install() {
 	fi
 }
 
+hcjx() {
+	echo -e "${GREEN}请按回车键继续下一条指令...${RES}"
+	read -r
+}
+
 echo -e "${INFO}优化系统请勿退出"
 echo -e "${GREEN}尝试修复时区${RES}"
 echo "127.0.0.1 localhost" >/etc/hosts

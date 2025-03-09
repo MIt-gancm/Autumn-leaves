@@ -18,7 +18,7 @@ startNapCatQQ() {
 	if [ ${system_os_type} = proot ]; then
 		log "系统为proot容器"
 		log "启动NapCatQQ"
-		if [ ${system_os_type2} = Bookworm_Debian_12 ]; then
+		if [ "${system_os_type2}" == Bookworm_Debian_12 ]; then
 			log "启动NapCatQQ"
 			if [ ${QQbot} = "" ]; then
 				read -e -p "请输入您的选择：" QQbot

@@ -37,7 +37,6 @@ archurl="${arch_map[$(uname -m)]}"
 variable() {
 	source ${HOME}/.gancm/config/config.sh
 }
-#!/bin/bash
 log() {
 	#log文件名
 	local fileName="${HOME}/.gancm/log.log"

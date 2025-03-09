@@ -9,7 +9,7 @@ for script in $HOME/.gancm/local/Linux/function/* ; do
 done
 case $1 in
 download_JAVA | dj)
-	install_java
+	download_JAVA
 	;;
 install_MC_SERVER | imcs)
 	install_MC_SERVER_MENU
