@@ -33,7 +33,7 @@ else
 			mv ${HOME}/.termux/gancm/MCserver/${Core_version}/${Game_version}/run.sh ${HOME}/.termux/gancm/MCserver/${Core_version}/${Game_version}/start.sh
 			exit 0
 		fi 
-
+        fi
 	# 显示菜单
 	echo "欢迎使用Java程序启动菜单"
 	echo "请输入选项："
