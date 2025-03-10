@@ -94,22 +94,23 @@ validity_git() {
 		)
 		case ${wheregit} in
 		1)
-			Modify_the_variable git "http:\/\/github.com\/" ${HOME}/.gancm/config/config.sh
+			Modify_the_variable git "https:\/\/github.com\/" ${HOME}/.gancm/config/config.sh
 			Modify_the_variable rawgit "https:\/\/raw.githubusercontent.com\/MIt-gancm\/Autumn-leaves\/refs\/heads\/main\/" ${HOME}/.gancm/config/config.sh
 			return 0
 			;;
 		2)
-			Modify_the_variable git "http:\/\/gitee.com\/" ${HOME}/.gancm/config/config.sh
+			Modify_the_variable git "https:\/\/gitee.com\/" ${HOME}/.gancm/config/config.sh
 			Modify_the_variable rawgit "https:\/\/raw.giteeusercontent.com\/MIt-gancm\/Autumn-leaves\/raw\/main\/" ${HOME}/.gancm/config/config.sh
 			return 0
 			;;
 		3)
-			Modify_the_variable git "https:\/\/dl.gancm.us.kg\/http:\/\/github.com\/" ${HOME}/.gancm/config/config.sh
+			Modify_the_variable git "https:\/\/dl.gancm.us.kg\/https:\/\/github.com\/" ${HOME}/.gancm/config/config.sh
 			Modify_the_variable rawgit "https:\/\/dl.gancm.us.kg\/https:\/\/raw.githubusercontent.com\/MIt-gancm\/Autumn-leaves\/refs\/heads\/main\/" ${HOME}/.gancm/config/config.sh
 			return 0
 			;;
 		0)
 			echo -e " 未选择默认修改为 ${YELLOW}Github${RES} "
+			Modify_the_variable git "https:\/\/gitee.com\/" ${HOME}/.gancm/config/config.sh
 			Modify_the_variable rawgit "https:\/\/raw.githubusercontent.com\/MIt-gancm\/Autumn-leaves\/refs\/heads\/main\/" ${HOME}/.gancm/config/config.sh
 			return 0
 			;;

@@ -108,15 +108,11 @@ if [ "$(printf '%s\n' "$REMOTE_VERSION" "$LOCAL_VERSION" | sort -V | tail -n1)" 
 		log 重新拉取
 		git clone --depth 1 ${git}$GIT_CLONE $TEMP_DIR
 	fi
-
-
-
 	if [ $? -ne 0 ]; then
 		echo -e "${ERROR}更新失败，无法克隆仓库！"
 		log 拉取失败
 		exit 1
 	fi
-
 	# 备份当前A分区
 	echo -e "${INFO}备份当前A分区..."
 	log 创建备份的 tar.gz 压缩包
@@ -136,11 +132,14 @@ if [ "$(printf '%s\n' "$REMOTE_VERSION" "$LOCAL_VERSION" | sort -V | tail -n1)" 
 	log 清理临时目录
 	rm -rf $TEMP_DIR
 	if [ "${git}" = "http://gitee.com/" ]; then
-		Modify_the_variable git "http:\/\/gitee.com\/" ${HOME}/.gancm/config/config.sh
+		Modify_the_variable git "https:\/\/gitee.com\/" ${HOME}/.gancm/config/config.sh
 		Modify_the_variable rawgit "https:\/\/raw.giteeusercontent.com\/MIt-gancm\/Autumn-leaves\/raw\/main\/" ${HOME}/.gancm/config/config.sh
 	elif [ "${git}" = "http://github.com/" ]; then
-		Modify_the_variable git "http:\/\/github.com\/" ${HOME}/.gancm/config/config.sh
+		Modify_the_variable git "https:\/\/github.com\/" ${HOME}/.gancm/config/config.sh
 		Modify_the_variable rawgit "https:\/\/raw.githubusercontent.com\/MIt-gancm\/Autumn-leaves\/refs\/heads\/main\/" ${HOME}/.gancm/config/config.sh
+	elif [ "${git}" = "https://dl.gancm.us.kg/https://github.com/" ]; then
+		Modify_the_variable git "https:\/\/dl.gancm.us.kg\/https:\/\/github.com\/" ${HOME}/.gancm/config/config.sh
+		Modify_the_variable rawgit "https:\/\/dl.gancm.us.kg\/https:\/\/raw.githubusercontent.com\/MIt-gancm\/Autumn-leaves\/refs\/heads\/main\/" ${HOME}/.gancm/config/config.sh
 	fi
 	if [ "${qqBot}" != "" ]; then
 		Modify_the_variable qqBot ${qqBot} ${HOME}/.gancm/config/config.sh
