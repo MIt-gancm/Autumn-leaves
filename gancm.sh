@@ -104,8 +104,8 @@ validity_git() {
 			return 0
 			;;
 		3)
-			Modify_the_variable git "https:\/\/dl.gancm.us.kg\/https:\/\/github.com\/" ${HOME}/.gancm/config/config.sh
-			Modify_the_variable rawgit "https:\/\/dl.gancm.us.kg\/https:\/\/raw.githubusercontent.com\/MIt-gancm\/Autumn-leaves\/refs\/heads\/main\/" ${HOME}/.gancm/config/config.sh
+			Modify_the_variable git "https:\/\/dl.gancmcs.top\/https:\/\/github.com\/" ${HOME}/.gancm/config/config.sh
+			Modify_the_variable rawgit "https:\/\/dl.gancmcs.top\/https:\/\/raw.githubusercontent.com\/MIt-gancm\/Autumn-leaves\/refs\/heads\/main\/" ${HOME}/.gancm/config/config.sh
 			return 0
 			;;
 		0)
