@@ -82,7 +82,7 @@ install_proot() {
 	esac
 	mkdir -p "${HOME}/.termux/gancm/proot"
 
-	Proot_os_download_source="https://dl.gancm.us.kg/https://sgp1lxdmirror01.do.letsbuildthe.cloud/images"
+	Proot_os_download_source="https://sgp1lxdmirror01.do.letsbuildthe.cloud/images"
 	open_proot_os_list=$(
 		whiptail --title "选择功能" --menu "proot容器按自己需求来" 15 60 7 \
 			"1" "debian" \
