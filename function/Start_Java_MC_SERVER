@@ -30,7 +30,11 @@ else
 			echo -e "${INFO}forge安装服务器成功" >forge_server_yes.txt
 		fi
 		if [ -f "run.sh" ]; then
-			mv ${HOME}/.termux/gancm/MCserver/${Core_version}/${Game_version}/run.sh ${HOME}/.termux/gancm/MCserver/${Core_version}/${Game_version}/start.sh
+		    echo -e "
+cd ${HOME}/.termux/gancm/MCserver/${Core_version}/${Game_version}/
+echo -e "eula=true" > ${HOME}/.termux/gancm/MCserver/${Core_version}/${Game_version}/eula.txt
+source run.sh
+" > ${HOME}/.termux/gancm/MCserver/${Core_version}/${Game_version}/start.sh
 			exit 0
 		fi 
         fi
