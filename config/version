@@ -1,6 +1,6 @@
 {
     "version": "1.1.9",
     "git_clone": "MIt-gancm/Autumn-leaves",
-    "description": "删除下载proot的代理",
-    "release_date": "2025-3-25-14-30"
+    "description": "修复proot判断失误",
+    "release_date": "2025-4-5-21-26"
 }
