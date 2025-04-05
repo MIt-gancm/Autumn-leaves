@@ -49,7 +49,7 @@ startNapCatQQB| startnQQB)
 			"2" "QQ机器人" \
 			"3" "咕咕咕" \
 			"0" "退出" \
-			"-1" "debuger" 3>&1 1>&2 2>&3
+			"D" "debuger" 3>&1 1>&2 2>&3
 	)
 	case $Linux_menu in
 	1)
@@ -149,7 +149,7 @@ startNapCatQQB| startnQQB)
 				;;
 		esac
 		;;
-	-1)
+	D)
 		debuger
 		;;
 	*)
