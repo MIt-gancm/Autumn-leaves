@@ -2,7 +2,7 @@ installNapCatQQ() {
 	if [ ${system_os_type} = proot ]; then
 		log "系统为proot容器"
 		log "安装NapCatQQ"
-		if [ ${system_os_type2} = Bookworm_Debian_12 ]; then
+		if [ "${system_os_type2}" = Bookworm_Debian_12 ]; then
 			log "容器为Bookworm_Debian_12下载并安装官方脚本"
 			curl -o napcat.sh https://nclatest.znin.net/NapNeko/NapCat-Installer/main/script/install.sh && sudo bash napcat.sh
 		else

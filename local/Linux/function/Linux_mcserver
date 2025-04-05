@@ -273,7 +273,7 @@ startMCSManager() {
 	if [ -d /opt/mcsmanager/ ]; then
 		log "mcsmanager已安装"
 		# mcsmanager
-		if [ ${system_os_type} = proot ]; then
+		if [ "${system_os_type}" = proot ]; then
 			log "系统为proot容器"
 			rm -rf /run/screen/S-root
 			start_mcsmanager
@@ -294,7 +294,7 @@ stopMCSManager() {
 	if [ -d /opt/mcsmanager/ ]; then
 		log "mcsmanager已安装"
 		# mcsmanager
-		if [ ${system_os_type} = proot ]; then
+		if [ "${system_os_type}" = proot ]; then
 			log "系统为proot容器"
 			rm -rf /run/screen/S-root
 			stop_mcsmanager
@@ -310,7 +310,7 @@ stopMCSManager() {
 }
 
 installMCSManager() {
-		if [ ${system_os_type} = proot ]; then
+		if [ "${system_os_type}" = proot ]; then
 			log "系统为proot容器"
 			if bash <(curl -sL https://gitee.com/moze_sz/MCSMFP/raw/master/setup_cn.sh); then
 				log "安装成功"

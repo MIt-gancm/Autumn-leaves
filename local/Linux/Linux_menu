@@ -39,12 +39,17 @@ startNapCatQQB| startnQQB)
 	startNapCatQQ -B
 	;;
 *)
+	if [ "${system_os_type}" = "" ] ; then
+		echo -e "${INFO}完整linux环境或非本脚本安装的proot{RES}"
+	fi
+
 	Linux_menu=$(
 		whiptail --title "Linux_menu" --menu "按自己需求来" 15 60 4 \
 			"1" "管理mc Server" \
 			"2" "QQ机器人" \
 			"3" "咕咕咕" \
-			"0" "退出" 3>&1 1>&2 2>&3
+			"0" "退出" \
+			"-1" "debuger" 3>&1 1>&2 2>&3
 	)
 	case $Linux_menu in
 	1)
@@ -94,7 +99,7 @@ startNapCatQQB| startnQQB)
 		esac
 		;;
 	2)
-	QQBot_menu=$(
+		QQBot_menu=$(
 		whiptail --title "选择功能" --menu "QQ机器人按自己需求来" 15 60 8 \
 			"1" "管理NapCatQQ" \
 			"2" "管理机器人" \
@@ -144,7 +149,9 @@ startNapCatQQB| startnQQB)
 				;;
 		esac
 		;;
-			
+	-1)
+		debuger
+		;;
 	*)
 		echo -e "待添加_Linux_menu"
 		;;

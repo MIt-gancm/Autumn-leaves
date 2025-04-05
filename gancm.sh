@@ -154,6 +154,50 @@ apt_up() {
 		Modify_the_variable last_time_aptup ${current_timestamp} ${HOME}/.gancm/config/config.sh
 	fi
 }
+debuger() {
+	echo "${INFO}脚本定义的变量：$(cat ${HOME}/.gancm/config/config.sh)" 
+	case $(uname -o) in
+	Android)
+		echo -e "${INFO}当前运行环境为Android${RES}"
+		;;
+	*)
+		echo -e "${INFO}当前运行环境为Linux${RES}"
+		if [ "${system_os_type}" = "" ] ; then
+			echo -e "${INFO}完整linux环境或非本脚本安装的proot{RES}"
+		fi
+		;;
+	esac
+	echo -e "${INFO}近期日志:"
+	IP=`ifconfig | grep inet | grep -vE 'inet6|127.0.0.1' | awk '{print $2}'`  
+	echo "IP地址："$IP  
+	cpu_num=`grep -c "model name" /proc/cpuinfo`  
+	echo "cpu总核数："$cpu_num  
+	cpu_user=`top -b -n 1 | grep Cpu | awk '{print $2}' | cut -f 1 -d "%"`  
+	echo "用户空间占用CPU百分比："$cpu_user  
+	cpu_system=`top -b -n 1 | grep Cpu | awk '{print $4}' | cut -f 1 -d "%"`  
+	echo "内核空间占用CPU百分比："$cpu_system  
+	cpu_idle=`top -b -n 1 | grep Cpu | awk '{print $8}' | cut -f 1 -d "%"`  
+	echo "空闲CPU百分比："$cpu_idle  
+	cpu_iowait=`top -b -n 1 | grep Cpu | awk '{print $10}' | cut -f 1 -d "%"`  
+	echo "等待输入输出占CPU百分比："$cpu_iowait  
+	mem_total=`free | grep Mem | awk '{print $2}'`  
+	echo "物理内存总量："$mem_total  
+	mem_sys_used=`free | grep Mem | awk '{print $3}'`  
+	echo "已使用内存总量(操作系统)："$mem_sys_used  
+	mem_sys_free=`free | grep Mem | awk '{print $4}'`  
+	echo "剩余内存总量(操作系统)："$mem_sys_free  
+	mem_user_used=`free | sed -n 3p | awk '{print $3}'`  
+	echo "已使用内存总量(应用程序)："$mem_user_used  
+	mem_user_free=`free | sed -n 3p | awk '{print $4}'`  
+	echo "剩余内存总量(应用程序)："$mem_user_free  
+	mem_swap_total=`free | grep Swap | awk '{print $2}'`  
+	echo "交换分区总大小："$mem_swap_total  
+	mem_swap_used=`free | grep Swap | awk '{print $3}'`  
+	echo "已使用交换分区大小："$mem_swap_used  
+	mem_swap_free=`free | grep Swap | awk '{print $4}'`  
+	echo "剩余交换分区大小："$mem_swap_free  
+	tail -n 50 ${HOME}/.gancm/log.log 
+}
 #函数
 
 case ${1} in

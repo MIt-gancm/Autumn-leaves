@@ -42,7 +42,8 @@ start)
 			"2" "换源" \
 			"3" "垃圾清理" \
 			"4" "待添加" \
-			"0" "退出" 3>&1 1>&2 2>&3
+			"0" "退出" \
+			"-1" "debuger"  3>&1 1>&2 2>&3
 	)
 	case $Android_menu in
 	1)
@@ -82,6 +83,9 @@ start)
 	3)
 		log "垃圾清理"
 		garbage_collection
+		;;
+	-1)
+		debuger
 		;;
 	*)
 		echo -e "待添加_Android_menu"
