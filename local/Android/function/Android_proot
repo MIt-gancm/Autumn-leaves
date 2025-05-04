@@ -107,27 +107,27 @@ install_proot() {
 	log "Download_proot_NAME: ${Download_proot_NAME}"
 	log "Download_proot_url: ${Download_proot_url}"
 
-wget_proot_url(){
-	# 这他妈就是脱裤子放屁还不得不写
-	i=0
-	while [ $i -lt 2 ]; do
-		if wget -q --show-progress "${Download_proot_url}" -O "$download_file"; then
-			echo -e "${INFO}文件存储在${RED}$download_file${RES}"
-			log "下载成功：$download_file"
-		else
-			echo -e "${WORRY}请检查网络访问问题${RES}"
-			log "下载失败：$download_file"
-			download_file=https://dl.gancmcs.top/$download_file
-			log "下载url:\"${Download_proot_url}\" 保存到 \"$download_file\""
-			wget_proot_url
-			if [ "$i" = "1" ]; then
-				echo -e "${ERROR}下载失败"
-				exit 1
+	wget_proot_url(){
+		# 这他妈就是脱裤子放屁还不得不写
+		i=0
+		while [ $i -lt 2 ]; do
+			if wget -q --show-progress "${Download_proot_url}" -O "$download_file"; then
+				echo -e "${INFO}文件存储在${RED}$download_file${RES}"
+				log "下载成功：$download_file"
+			else
+				echo -e "${WORRY}请检查网络访问问题${RES}"
+				log "下载失败：$download_file"
+				download_file=https://dl.gancmcs.top/$download_file
+				log "下载url:\"${Download_proot_url}\" 保存到 \"$download_file\""
+				wget_proot_url
+				if [ "$i" = "1" ]; then
+					echo -e "${ERROR}下载失败"
+					exit 1
+				fi
 			fi
-		fi
-		i =$i+1
-	done
-}
+			i =$i+1
+		done
+	}
 
 	download_file="${HOME}/.gancm/download/${os_name}.tar.xz"
 	# 检查文件是否存在并且文件大小是否小于40MB
