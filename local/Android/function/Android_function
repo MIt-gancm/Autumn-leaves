@@ -48,7 +48,11 @@ Change_the_source() {
 	read -e -p "是否更换下载源和最快下载路线为: $FASTEST_URL [Y/n]:" user_input
 	case $user_input in
 	YES | Yes | Y | y)
-		sed -i "s@^\(deb.*stable main\)$@#\1\ndeb $FASTEST_URL/termux/apt/termux-main stable main@" $PREFIX/etc/apt/sources.list
+		if [ "$FASTEST_URL" = "https://mirrors.tuna.tsinghua.edu.cn" ]; then 
+			sed -i 's@^\(deb.*stable main\)$@#\1\ndeb https://mirrors.tuna.tsinghua.edu.cn/termux/apt/termux-main stable main@' $PREFIX/etc/apt/sources.list
+		else
+			sed -i 's@^\(deb.*stable main\)$@#\1\ndeb https://mirrors.aliyun.com/termux/termux-packages-24 stable main@' $PREFIX/etc/apt/sources.list
+		fi
 		apt update && apt upgrade
 		source $HOME/.gancm/config/config.sh
 		hcjx

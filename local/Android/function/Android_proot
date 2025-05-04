@@ -9,17 +9,17 @@ open_debian_os_list() {
 	case ${debian_os_list} in
 	1)
 		os_name=Bookworm_Debian_12
-		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/debian/bookworm/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2p')
+		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/debian/bookworm/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2s|/$||p')
 		Download_proot_url=${Proot_os_download_source}/debian/bookworm/${archurl}/default/${Download_proot_NAME}/rootfs.tar.xz
 		;;
 	2)
 		os_name=Bullseye_Debian_11
-		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/debian/bullseye/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2p')
+		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/debian/bullseye/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2s|/$||p')
 		Download_proot_url=${Proot_os_download_source}/debian/bullseye/${archurl}/default/${Download_proot_NAME}/rootfs.tar.xz
 		;;
 	3)
 		os_name=Buster_Debian_10
-		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/debian/buster/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2p')
+		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/debian/buster/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2s|/$||p')
 		Download_proot_url=${Proot_os_download_source}/debian/buster/${archurl}/default/${Download_proot_NAME}/rootfs.tar.xz
 		;;
 	*)
@@ -40,22 +40,22 @@ open_ubuntu_os_list() {
 	case ${ubuntu_os_list} in
 	1)
 		os_name=Focal_Ubuntu_20.04
-		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/ubuntu/focal/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2p')
+		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/ubuntu/focal/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2s|/$||p')
 		Download_proot_url=${Proot_os_download_source}/ubuntu/focal/${archurl}/default/${Download_proot_NAME}/rootfs.tar.xz
 		;;
 	2)
 		os_name=Jammy_Ubuntu_22.04
-		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/ubuntu/jammy/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2p')
+		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/ubuntu/jammy/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2s|/$||p')
 		Download_proot_url=${Proot_os_download_source}/ubuntu/jammy/${archurl}/default/${Download_proot_NAME}/rootfs.tar.xz
 		;;
 	3)
 		os_name=Noble_Ubuntu_24.04
-		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/ubuntu/noble/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2p')
+		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/ubuntu/noble/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2s|/$||p')
 		Download_proot_url=${Proot_os_download_source}/ubuntu/noble/${archurl}/default/${Download_proot_NAME}/rootfs.tar.xz
 		;;
 	4)
 		os_name=Oracular_Ubuntu_24.10
-		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/ubuntu/oracular/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2p')
+		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/ubuntu/oracular/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2s|/$||p')
 		Download_proot_url=${Proot_os_download_source}/ubuntu/oracular/${archurl}/default/${Download_proot_NAME}/rootfs.tar.xz
 		;;
 	*)
@@ -107,33 +107,41 @@ install_proot() {
 	log "Download_proot_NAME: ${Download_proot_NAME}"
 	log "Download_proot_url: ${Download_proot_url}"
 
+wget_proot_url(){
+	# 这他妈就是脱裤子放屁还不得不写
+	i=0
+	while [ $i -lt 2 ]; do
+		if wget -q --show-progress "${Download_proot_url}" -O "$download_file"; then
+			echo -e "${INFO}文件存储在${RED}$download_file${RES}"
+			log "下载成功：$download_file"
+		else
+			echo -e "${WORRY}请检查网络访问问题${RES}"
+			log "下载失败：$download_file"
+			download_file=https://dl.gancmcs.top/$download_file
+			log "下载url:\"${Download_proot_url}\" 保存到 \"$download_file\""
+			wget_proot_url
+			if [ "$i" = "1" ]; then
+				echo -e "${ERROR}下载失败"
+				exit 1
+			fi
+		fi
+		i =$i+1
+	done
+}
+
 	download_file="${HOME}/.gancm/download/${os_name}.tar.xz"
 	# 检查文件是否存在并且文件大小是否小于40MB
 	if [ -f "$download_file" ] && [ $(du -b "$download_file" | cut -f1) -lt 41943040 ]; then
 		echo -e "${WORRY}${RED}${download_file}${RES}可能已经损坏"
 		log "\"${HOME}/.gancm/download/${os_name}.tar.xz\"文件损坏，重新下载"
 		log "下载url:\"${Download_proot_url}\" 保存到 \"$download_file\""
-		if wget -q --show-progress "${Download_proot_url}" -O "$download_file"; then
-			echo -e "${INFO}文件存储在${RED}$download_file${RES}"
-			log "下载成功：$download_file"
-		else
-			echo -e "${WORRY}请检查网络访问问题${RES}"
-			log "下载失败：$download_file"
-			exit
-		fi
+		wget_proot_url
 	elif [ -f "$download_file" ]; then
 		log "\"${HOME}/.gancm/download/${os_name}.tar.xz\"存在且大于40MBB"
 	else
 		log "\"${HOME}/.gancm/download/${os_name}.tar.xz\"不存在"
 		log "下载url:\"${Download_proot_url}\" 保存到 \"$download_file\""
-		if wget -q --show-progress "${Download_proot_url}" -O "$download_file"; then
-			echo -e "${INFO}文件存储在${RED}$download_file${RES}"
-			log "下载成功：$download_file"
-		else
-			echo -e "${WORRY}请检查网络访问问题${RES}"
-			log "下载失败：$download_file"
-			exit
-		fi
+		wget_proot_url
 	fi
 
 	# 提示清理空间
@@ -147,7 +155,7 @@ install_proot() {
 	log "复制脚本到容器"
 	mkdir -p ${HOME}/.termux/gancm/proot/${os_name}/root/.gancm
 	mkdir -p ${HOME}/.termux/gancm/sys/.empty
-	mkdir -p ${HOME}/.termux/gancm/dev/shm
+	mkdir -p ${HOME}/.termux/gancm/.重要文件夹/dev/shm
 	cp -r ${HOME}/.gancm/config ${HOME}/.termux/gancm/proot/${os_name}/root/.gancm
 	cp -r ${HOME}/.gancm/function ${HOME}/.termux/gancm/proot/${os_name}/root/.gancm
 	cp -r ${HOME}/.gancm/local ${HOME}/.termux/gancm/proot/${os_name}/root/.gancm
@@ -224,7 +232,7 @@ start_proot() {
 			--bind=${HOME}/.termux/gancm/proot/${os_name}/proc/.stat:/proc/stat \
 			--bind=${HOME}/.termux/gancm/proot/${os_name}/proc/.loadavg:/proc/loadavg \
 			--bind=${HOME}/.termux/gancm/sys/.empty:/sys/fs/selinux \
-			--bind=${HOME}/.termux/gancm/dev/shm:/dev/shm \
+			--bind=${HOME}/.termux/gancm/dev/.重要文件夹/shm:/dev/shm \
 			--bind=/sys \
 			--bind=/proc/self/fd/2:/dev/stderr \
 			--bind=/proc/self/fd/1:/dev/stdout \
