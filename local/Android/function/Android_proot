@@ -114,6 +114,7 @@ install_proot() {
 			if wget -q --show-progress "${Download_proot_url}" -O "$download_file"; then
 				echo -e "${INFO}文件存储在${RED}$download_file${RES}"
 				log "下载成功：$download_file"
+                                break
 			else
 				echo -e "${WORRY}请检查网络访问问题${RES}"
 				log "下载失败：$download_file"
