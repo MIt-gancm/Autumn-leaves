@@ -125,7 +125,7 @@ install_proot() {
 					exit 1
 				fi
 			fi
-			$i=$i+1
+	                ((i++))
 		done
 	}
 
