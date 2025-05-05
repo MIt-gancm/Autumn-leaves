@@ -1,6 +1,6 @@
 {
-    "version": "1.2.2",
+    "version": "1.2.3",
     "git_clone": "MIt-gancm/Autumn-leaves",
-    "description": "更改了一个文件的位置 添加了容器下载失败自动用代理链接重试 加了个脱裤子放屁的傻逼函数就为了少写几行代码",
-    "release_date": "2025-5-4-18-44"
+    "description": "给傻逼函数修复了个bug",
+    "release_date": "2025-5-5-23-34"
 }
