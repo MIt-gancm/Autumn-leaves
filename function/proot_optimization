@@ -53,7 +53,8 @@ apt upgrade -y
 Modify_the_variable last_time_aptup $(date +%s) ${HOME}/.gancm/config/config.sh
 self_install language-pack-zh-hans apt
 self_install fonts-wqy-microhei apt
-self_install fonts-wqy-zenhei xfonts-wqy apt
+self_install fonts-wqy-zenhei apt
+self_install xfonts-wqy apt
 self_install ttf-wqy-zenhei apt
 self_install wget apt
 self_install git apt
