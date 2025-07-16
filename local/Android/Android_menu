@@ -6,10 +6,8 @@
 # 	echo -e "${WORRY}加载安卓功能失败"
 # 	log "加载安卓功能失败"
 # fi
-for script in $HOME/.gancm/local/Android/function/* ; do
-	source "$script" 
-	log "加载:$script"
-done
+	source ~/.gancm/local/Android/function/Android_proot
+	log "加载:Android_proot"
 case $1 in
 install)
 	case $2 in
@@ -78,7 +76,8 @@ start)
 		;;
 	2)
 		log "换源"
-		Change_the_source
+		pip install requests
+		python ~/.gancm/local/Android/function/Android_function.py
 		;;
 	3)
 		log "垃圾清理"

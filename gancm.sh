@@ -246,7 +246,8 @@ case ${1} in
 	Android)
 		log "加载安卓功能"
 		self_install jq pkg
-		self_install git apt
+		self_install git pkg
+		self_install python pkg
 		self_install wget pkg
 		self_install whiptail pkg
 		self_install tmux pkg
