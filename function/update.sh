@@ -144,7 +144,7 @@ if [ "$(printf '%s\n' "$REMOTE_VERSION" "$LOCAL_VERSION" | sort -V | tail -n1)" 
 	if [ "${qqBot}" != "" ]; then
 		Modify_the_variable qqBot ${qqBot} ${HOME}/.gancm/config/config.sh
 	fi
-	
+	chmod 777 ${HOME}/.gancm/gancm.sh
 	echo "更新完成！当前版本: $REMOTE_VERSION"
 	log 更新成功
 else
