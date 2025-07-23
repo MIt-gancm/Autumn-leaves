@@ -37,11 +37,10 @@ start)
 	;;
 *)
 	Android_menu=$(
-		whiptail --title "选择功能" --menu "termux按自己需求来" 15 60 4 \
+		whiptail --title "选择功能" --menu "termux按自己需求来" 15 60 8 \
 			"1" "管理proot容器" \
-			"2" "换源" \
-			"3" "垃圾清理" \
-			"4" "待添加" \
+			"2" "垃圾清理" \
+			"3" "待添加" \
 			"0" "退出" \
 			"D" "debuger"  3>&1 1>&2 2>&3
 	)
@@ -77,10 +76,6 @@ start)
 		esac
 		;;
 	2)
-		log "换源"
-		Change_the_source
-		;;
-	3)
 		log "垃圾清理"
 		garbage_collection
 		;;

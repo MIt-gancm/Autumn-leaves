@@ -37,7 +37,7 @@ source run.sh
 " > ${HOME}/.termux/gancm/MCserver/${Core_version}/${Game_version}/start.sh
 			exit 0
 		fi 
-        fi
+    fi
 	# 显示菜单
 	echo "欢迎使用Java程序启动菜单"
 	echo "请输入选项："
@@ -75,4 +75,3 @@ java -Xms"$min_memory" -Xmx"$max_memory" -jar "${HOME}/.termux/gancm/MCserver/${
 		echo -e "${ERROR}无效的选项，请重新运行脚本并选择1或2。"
 		;;
 	esac
-fi

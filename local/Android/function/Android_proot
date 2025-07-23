@@ -38,25 +38,68 @@ open_ubuntu_os_list() {
 			"0" "退出" 3>&1 1>&2 2>&3
 	)
 	case ${ubuntu_os_list} in
+
 	1)
-		os_name=Focal_Ubuntu_20.04
-		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/ubuntu/focal/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2s|/$||p')
-		Download_proot_url=${Proot_os_download_source}/ubuntu/focal/${archurl}/default/${Download_proot_NAME}/rootfs.tar.xz
-		;;
-	2)
 		os_name=Jammy_Ubuntu_22.04
 		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/ubuntu/jammy/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2s|/$||p')
 		Download_proot_url=${Proot_os_download_source}/ubuntu/jammy/${archurl}/default/${Download_proot_NAME}/rootfs.tar.xz
 		;;
-	3)
+	2)
 		os_name=Noble_Ubuntu_24.04
 		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/ubuntu/noble/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2s|/$||p')
 		Download_proot_url=${Proot_os_download_source}/ubuntu/noble/${archurl}/default/${Download_proot_NAME}/rootfs.tar.xz
 		;;
-	4)
+	3)
 		os_name=Oracular_Ubuntu_24.10
 		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/ubuntu/oracular/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2s|/$||p')
 		Download_proot_url=${Proot_os_download_source}/ubuntu/oracular/${archurl}/default/${Download_proot_NAME}/rootfs.tar.xz
+		;;
+	4)
+		os_name=Plucky_Ubuntu_25.04
+		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/ubuntu/plucky/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2s|/$||p')
+		Download_proot_url=${Proot_os_download_source}/ubuntu/plucky/${archurl}/default/${Download_proot_NAME}/rootfs.tar.xz
+		;;
+	*)
+		exit 1
+		;;
+	esac
+}
+
+open_rockylinux_os_list() {
+	rockylinux_os_list=$(
+		whiptail --title "选择功能" --menu "rockylinux容器推荐MC开服" 15 60 6 \
+			"1" "Rocky_Linux_8" \
+			"2" "Rocky_Linux_9" \
+			"0" "退出" 3>&1 1>&2 2>&3
+	)
+	case ${rockylinux_os_list} in
+	1)
+		os_name=Rocky_Linux_8
+		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/rockylinux/8/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2s|/$||p')
+		Download_proot_url=${Proot_os_download_source}/rockylinux/8/${archurl}/default/${Download_proot_NAME}/rootfs.tar.xz
+		;;
+	2)
+		os_name=Rocky_Linux_9
+		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/rockylinux/9/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2s|/$||p')
+		Download_proot_url=${Proot_os_download_source}/rockylinux/9/${archurl}/default/${Download_proot_NAME}/rootfs.tar.xz
+		;;
+	*)
+		exit 1
+		;;
+	esac
+}
+
+open_centos_os_list() {
+	centos_os_list=$(
+		whiptail --title "选择功能" --menu "centos容器推荐MC开服" 15 60 6 \
+			"1" "centos_9-Stream" \
+			"0" "退出" 3>&1 1>&2 2>&3
+	)
+	case ${centos_os_list} in
+	1)
+		os_name=centos_9-Stream
+		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/centos/9-Stream/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2s|/$||p')
+		Download_proot_url=${Proot_os_download_source}/centos/9-Stream/${archurl}/default/${Download_proot_NAME}/rootfs.tar.xz
 		;;
 	*)
 		exit 1
@@ -81,22 +124,31 @@ install_proot() {
 		;;
 	esac
 	mkdir -p "${HOME}/.termux/gancm/proot"
-
 	Proot_os_download_source="https://sgp1lxdmirror01.do.letsbuildthe.cloud/images"
 	open_proot_os_list=$(
 		whiptail --title "选择功能" --menu "proot容器按自己需求来" 15 60 7 \
-			"1" "debian" \
-			"2" "ubuntu" \
+			"1" "ubuntu" \
+			"2" "debian" \
+			"3" "rockylinux" \
+			"4" "centos" \
 			"0" "退出" 3>&1 1>&2 2>&3
 	)
 	case ${open_proot_os_list} in
 	1)
+		open_ubuntu_os_list
+		log "安装ubuntu系列"
+		;;
+	2)
 		open_debian_os_list
 		log "debian系列"
 		;;
-	2)
-		open_ubuntu_os_list
-		log "安装ubuntu系列"
+	3)
+		open_rockylinux_os_list
+		log "安装rockylinux系列"
+		;;
+	4)
+		open_centos_os_list
+		log "安装centos系列"
 		;;
 	*)
 		log "未选择退出"
@@ -108,25 +160,27 @@ install_proot() {
 	log "Download_proot_url: ${Download_proot_url}"
 
 	wget_proot_url(){
-		# 这他妈就是脱裤子放屁还不得不写
-		i=0
-		while [ $i -lt 2 ]; do
+		while [ $counter -lt $Maximum_number_of_attempts ]; do
+			log "最大循环Maximum_number_of_attempts: $Maximum_number_of_attempts"
+			log "当前循环counter= $counter"
 			if wget -q --show-progress "${Download_proot_url}" -O "$download_file"; then
 				echo -e "${INFO}文件存储在${RED}$download_file${RES}"
 				log "下载成功：$download_file"
-                                break
+				break
 			else
 				echo -e "${WORRY}请检查网络访问问题${RES}"
 				log "下载失败：$download_file"
-				download_file=https://dl.gancmcs.top/$download_file
-				log "下载url:\"${Download_proot_url}\" 保存到 \"$download_file\""
-				wget_proot_url
-				if [ "$i" = "1" ]; then
-					echo -e "${ERROR}下载失败"
+				if [ $counter -eq 0 ]; then
+					Download_proot_url="https://dl.gancmcs.top/${Download_proot_url}"
+					log "尝试使用备用 URL 下载，更新 Download_proot_url 为 \"$Download_proot_url\""
+				fi
+				if [ $counter -eq $((Maximum_number_of_attempts - 1)) ]; then
+					echo -e "${ERROR}多次下载失败，退出程序"
 					exit 1
 				fi
 			fi
-	                ((i++))
+
+			((counter++))
 		done
 	}
 
@@ -136,12 +190,16 @@ install_proot() {
 		echo -e "${WORRY}${RED}${download_file}${RES}可能已经损坏"
 		log "\"${HOME}/.gancm/download/${os_name}.tar.xz\"文件损坏，重新下载"
 		log "下载url:\"${Download_proot_url}\" 保存到 \"$download_file\""
+		counter=0
+		Maximum_number_of_attempts=2  # 定义最大重试次数
 		wget_proot_url
 	elif [ -f "$download_file" ]; then
 		log "\"${HOME}/.gancm/download/${os_name}.tar.xz\"存在且大于40MBB"
 	else
 		log "\"${HOME}/.gancm/download/${os_name}.tar.xz\"不存在"
 		log "下载url:\"${Download_proot_url}\" 保存到 \"$download_file\""
+		counter=0
+		Maximum_number_of_attempts=2  # 
 		wget_proot_url
 	fi
 
@@ -151,11 +209,13 @@ install_proot() {
 	unset LD_PRELOAD
 	mkdir -p ${HOME}/.termux/gancm/proot/${os_name}
 	log "解压\"${HOME}/.gancm/download/${os_name}.tar.xz\""
-	proot --link2symlink tar -xJf ${HOME}/.gancm/download/${os_name}.tar.xz -C ${HOME}/.termux/gancm/proot/${os_name}/ --exclude='dev' || :
+	proot --link2symlink tar --overwrite -xJf ${HOME}/.gancm/download/${os_name}.tar.xz -C ${HOME}/.termux/gancm/proot/${os_name}/ --exclude='dev' || :
+	chmod 777 -R "${HOME}/.termux/gancm/proot/${os_name}/root/"
+	chmod 777 -R "${HOME}/.termux/gancm/proot/${os_name}/proc/"
 	echo -e "${GREEN}复制脚本到容器${RES}"
 	log "复制脚本到容器"
 	mkdir -p ${HOME}/.termux/gancm/proot/${os_name}/root/.gancm
-	mkdir -p ${HOME}/.termux/gancm/sys/.empty
+	mkdir -p ${HOME}/.termux/gancm/.重要文件夹/sys/.empty
 	mkdir -p ${HOME}/.termux/gancm/.重要文件夹/dev/shm
 	cp -r ${HOME}/.gancm/config ${HOME}/.termux/gancm/proot/${os_name}/root/.gancm
 	cp -r ${HOME}/.gancm/function ${HOME}/.termux/gancm/proot/${os_name}/root/.gancm
@@ -225,6 +285,7 @@ start_proot() {
 			--bind=/data/data/com.termux/cache \
 			--bind=/data/dalvik-cache \
 			--bind=/data/app \
+			--bind=/proc:/proc \
 			--bind=${HOME}/.termux/gancm/proot/${os_name}/proc/.sysctl_inotify_max_user_watches:/proc/sys/fs/inotify/max_user_watches \
 			--bind=${HOME}/.termux/gancm/proot/${os_name}/proc/.sysctl_entry_cap_last_cap:/proc/sys/kernel/cap_last_cap \
 			--bind=${HOME}/.termux/gancm/proot/${os_name}/proc/.vmstat:/proc/vmstat \
@@ -232,8 +293,8 @@ start_proot() {
 			--bind=${HOME}/.termux/gancm/proot/${os_name}/proc/.uptime:/proc/uptime \
 			--bind=${HOME}/.termux/gancm/proot/${os_name}/proc/.stat:/proc/stat \
 			--bind=${HOME}/.termux/gancm/proot/${os_name}/proc/.loadavg:/proc/loadavg \
-			--bind=${HOME}/.termux/gancm/sys/.empty:/sys/fs/selinux \
-			--bind=${HOME}/.termux/gancm/dev/.重要文件夹/shm:/dev/shm \
+			--bind=${HOME}/.termux/gancm/.重要文件夹/sys/.empty:/sys/fs/selinux \
+			--bind=${HOME}/.termux/gancm/.重要文件夹/dev/shm:/dev/shm \
 			--bind=/sys \
 			--bind=/proc/self/fd/2:/dev/stderr \
 			--bind=/proc/self/fd/1:/dev/stdout \

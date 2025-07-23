@@ -3,8 +3,8 @@
 # else
 # 	echo -e "${WORRY}加载Linux功能失败"
 # fi
-for script in $HOME/.gancm/local/Linux/function/* ; do
-	source "$script" 
+for script in $HOME/.gancm/local/Linux/function/*; do
+	source "$script"
 	log "加载:$script"
 done
 case $1 in
@@ -35,11 +35,11 @@ installNapCatQQ | inQQ)
 startNapCatQQ | startnQQ)
 	startNapCatQQ
 	;;
-startNapCatQQB| startnQQB)
+startNapCatQQB | startnQQB)
 	startNapCatQQ -B
 	;;
 *)
-	if [ "${system_os_type}" = "" ] ; then
+	if [ "${system_os_type}" = "" ]; then
 		echo -e "${INFO}完整linux环境或非本脚本安装的proot{RES}"
 	fi
 
@@ -51,6 +51,10 @@ startNapCatQQB| startnQQB)
 			"0" "退出" \
 			"D" "debuger" 3>&1 1>&2 2>&3
 	)
+	if [ ! "$package_manager" = "apt" ]; then
+		echo -e "${RED}请使用apt包管理器${RES}"
+		exit 1
+	fi
 	case $Linux_menu in
 	1)
 		MC_Server=$(
@@ -78,11 +82,11 @@ startNapCatQQB| startnQQB)
 			rm_MC_SERVER
 			;;
 		4)
-			log "停止我的世界面板"
+			log "启动我的世界面板"
 			startMCSManager
 			;;
 		5)
-			log "启动我的世界面板"
+			log "停止我的世界面板"
 			stopMCSManager
 			;;
 		6)
@@ -100,55 +104,56 @@ startNapCatQQB| startnQQB)
 		;;
 	2)
 		QQBot_menu=$(
-		whiptail --title "选择功能" --menu "QQ机器人按自己需求来" 15 60 8 \
-			"1" "管理NapCatQQ" \
-			"2" "管理机器人" \
-			"0" "退出" 3>&1 1>&2 2>&3
+			whiptail --title "选择功能" --menu "QQ机器人按自己需求来" 15 60 8 \
+				"1" "管理NapCatQQ" \
+				"2" "管理机器人" \
+				"0" "退出" 3>&1 1>&2 2>&3
 		)
 		case $QQBot_menu in
+		1)
+			log "管理NapCatQQ"
+			QQBotTX_menu=$(
+				whiptail --title "选择功能" --menu "QQ机器容器支持deb12和非容器Ubuntu 20+/Debian 10+/Centos9" 15 60 8 \
+					"1" "安装NapCatQQ" \
+					"2" "启动NapCatQQ" \
+					"3" "后台启动NapCatQQ" \
+					"4" "WebUI地址" \
+					"0" "退出" 3>&1 1>&2 2>&3
+			)
+			case $QQBotTX_menu in
 			1)
-				log "管理NapCatQQ"
-				QQBotTX_menu=$(
-					whiptail --title "选择功能" --menu "QQ机器容器支持deb12和非容器Ubuntu 20+/Debian 10+/Centos9" 15 60 8 \
-						"1" "安装NapCatQQ" \
-						"2" "启动NapCatQQ" \
-						"3" "后台启动NapCatQQ" \
-						"4" "WebUI地址" \
-						"0" "退出" 3>&1 1>&2 2>&3
-				)
-				case $QQBotTX_menu in
-					1)
-						log "安装NapCatQQ"
-						installNapCatQQ
-						;;
-					2)
-						log "启动NapCatQQ"
-						startNapCatQQ
-						;;
-					3)
-						log "后台启动NapCatQQ"
-						startNapCatQQ -B
-						;;
-					4)
-						log "WebUI地址"
-						QQbottk=$(jq -r '.token' /opt/QQ/resources/app/app_launcher/napcat/config/webui.json)
-						echo -e "机器人后台地址: http://127.0.0.1:6099/webui?token=${QQbottk} "
-						hcjx
-						;;
-					*)
-						echo -e "${RED}quit$RES"
-						;;
-				esac
-			;;
+				log "安装NapCatQQ"
+				installNapCatQQ
+				;;
 			2)
-				log "管理机器人"
-				echo "咕咕咕"
+				log "启动NapCatQQ"
+				startNapCatQQ
+				;;
+			3)
+				log "后台启动NapCatQQ"
+				startNapCatQQ -B
+				;;
+			4)
+				log "WebUI地址"
+				QQbottk=$(jq -r '.token' /opt/QQ/resources/app/app_launcher/napcat/config/webui.json)
+				echo -e "机器人后台地址: http://127.0.0.1:6099/webui?token=${QQbottk} "
+				hcjx
 				;;
 			*)
 				echo -e "${RED}quit$RES"
 				;;
+			esac
+			;;
+		2)
+			log "管理机器人"
+			echo "咕咕咕"
+			;;
+		*)
+			echo -e "${RED}quit$RES"
+			;;
 		esac
 		;;
+
 	D)
 		debuger
 		;;

@@ -1,6 +1,6 @@
 {
-    "version": "1.2.4",
+    "version": "1.3.0",
     "git_clone": "MIt-gancm/Autumn-leaves",
-    "description": "给傻逼函数修复了个bug",
-    "release_date": "2025-5-5-23-34"
+    "description": "一堆自己摸索吧 改了底层命令可能有很多bug  反馈给我  如果bug严重可以通过\"~/.back\"目录下恢复更新前的版本 同时更改\"~/.gancm/config/version\"文件中的version为1.3.0跳过本次更新",
+    "release_date": "2025-7-23-21-18"
 }

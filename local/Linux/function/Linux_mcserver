@@ -22,7 +22,7 @@ download_JAVA() {
 		exit
 	fi
 	echo "您选择了：${selected[*]}"
-	apt install ${selected[*]} -y
+	$package_manager install ${selected[*]} -y
 	log "选择的Java:${selected[*]}"
 }
 install_MC_SERVER() {
@@ -144,7 +144,6 @@ install_MC_SERVER() {
 	fi
 
 }
-
 start_MC_SERVER() {
 	log "准备启动mcserver"
 	if [ ! -f "$(command -v java)" ]; then
@@ -235,7 +234,6 @@ rm_MC_SERVER() {
 	esac
 
 }
-
 install_MC_SERVER_MENU() {
 	install_MC_SERVER_MENU=$(
 		whiptail --title "服务器核心种类选择" --menu "按自己需求来" 15 60 7 \
@@ -267,7 +265,6 @@ install_MC_SERVER_MENU() {
 		;;
 	esac
 }
-
 startMCSManager() {
 	log "启动mcsmanager"
 	if [ -d /opt/mcsmanager/ ]; then
@@ -288,7 +285,6 @@ startMCSManager() {
 		installMCSManager
 	fi
 }
-
 stopMCSManager() {
 	log "启动mcsmanager"
 	if [ -d /opt/mcsmanager/ ]; then
@@ -308,7 +304,6 @@ stopMCSManager() {
 		echo -e "${WARNING}没安装点到天荒地老也没用${RES}"
 	fi
 }
-
 installMCSManager() {
 		if [ "${system_os_type}" = proot ]; then
 			log "系统为proot容器"

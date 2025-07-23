@@ -72,10 +72,7 @@ log() {
 self_install() {
 	if ! command -v "$1" &>/dev/null; then
 		echo -e "${RED}未安装 $1，正在安装...${RES}"
-		case $2 in
-		pip | pip3 | apt | pkg) $2 install -y "$1" ;;
-		*) echo -e "${YELLOW}未知的安装方式: $2${RES}" ;;
-		esac
+		${package_manager} install -y "$1"
 	fi
 }
 hcjx() {
@@ -108,10 +105,40 @@ validity_git() {
 			Modify_the_variable rawgit "https:\/\/dl.gancmcs.top\/https:\/\/raw.githubusercontent.com\/MIt-gancm\/Autumn-leaves\/refs\/heads\/main\/" ${HOME}/.gancm/config/config.sh
 			return 0
 			;;
-		0)
+		*)
 			echo -e " 未选择默认修改为 ${YELLOW}Github${RES} "
 			Modify_the_variable git "https:\/\/gitee.com\/" ${HOME}/.gancm/config/config.sh
 			Modify_the_variable rawgit "https:\/\/raw.githubusercontent.com\/MIt-gancm\/Autumn-leaves\/refs\/heads\/main\/" ${HOME}/.gancm/config/config.sh
+			return 0
+			;;
+		esac
+	fi
+}
+validity_auto_upgrade() {
+	source ${HOME}/.gancm/config/config.sh
+	if [ "${auto_upgrade}" = "" ]; then
+		wheregit=$(
+			whiptail --title "选择默认安装源" --menu "是否自动更新软件包(默认关闭)" 15 60 4 \
+				"1" "开启" \
+				"2" "关闭" \
+				"0" "退出" 3>&1 1>&2 2>&3
+		)
+		case ${wheregit} in
+		1)
+			Modify_the_variable auto_upgrade "true" ${HOME}/.gancm/config/config.sh
+			log "自动升级脚本开启"
+			return 0
+			;;
+		2)
+			Modify_the_variable auto_upgrade "false" ${HOME}/.gancm/config/config.sh
+			log "自动升级脚本关闭"
+			return 0
+			;;
+		*)
+			echo -e " 未选择默认修改为 ${YELLOW}false${RES} "
+			Modify_the_variable auto_upgrade "false" ${HOME}/.gancm/config/config.sh
+			log "自动升级脚本关闭"
+			# 默认关闭自动升级脚本
 			return 0
 			;;
 		esac
@@ -125,6 +152,7 @@ validity_dir() {
 validity() {
 	validity_dir
 	validity_git
+	validity_auto_upgrade
 }
 Modify_the_variable() {
 	sed -i "s/^${1}=.*/${1}=${2}/" ${3}
@@ -150,8 +178,13 @@ apt_up() {
 	source ${HOME}/.gancm/config/config.sh
 	current_timestamp=$(date +%s)
 	if [[ -z "${last_time_aptup}" || $((current_timestamp - last_time_aptup)) -ge $((5 * 24 * 60 * 60)) ]]; then
-		apt update -y && apt upgrade -y
-		Modify_the_variable last_time_aptup ${current_timestamp} ${HOME}/.gancm/config/config.sh
+		if [ "${auto_upgrade}" = "true" ]; then
+			log "自动升级脚本开启"
+			$package_manager update -y && $package_manager upgrade -y
+			Modify_the_variable last_time_aptup ${current_timestamp} ${HOME}/.gancm/config/config.sh
+		else
+			log "自动升级脚本未开启"
+		fi
 	fi
 }
 debuger() {
@@ -198,6 +231,75 @@ debuger() {
 	echo "剩余交换分区大小："$mem_swap_free  
 	tail -n 50 ${HOME}/.gancm/log.log 
 }
+
+get_linux_distro() {
+    if [ -f /etc/os-release ]; then
+        . /etc/os-release
+        echo "$ID"
+    elif [ -f /etc/issue ]; then
+        local issue_content=$(cat /etc/issue | awk '{print $1; exit}')
+        echo "$issue_content" | tr '[:upper:]' '[:lower:]'
+    else
+        echo "unknown"
+    fi
+}
+ 
+# 检测包管理器的函数
+get_linux_distro() {
+    if [ -f /etc/os-release ]; then
+        . /etc/os-release
+        echo "$ID"
+    elif [ -f /etc/issue ]; then
+        local issue_content=$(cat /etc/issue | awk '{print $1; exit}')
+        echo "$issue_content" | tr '[:upper:]' '[:lower:]'
+    else
+        echo "unknown"
+    fi
+}
+
+detect_package_manager() {
+    local distro=$(get_linux_distro)
+    case "$distro" in
+        "ubuntu"|"debian"|"linuxmint"|"pop"|"kali")
+            echo "apt"
+            ;;
+        "centos"|"rhel"|"rocky"|"almalinux")
+            echo "yum"
+            ;;
+        "fedora")
+            echo "dnf"
+            ;;
+        "arch"|"manjaro"|"endeavouros")
+            echo "pacman"
+            ;;
+        "opensuse"|"suse")
+            echo "zypper"
+            ;;
+        *)
+            # 3. 如果发行版未知，再检查命令是否存在
+            if command -v apt >/dev/null 2>&1; then
+                echo "apt"
+            elif command -v dnf >/dev/null 2>&1; then
+                echo "dnf"
+            elif command -v yum >/dev/null 2>&1; then
+                echo "yum"
+            elif command -v pacman >/dev/null 2>&1; then
+                echo "pacman"
+            elif command -v zypper >/dev/null 2>&1; then
+                echo "zypper"
+			elif [ -d "/data/data/com.termux/files/usr" ]; then
+				echo "pkg"
+            else
+                echo "unknown"
+                return 1
+            fi
+            ;;
+    esac
+	log "检测到的包管理器: $package_manager"
+}
+ 
+# 主程序
+package_manager=$(detect_package_manager)
 #函数
 
 case ${1} in
@@ -245,12 +347,12 @@ case ${1} in
 	case $(uname -o) in
 	Android)
 		log "加载安卓功能"
-		self_install jq pkg
-		self_install git apt
-		self_install wget pkg
-		self_install whiptail pkg
-		self_install tmux pkg
-		self_install bc pkg
+		self_install jq 
+		self_install git 
+		self_install wget 
+		self_install whiptail 
+		self_install tmux 
+		self_install bc 
 		validity
 		variable
 		bash ${HOME}/.gancm/function/update.sh
@@ -259,12 +361,12 @@ case ${1} in
 		;;
 	*)
 		log "加载Linux功能"
-		self_install jq apt
-		self_install git apt
-		self_install wget apt
-		self_install whiptail apt
-		self_install tmux apt
-		self_install bc apt
+		self_install jq
+		self_install git
+		self_install wget
+		self_install whiptail
+		self_install tmux
+		self_install bc
 		validity
 		variable
 		bash ${HOME}/.gancm/function/update.sh
