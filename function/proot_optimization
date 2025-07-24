@@ -105,15 +105,11 @@ echo "127.0.0.1 localhost" >/etc/hosts
 mkdir -p /run/systemd/resolve
 echo -e "${GREEN}尝试修复dns${RES}"
 if [ -f /run/systemd/resolve/stub-resolv.conf ]; then
-	echo -e "
-nameserver 8.8.8.8
-nameserver 114.114.114.114
-	" >/run/systemd/resolve/stub-resolv.conf
+	echo -e "nameserver 8.8.8.8
+nameserver 114.114.114.114" >/run/systemd/resolve/stub-resolv.conf
 elif [ -f /etc/resolv.conf ]; then
-	echo -e "
-nameserver 8.8.8.8
-nameserver 114.114.114.114
-	" >/etc/resolv.conf
+echo -e "nameserver 8.8.8.8
+nameserver 114.114.114.114" >/etc/resolv.conf
 fi
 echo -e "${GREEN}尝试禁用无用检测${RES}"
 ln -s ~/.gancm/gancm.sh /usr/bin/gancm
@@ -135,6 +131,6 @@ self_install curl $package_manager
 self_install bc $package_manager
 echo -e "${GREEN}自己选择语言${RES}"
 hcjx
-dpkg-reconfigure locales
 rm -rf $0
+dpkg-reconfigure locales
 exit
