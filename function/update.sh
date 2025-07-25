@@ -131,16 +131,6 @@ if [ "$(printf '%s\n' "$REMOTE_VERSION" "$LOCAL_VERSION" | sort -V | tail -n1)" 
 
 	log 清理临时目录
 	rm -rf $TEMP_DIR
-	if [ "${git}" = "http://gitee.com/" ]; then
-		Modify_the_variable git "https:\/\/gitee.com\/" ${HOME}/.gancm/config/config.sh
-		Modify_the_variable rawgit "https:\/\/raw.giteeusercontent.com\/MIt-gancm\/Autumn-leaves\/raw\/main\/" ${HOME}/.gancm/config/config.sh
-	elif [ "${git}" = "http://github.com/" ]; then
-		Modify_the_variable git "https:\/\/github.com\/" ${HOME}/.gancm/config/config.sh
-		Modify_the_variable rawgit "https:\/\/raw.githubusercontent.com\/MIt-gancm\/Autumn-leaves\/refs\/heads\/main\/" ${HOME}/.gancm/config/config.sh
-	elif [ "${git}" = "https://dl.gancm.us.kg/https://github.com/" ]; then
-		Modify_the_variable git "https:\/\/dl.gancm.us.kg\/https:\/\/github.com\/" ${HOME}/.gancm/config/config.sh
-		Modify_the_variable rawgit "https:\/\/dl.gancm.us.kg\/https:\/\/raw.githubusercontent.com\/MIt-gancm\/Autumn-leaves\/refs\/heads\/main\/" ${HOME}/.gancm/config/config.sh
-	fi
 	if [ "${qqBot}" != "" ]; then
 		Modify_the_variable qqBot ${qqBot} ${HOME}/.gancm/config/config.sh
 	fi
