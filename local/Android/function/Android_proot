@@ -1,3 +1,5 @@
+self_install proot 
+mkdir -p ${HOME}/.termux/共享文件夹
 open_debian_os_list() {
 	debian_os_list=$(
 		whiptail --title "选择功能" --menu "debian容器推荐QQ机器人" 15 60 6 \
@@ -280,11 +282,11 @@ start_proot() {
 			--bind=/system/product \
 			--bind=/odm \
 			--bind=/apex \
-			--bind=/data/data/com.termux/files/home \
 			--bind=/data/data/com.termux/cache \
 			--bind=/data/dalvik-cache \
 			--bind=/data/app \
 			--bind=/proc:/proc \
+			--bind=/data/data/com.termux/files/home/.termux/共享文件夹:/termux共享文件夹 \
 			--bind=${HOME}/.termux/gancm/proot/${os_name}/proc/.sysctl_inotify_max_user_watches:/proc/sys/fs/inotify/max_user_watches \
 			--bind=${HOME}/.termux/gancm/proot/${os_name}/proc/.sysctl_entry_cap_last_cap:/proc/sys/kernel/cap_last_cap \
 			--bind=${HOME}/.termux/gancm/proot/${os_name}/proc/.vmstat:/proc/vmstat \

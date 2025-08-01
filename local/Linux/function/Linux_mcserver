@@ -234,6 +234,89 @@ rm_MC_SERVER() {
 	esac
 
 }
+Import_zip_MC_SERVER() {
+	log "准备导入zip格式的mcserver"
+	if [ ! -f "$(command -v unzip)" ]; then
+		echo -e "${RED}目前并没有任何安装 unzip ${RES}"
+		echo -e "没有安装unzip"
+		self_install zip 
+		self_install unzip
+	fi
+	if [ ! -d ${HOME}/.termux/gancm/MCserver/ ]; then
+		mkdir -p ${HOME}/.termux/gancm/MCserver/导入的MCserver/MCserver
+	fi
+	log "请选择要导入的zip文件"
+	zip_file=$(whiptail --title "选择zip文件以当前系统目录为准" --inputbox "请输入zip文件路径解压后直接为服务器根目录的zip" 10 60 3>&1 1>&2 2>&3)
+	log "选择的zip文件:${zip_file}"
+	unzip "${zip_file}" -d "${HOME}/.termux/gancm/MCserver/导入的MCserver/MCserver"
+	if [ ! $? = 0 ]; then
+	log "导入失败"
+		exit
+	fi
+	log "导入完成"
+} 
+Export_zip_MC_SERVER() {
+	mkdir -p ${HOME}/.termux/gancm/back
+	log "准备导出zip格式的mcserver"
+	if [ ! -f "$(command -v zip)" ]; then
+		echo -e "${RED}目前并没有任何安装 zip ${RES}"
+		echo -e "没有安装zip"
+		self_install zip
+	fi
+	list_dir ${HOME}/.termux/gancm/MCserver/
+	case $user_choice in
+	0)
+		echo -e "${RED}quit${RES}"
+		exit
+		;;
+	*)
+		if [ ! $? = 0 ]; then
+			exit
+		fi
+		export_MC_SERVER_class=${list_items[$((user_choice - 1))]}
+		log "选择核心类型:${export_MC_SERVER_class}"
+		if [ ! $? = 0 ]; then
+			exit
+		fi
+		#核心
+		;;
+	esac
+
+	list_dir ${HOME}/.termux/gancm/MCserver/${export_MC_SERVER_class}
+	case $user_choice in
+	0)
+		echo -e "${RED}quit${RES}"
+		exit
+		;;
+	*)
+		if [ ! $? = 0 ]; then
+			exit
+		fi
+		export_MC_SERVER_class_bb=${list_items[$((user_choice - 1))]}
+		log "选择服务器版本类型:${export_MC_SERVER_class_bb}"
+		#核心
+		;;
+	esac
+
+	log "请输入导出zip文件名"
+	read -e -p "请输入导出zip文件名:" export_zip_name
+	if [ -z "${export_zip_name}" ]; then
+		export_zip_name="${export_MC_SERVER_class_bb}_$(date +%Y%m%d_%H%M%S).zip"
+	fi
+
+	if [ ! -d ${HOME}/.termux/gancm/MCserver/${export_MC_SERVER_class}/${export_MC_SERVER_class_bb} ]; then
+		log "未找到服务器:${export_MC_SERVER_class_bb}"
+		exit
+	fi
+
+	cd ${HOME}/.termux/gancm/MCserver/${export_MC_SERVER_class}/${export_MC_SERVER_class_bb}
+	if zip -r "${HOME}/.termux/gancm/back/${export_zip_name}" .; then
+		log "导出完成:${HOME}/.termux/gancm/back/${export_zip_name}"
+	else
+		log "导出失败"
+	fi
+
+}
 install_MC_SERVER_MENU() {
 	install_MC_SERVER_MENU=$(
 		whiptail --title "服务器核心种类选择" --menu "按自己需求来" 15 60 7 \

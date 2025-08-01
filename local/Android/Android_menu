@@ -47,8 +47,6 @@ start)
 	case $Android_menu in
 	1)
 		log "管理proot容器"
-		self_install proot pkg
-		# 必要安装 proot功能实现的基础
 		open_proot=$(
 			whiptail --title "选择功能" --menu "termux按自己需求来" 15 60 4 \
 				"1" "安装proot容器" \

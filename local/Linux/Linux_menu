@@ -58,14 +58,16 @@ startNapCatQQB | startnQQB)
 	case $Linux_menu in
 	1)
 		MC_Server=$(
-			whiptail --title "选择功能" --menu "我的世界服务器按自己需求来" 15 60 8 \
+			whiptail --title "选择功能" --menu "我的世界服务器按自己需求来" 20 60 10 \
 				"1" "安装MC SERVER" \
 				"2" "启动MC SERVER" \
 				"3" "删除MC SERVER" \
-				"4" "启动我的世界面板" \
-				"5" "停止我的世界面板" \
-				"6" "安装我的世界面板" \
-				"7" "安装java" \
+				"4" "导入我的世界zip服务器" \
+				"5" "打包/备份我的世界zip服务器" \
+				"6" "启动我的世界面板" \
+				"7" "停止我的世界面板" \
+				"8" "安装我的世界面板" \
+				"9" "安装java" \
 				"0" "退出" 3>&1 1>&2 2>&3
 		)
 		case $MC_Server in
@@ -82,18 +84,26 @@ startNapCatQQB | startnQQB)
 			rm_MC_SERVER
 			;;
 		4)
+			log "导入我的世界面板"
+			Import_zip_MC_SERVER
+			;;
+		5)
+			log "导出我的世界面板"
+			Export_zip_MC_SERVER
+			;;
+		6)
 			log "启动我的世界面板"
 			startMCSManager
 			;;
-		5)
+		7)
 			log "停止我的世界面板"
 			stopMCSManager
 			;;
-		6)
+		8)
 			log "安装我的世界面板"
 			installMCSManager
 			;;
-		7)
+		9)
 			log "安装java"
 			download_JAVA
 			;;
