@@ -80,12 +80,10 @@ fi
 REMOTE_VERSION=$(echo $RESPONSE | jq -r .version)
 GIT_CLONE=$(echo $RESPONSE | jq -r .git_clone)
 DESCRIPTION=$(echo $RESPONSE | jq -r .description)
-RELEASE_DATE=$(echo $RESPONSE | jq -r .release_date)
 
 log "本地版本: $LOCAL_VERSION"
 log "云端版本: $REMOTE_VERSION"
 log "公告: $DESCRIPTION"
-log "发布日期: $RELEASE_DATE"
 
 # 比较版本
 if [ "$(printf '%s\n' "$REMOTE_VERSION" "$LOCAL_VERSION" | sort -V | tail -n1)" != "$LOCAL_VERSION" ]; then
@@ -93,7 +91,6 @@ if [ "$(printf '%s\n' "$REMOTE_VERSION" "$LOCAL_VERSION" | sort -V | tail -n1)" 
 	echo "本地版本: $LOCAL_VERSION"
 	echo "云端版本: $REMOTE_VERSION"
 	echo "公告: $DESCRIPTION"
-	echo "发布日期: $RELEASE_DATE"
 
 	echo "发现新版本，准备更新..."
 
