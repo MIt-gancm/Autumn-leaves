@@ -102,6 +102,7 @@ if [ "$(printf '%s\n' "$REMOTE_VERSION" "$LOCAL_VERSION" | sort -V | tail -n1)" 
 	if git clone --depth 1 ${git}$GIT_CLONE $TEMP_DIR ; then
 	    log 仓库拉取成功
 	else
+		rm -rf $TEMP_DIR
 	    git config --global http.postBuffer 524288000  # 设置缓冲区为 500MB  
 	    git config --global http.maxRequestBuffer 100M
 		log 设置缓冲区
@@ -111,6 +112,7 @@ if [ "$(printf '%s\n' "$REMOTE_VERSION" "$LOCAL_VERSION" | sort -V | tail -n1)" 
 	if [ $? -ne 0 ]; then
 		echo -e "${ERROR}更新失败，无法克隆仓库！"
 		log 拉取失败
+		rm -rf $TEMP_DIR
 		exit 1
 	fi
 	# 备份当前A分区

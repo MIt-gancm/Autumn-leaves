@@ -1,6 +1,6 @@
 {
-    "version": "1.3.7",
+    "version": "1.3.8",
     "git_clone": "MIt-gancm/Autumn-leaves",
-    "description": "导入问题修复x3",
+    "description": "更新失败删除临时目录",
     "release_date": "2025-8-2-10-30"
 }
