@@ -244,7 +244,7 @@ Import_zip_MC_SERVER() {
 	log "请选择要导入的zip文件"
 	zip_file=$(whiptail --title "选择zip文件以当前系统目录为准" --inputbox "请输入zip文件路径解压后直接为服务器根目录的zip" 10 60 3>&1 1>&2 2>&3)
 	log "选择的zip文件:${zip_file}"		
-	nowtime=$(date +%y/%m/%d-%H:%M:%S)
+	nowtime=$(date +%y-%m-%d-%H:%M:%S)
 	if [ ! -d ${HOME}/.termux/gancm/MCserver/导入的MCserver/${nowtime}解压后目录/ ]; then
 		mkdir -p ${HOME}/.termux/gancm/MCserver/导入的MCserver/${nowtime}解压后目录/
 	fi
