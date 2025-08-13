@@ -1,5 +1,5 @@
 {
-    "version": "1.3.11",
+    "version": "1.3.12",
     "git_clone": "MIt-gancm/Autumn-leaves",
     "description": "更新失败删除临时目录 删除更新时间"
 }

@@ -52,7 +52,7 @@ source run.sh
 	1)
 		# 提示用户输入Java程序的jar文件路径
 		read -e -p "请输入jar文件路径 已安装的有: 
-$(ls /usr/lib/jvm/*/bin/java) :"
+$(ls /usr/lib/jvm/*/bin/java) :" wherejava
 
 		# 提示用户输入Java程序的最小内存
 		read -e -p "请输入Java程序的最小内存（例如：512m,2G）：" min_memory
@@ -64,7 +64,7 @@ $(ls /usr/lib/jvm/*/bin/java) :"
 		echo -e "
 cd ${HOME}/.termux/gancm/MCserver/${Core_version}/${Game_version}/
 echo -e "eula=true" > ${HOME}/.termux/gancm/MCserver/${Core_version}/${Game_version}/eula.txt
-java -Xms"$min_memory" -Xmx"$max_memory" -jar "${HOME}/.termux/gancm/MCserver/${Core_version}/${Game_version}/${Core_version}_${Game_version}_server.jar" 
+${wherejava} -Xms"$min_memory" -Xmx"$max_memory" -jar "${HOME}/.termux/gancm/MCserver/${Core_version}/${Game_version}/${Core_version}_${Game_version}_server.jar"
 " >${HOME}/.termux/gancm/MCserver/${Core_version}/${Game_version}/start.sh
 		;;
 	2)
