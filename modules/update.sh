@@ -183,7 +183,6 @@ if [ "$LATEST_VER" != "$LOCAL_VERSION" ]; then
 
     Modify_the_variable git "$git" "${A_DIR}/config/config.sh"
     Modify_the_variable rawgit "$rawgit" "${A_DIR}/config/config.sh"
-    Modify_the_variable Fastest_download_source "$Fastest_download_source" "${A_DIR}/config/config.sh"
     Modify_the_variable last_time_aptup "$last_time_aptup" "${A_DIR}/config/config.sh"
     Modify_the_variable QQbot "$QQbot" "${A_DIR}/config/config.sh"
     Modify_the_variable auto_upgrade "$auto_upgrade" "${A_DIR}/config/config.sh"
