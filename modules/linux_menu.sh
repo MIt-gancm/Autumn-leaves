@@ -1,11 +1,8 @@
-# if source $HOME/.gancm/local/Linux/Linux_function; then
-# 	echo -e "${SUSSEC}加载Linux功能成功"
-# else
-# 	echo -e "${WORRY}加载Linux功能失败"
-# fi
-for script in $HOME/.gancm/local/Linux/function/*; do
+#!/bin/bash
+# modules/linux_menu.sh - Linux功能模块
+for script in $HOME/.gancm/lib/linux/*; do
 	source "$script"
-	log "加载:$script"
+	log_info "加载:$script"
 done
 case $1 in
 download_JAVA | dj)
@@ -51,7 +48,7 @@ startNapCatQQB | startnQQB)
 			"0" "退出" \
 			"D" "debuger" 3>&1 1>&2 2>&3
 	)
-	if [ ! "$package_manager" = "apt" ]; then
+	if [ ! "${package_manager}" = "apt" ]; then
 		echo -e "${RED}请使用apt包管理器${RES}"
 		exit 1
 	fi
@@ -72,39 +69,39 @@ startNapCatQQB | startnQQB)
 		)
 		case $MC_Server in
 		1)
-			log "安装MC SERVER"
+			log_info "安装MC SERVER"
 			install_MC_SERVER_MENU
 			;;
 		2)
-			log "启动MC SERVER"
+			log_info "启动MC SERVER"
 			start_MC_SERVER
 			;;
 		3)
-			log "删除MC SERVER"
+			log_info "删除MC SERVER"
 			rm_MC_SERVER
 			;;
 		4)
-			log "导入我的世界面板"
+			log_info "导入我的世界面板"
 			Import_zip_MC_SERVER
 			;;
 		5)
-			log "导出我的世界面板"
+			log_info "导出我的世界面板"
 			Export_zip_MC_SERVER
 			;;
 		6)
-			log "启动我的世界面板"
+			log_info "启动我的世界面板"
 			startMCSManager
 			;;
 		7)
-			log "停止我的世界面板"
+			log_info "停止我的世界面板"
 			stopMCSManager
 			;;
 		8)
-			log "安装我的世界面板"
+			log_info "安装我的世界面板"
 			installMCSManager
 			;;
 		9)
-			log "安装java"
+			log_info "安装java"
 			download_JAVA
 			;;
 		*)
@@ -121,7 +118,7 @@ startNapCatQQB | startnQQB)
 		)
 		case $QQBot_menu in
 		1)
-			log "管理NapCatQQ"
+			log_info "管理NapCatQQ"
 			QQBotTX_menu=$(
 				whiptail --title "选择功能" --menu "QQ机器容器支持deb12和非容器Ubuntu 20+/Debian 10+/Centos9" 15 60 8 \
 					"1" "安装NapCatQQ" \
@@ -132,19 +129,19 @@ startNapCatQQB | startnQQB)
 			)
 			case $QQBotTX_menu in
 			1)
-				log "安装NapCatQQ"
+				log_info "安装NapCatQQ"
 				installNapCatQQ
 				;;
 			2)
-				log "启动NapCatQQ"
+				log_info "启动NapCatQQ"
 				startNapCatQQ
 				;;
 			3)
-				log "后台启动NapCatQQ"
+				log_info "后台启动NapCatQQ"
 				startNapCatQQ -B
 				;;
 			4)
-				log "WebUI地址"
+				log_info "WebUI地址"
 				QQbottk=$(jq -r '.token' /opt/QQ/resources/app/app_launcher/napcat/config/webui.json)
 				echo -e "机器人后台地址: http://127.0.0.1:6099/webui?token=${QQbottk} "
 				hcjx
@@ -155,7 +152,7 @@ startNapCatQQB | startnQQB)
 			esac
 			;;
 		2)
-			log "管理机器人"
+			log_info "管理机器人"
 			echo "咕咕咕"
 			;;
 		*)

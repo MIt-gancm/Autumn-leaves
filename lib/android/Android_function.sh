@@ -4,10 +4,10 @@ garbage_collection() {
 	if [[ $delete_files =~ ^[Yy]$ ]]; then
 		rm -rf ${HOME}/dowload/*
 		echo -e "${SUSSEC}所有文件已删除。"
-		log "所有文件已删除。"
+		log_info "所有文件已删除。"
 	else
 		echo -e "${INFO}文件未删除。"
-		log "文件未删除。"
+		log_info "文件未删除。"
 	fi
 
 }

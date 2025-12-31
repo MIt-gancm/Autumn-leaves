@@ -1,20 +1,14 @@
-#!/data/data/com.termux/files/usr/bin/bash
-# if source $HOME/.gancm/local/Android/Android_function; then
-# 	echo -e "${SUSSEC}加载安卓功能成功"
-# 	log "加载安卓功能成功"
-# else
-# 	echo -e "${WORRY}加载安卓功能失败"
-# 	log "加载安卓功能失败"
-# fi
-for script in $HOME/.gancm/local/Android/function/* ; do
+#!/bin/bash
+# modules/android_menu.sh - 安卓功能模块
+for script in $HOME/.gancm/lib/android/* ; do
 	source "$script" 
-	log "加载:$script"
+	log_info "加载:$script"
 done
 case $1 in
 install)
 	case $2 in
 	proot)
-		log "安装proot容器"
+		log_info "安装proot容器"
 		install_proot
 		;;
 	*)
@@ -26,7 +20,7 @@ install)
 start)
 	case $2 in
 	proot)
-		log "启动proot容器"
+		log_info "启动proot容器"
 		start_proot
 		;;
 	*)
@@ -46,7 +40,7 @@ start)
 	)
 	case $Android_menu in
 	1)
-		log "管理proot容器"
+		log_info "管理proot容器"
 		open_proot=$(
 			whiptail --title "选择功能" --menu "termux按自己需求来" 15 60 4 \
 				"1" "安装proot容器" \
@@ -56,25 +50,25 @@ start)
 		)
 		case $open_proot in
 		1)
-			log "安装proot容器"
+			log_info "安装proot容器"
 			install_proot
 			;;
 		2)
-			log "启动proot容器"
+			log_info "启动proot容器"
 			start_proot
 			;;
 		3)
-			log "删除proot容器"
+			log_info "删除proot容器"
 			rm_proot
 			;;
 		*)
-			log "退出"
+			log_info "退出"
 			echo -e "${RED}quit$RES"
 			;;
 		esac
 		;;
 	2)
-		log "垃圾清理"
+		log_info "垃圾清理"
 		garbage_collection
 		;;
 	D)

@@ -1,15 +1,16 @@
-RED='\e[1;31m'    # 红
-GREEN='\e[1;32m'  # 绿
-YELLOW='\e[1;33m' # 黄
-BLUE='\e[1;34m'   # 蓝
-PINK='\e[1;35m'   # 粉红
-RES='\e[0m'       # 清除颜色
-##字体颜色
+# 字体颜色定义
+export RED='\e[1;31m' # 红色
+export GREEN='\e[1;32m' # 绿色
+export YELLOW='\e[1;33m' # 黄色
+export BLUE='\e[1;34m' # 蓝色 
+export PINK='\e[1;35m' # 粉色
+export RES='\e[0m' # 结束颜色
 
-ERROR="[${RED}错误${RES}]:"
-WORRY="[${YELLOW}警告${RES}]:"
-SUSSEC="[${GREEN}成功${RES}]:"
-INFO="[${BLUE}信息${RES}]:"
+# 定义颜色 (如果外部未定义)
+[ -z "$INFO" ] && INFO="\033[32m[INFO]\033[0m"
+[ -z "$ERROR" ] && ERROR="\033[31m[ERROR]\033[0m"
+[ -z "$SUSSEC" ] && SUSSEC="\033[32m[SUCCESS]\033[0m"
+[ -z "$WARN" ] && WARN="\033[33m[WARN]\033[0m"
 
 
 Modify_the_variable() {
@@ -100,7 +101,6 @@ hcjx() {
 	read -r
 }
 
-echo -e "${INFO}优化系统请勿退出"
 echo "127.0.0.1 localhost" >/etc/hosts
 mkdir -p /run/systemd/resolve
 echo -e "${GREEN}尝试修复dns${RES}"

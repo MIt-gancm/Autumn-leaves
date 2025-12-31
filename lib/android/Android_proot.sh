@@ -1,111 +1,84 @@
 self_install proot 
 mkdir -p ${HOME}/.termux/共享文件夹
-open_debian_os_list() {
-	debian_os_list=$(
-		whiptail --title "选择功能" --menu "debian容器推荐QQ机器人" 15 60 6 \
-			"1" "Bookworm（Debian 12）" \
-			"2" "Bullseye（Debian 11）" \
-			"3" "Buster（Debian 10）" \
-			"0" "退出" 3>&1 1>&2 2>&3
-	)
-	case ${debian_os_list} in
-	1)
-		os_name=Bookworm_Debian_12
-		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/debian/bookworm/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2s|/$||p')
-		Download_proot_url=${Proot_os_download_source}/debian/bookworm/${archurl}/default/${Download_proot_NAME}/rootfs.tar.xz
-		;;
-	2)
-		os_name=Bullseye_Debian_11
-		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/debian/bullseye/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2s|/$||p')
-		Download_proot_url=${Proot_os_download_source}/debian/bullseye/${archurl}/default/${Download_proot_NAME}/rootfs.tar.xz
-		;;
-	3)
-		os_name=Buster_Debian_10
-		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/debian/buster/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2s|/$||p')
-		Download_proot_url=${Proot_os_download_source}/debian/buster/${archurl}/default/${Download_proot_NAME}/rootfs.tar.xz
-		;;
-	*)
-		exit 1
-		;;
-	esac
-}
+open_os_list() {
+	# 这段代码多亏了ai我才看懂((((((
 
-open_ubuntu_os_list() {
-	ubuntu_os_list=$(
-		whiptail --title "选择功能" --menu "ubuntu容器推荐MC开服" 15 60 6 \
-			"1" "Jammy（22.04 LTS）" \
-			"2" "Noble（24.04 LTS）" \
-			"3" "Oracular（25.10 LTS）" \
-			"0" "退出" 3>&1 1>&2 2>&3
-	)
-	case ${ubuntu_os_list} in
+    # 1. 获取传入的发行版名称 (例如 ubuntu, debian, kali)
+    local target_distro="$1"
+    
+    # 检查是否传入了参数
+    if [ -z "${target_distro}" ]; then
+        whiptail --title "错误" --msgbox "未指定发行版名称！" 10 60
+        return 1
 
-	1)
-		os_name=Jammy_Ubuntu_22.04
-		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/ubuntu/jammy/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2s|/$||p')
-		Download_proot_url=${Proot_os_download_source}/ubuntu/jammy/${archurl}/default/${Download_proot_NAME}/rootfs.tar.xz
-		;;
-	2)
-		os_name=Noble_Ubuntu_24.04
-		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/ubuntu/noble/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2s|/$||p')
-		Download_proot_url=${Proot_os_download_source}/ubuntu/noble/${archurl}/default/${Download_proot_NAME}/rootfs.tar.xz
-		;;
-	3)
-		os_name=Oracular_Ubuntu_24.10
-		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/ubuntu/oracular/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2s|/$||p')
-		Download_proot_url=${Proot_os_download_source}/ubuntu/oracular/${archurl}/default/${Download_proot_NAME}/rootfs.tar.xz
-		;;
-	4)
-		os_name=Plucky_Ubuntu_25.04
-		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/ubuntu/plucky/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2s|/$||p')
-		Download_proot_url=${Proot_os_download_source}/ubuntu/plucky/${archurl}/default/${Download_proot_NAME}/rootfs.tar.xz
-		;;
-	*)
-		exit 1
-		;;
-	esac
-}
+    fi
 
-open_rockylinux_os_list() {
-	rockylinux_os_list=$(
-		whiptail --title "选择功能" --menu "rockylinux容器推荐MC开服" 15 60 6 \
-			"1" "Rocky_Linux_8" \
-			"2" "Rocky_Linux_9" \
-			"0" "退出" 3>&1 1>&2 2>&3
-	)
-	case ${rockylinux_os_list} in
-	1)
-		os_name=Rocky_Linux_8
-		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/rockylinux/8/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2s|/$||p')
-		Download_proot_url=${Proot_os_download_source}/rockylinux/8/${archurl}/default/${Download_proot_NAME}/rootfs.tar.xz
-		;;
-	2)
-		os_name=Rocky_Linux_9
-		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/rockylinux/9/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2s|/$||p')
-		Download_proot_url=${Proot_os_download_source}/rockylinux/9/${archurl}/default/${Download_proot_NAME}/rootfs.tar.xz
-		;;
-	*)
-		exit 1
-		;;
-	esac
-}
+    # 2. 从网络获取该发行版的所有版本列表 (Releases)
+    # URL 结构假设为: ${Proot_os_download_source}/${target_distro}/
+    # grep 提取链接文本，sed 去除末尾斜杠，grep -v 过滤掉 "Parent Directory" 或非版本号的干扰项
+    local release_list
+    release_list=$(curl -s "${Proot_os_download_source}/${target_distro}/" | \
+                   grep -oP '<a href="[^"]*">\K[^/<]*' | \
+                   sed 's|/$||' | \
+                   grep -vE "^(\.|default|images|alt|cloud|daily)" | sort -r)
 
-open_centos_os_list() {
-	centos_os_list=$(
-		whiptail --title "选择功能" --menu "centos容器推荐MC开服" 15 60 6 \
-			"1" "centos_9-Stream" \
-			"0" "退出" 3>&1 1>&2 2>&3
-	)
-	case ${centos_os_list} in
-	1)
-		os_name=centos_9-Stream
-		Download_proot_NAME=$(curl -s "${Proot_os_download_source}/centos/9-Stream/${archurl}/default/" | grep -oP '<a href="[^"]*">\K[^<]*' | sed -n '2s|/$||p')
-		Download_proot_url=${Proot_os_download_source}/centos/9-Stream/${archurl}/default/${Download_proot_NAME}/rootfs.tar.xz
-		;;
-	*)
-		exit 1
-		;;
-	esac
+    # 如果获取失败或列表为空
+    if [ -z "${release_list}" ]; then
+        whiptail --title "错误" --msgbox "无法获取 ${target_distro} 的版本列表，请检查网络或源地址。" 10 60
+        return 1
+    fi
+
+    # 3. 构建 Whiptail 菜单数组
+    # 格式: ID "版本名称" ID "版本名称" ...
+    local menu_ops=()
+    local i=1
+    local releases_array=() # 用于后续通过 ID 映射回名称
+
+    # 这里使用 while read 循环处理换行符分隔的列表
+    while IFS= read -r release; do
+        menu_ops+=("$i" "${release}")
+        releases_array[i]="${release}" # 存储映射关系: 1=bookworm
+        ((i++))
+    done <<< "$release_list"
+    
+    # 添加退出选项
+    menu_ops+=("0" "退出")
+
+    # 4. 显示菜单并获取用户选择
+    local choice
+    choice=$(whiptail --title "选择版本" --menu "请选择 ${target_distro} 的版本" 20 60 10 \
+        "${menu_ops[@]}" 3>&1 1>&2 2>&3)
+
+    # 处理退出逻辑
+    if [ "$choice" == "0" ] || [ -z "$choice" ]; then
+        return 1
+    fi
+
+    # 5. 获取选中的版本名称
+    local selected_release="${releases_array[$choice]}"
+    
+    # 设置 os_name (例如: bookworm_debian)
+    os_name="${selected_release}_${target_distro}"
+
+    # 6. 获取具体的 Build ID (时间戳目录)
+    # 逻辑沿用原代码：进入 default 目录，取第二个链接 (通常第一个是 ../，第二个是最新版本)
+    # URL 结构: .../distro/release/arch/default/
+    local base_path="${Proot_os_download_source}/${target_distro}/${selected_release}/${archurl}/default"
+    
+    local download_proot_name
+    download_proot_name=$(curl -s "${base_path}/" | \
+                          grep -oP '<a href="[^"]*">\K[^<]*' | \
+                          sed -n '2s|/$||p')
+
+    # 检查是否成功获取到具体版本目录
+    if [ -z "${download_proot_name}" ]; then
+        whiptail --title "错误" --msgbox "无法解析 ${selected_release} 的具体下载路径 (arch: ${archurl})。" 10 60
+        return 1
+    fi
+
+    # 7. 最终生成下载链接
+    Download_proot_url="${base_path}/${download_proot_name}/rootfs.tar.xz"
+    
 }
 
 install_proot() {
@@ -129,51 +102,46 @@ install_proot() {
 	open_proot_os_list=$(
 		whiptail --title "选择功能" --menu "proot容器按自己需求来" 15 60 7 \
 			"1" "ubuntu" \
-			"2" "debian" \
-			"3" "rockylinux" \
-			"4" "centos" \
+			"2" "rockylinux" \
+			"3" "centos" \
 			"0" "退出" 3>&1 1>&2 2>&3
 	)
 	case ${open_proot_os_list} in
 	1)
-		open_ubuntu_os_list
-		log "安装ubuntu系列"
+		open_os_list ubuntu
+		log_info "安装ubuntu系列"
 		;;
 	2)
-		open_debian_os_list
-		log "debian系列"
+		open_os_list rockylinux
+		log_info "安装rockylinux系列"
 		;;
 	3)
-		open_rockylinux_os_list
-		log "安装rockylinux系列"
-		;;
-	4)
-		open_centos_os_list
-		log "安装centos系列"
+		open_os_list centos
+		log_info "安装centos系列"
 		;;
 	*)
-		log "未选择退出"
+		log_info "未选择退出"
 		exit 1
 		;;
 	esac
-	log "os_name: ${os_name}"
-	log "Download_proot_NAME: ${Download_proot_NAME}"
-	log "Download_proot_url: ${Download_proot_url}"
+	log_info "os_name: ${os_name}"
+	log_info "Download_proot_NAME: ${Download_proot_NAME}"
+	log_info "Download_proot_url: ${Download_proot_url}"
 
 	wget_proot_url(){
 		while [ $counter -lt $Maximum_number_of_attempts ]; do
-			log "最大循环Maximum_number_of_attempts: $Maximum_number_of_attempts"
-			log "当前循环counter= $counter"
+			log_info "最大循环Maximum_number_of_attempts: $Maximum_number_of_attempts"
+			log_info "当前循环counter= $counter"
 			if wget -q --show-progress "${Download_proot_url}" -O "$download_file"; then
 				echo -e "${INFO}文件存储在${RED}$download_file${RES}"
-				log "下载成功：$download_file"
+				log_info "下载成功：$download_file"
 				break
 			else
 				echo -e "${WORRY}请检查网络访问问题${RES}"
-				log "下载失败：$download_file"
+				log_error "下载失败：$download_file"
 				if [ $counter -eq 0 ]; then
 					Download_proot_url="https://dl.gancmcs.top/${Download_proot_url}"
-					log "尝试使用备用 URL 下载，更新 Download_proot_url 为 \"$Download_proot_url\""
+					log_info "尝试使用备用 URL 下载，更新 Download_proot_url 为 \"$Download_proot_url\""
 				fi
 				if [ $counter -eq $((Maximum_number_of_attempts - 1)) ]; then
 					echo -e "${ERROR}多次下载失败，退出程序"
@@ -189,16 +157,16 @@ install_proot() {
 	# 检查文件是否存在并且文件大小是否小于40MB
 	if [ -f "$download_file" ] && [ $(du -b "$download_file" | cut -f1) -lt 41943040 ]; then
 		echo -e "${WORRY}${RED}${download_file}${RES}可能已经损坏"
-		log "\"${HOME}/.gancm/download/${os_name}.tar.xz\"文件损坏，重新下载"
-		log "下载url:\"${Download_proot_url}\" 保存到 \"$download_file\""
+		log_info "\"${HOME}/.gancm/download/${os_name}.tar.xz\"文件损坏，重新下载"
+		log_info "下载url:\"${Download_proot_url}\" 保存到 \"$download_file\""
 		counter=0
 		Maximum_number_of_attempts=2  # 定义最大重试次数
 		wget_proot_url
 	elif [ -f "$download_file" ]; then
-		log "\"${HOME}/.gancm/download/${os_name}.tar.xz\"存在且大于40MBB"
+		log_info "\"${HOME}/.gancm/download/${os_name}.tar.xz\"存在且大于40MBB"
 	else
-		log "\"${HOME}/.gancm/download/${os_name}.tar.xz\"不存在"
-		log "下载url:\"${Download_proot_url}\" 保存到 \"$download_file\""
+		log_info "\"${HOME}/.gancm/download/${os_name}.tar.xz\"不存在"
+		log_info "下载url:\"${Download_proot_url}\" 保存到 \"$download_file\""
 		counter=0
 		Maximum_number_of_attempts=2  # 
 		wget_proot_url
@@ -209,23 +177,27 @@ install_proot() {
 
 	unset LD_PRELOAD
 	mkdir -p ${HOME}/.termux/gancm/proot/${os_name}
-	log "解压\"${HOME}/.gancm/download/${os_name}.tar.xz\""
+	log_info "解压\"${HOME}/.gancm/download/${os_name}.tar.xz\""
 	proot --link2symlink tar --overwrite -xJf ${HOME}/.gancm/download/${os_name}.tar.xz -C ${HOME}/.termux/gancm/proot/${os_name}/ --exclude='dev' || :
 	chmod 777 "${HOME}/.termux/gancm/proot/${os_name}/root/"
 	chmod 777 "${HOME}/.termux/gancm/proot/${os_name}/proc/"
 	echo -e "${GREEN}复制脚本到容器${RES}"
-	log "复制脚本到容器"
+	log_info "复制脚本到容器"
 	mkdir -p ${HOME}/.termux/gancm/proot/${os_name}/root/.gancm
 	mkdir -p ${HOME}/.termux/gancm/.重要文件夹/sys/.empty
 	mkdir -p ${HOME}/.termux/gancm/.重要文件夹/dev/shm
+
+	echo -e "${GREEN}复制gancm脚本到容器${RES}"
 	cp -r ${HOME}/.gancm/config ${HOME}/.termux/gancm/proot/${os_name}/root/.gancm
-	cp -r ${HOME}/.gancm/function ${HOME}/.termux/gancm/proot/${os_name}/root/.gancm
-	cp -r ${HOME}/.gancm/local ${HOME}/.termux/gancm/proot/${os_name}/root/.gancm
+	cp -r ${HOME}/.gancm/core ${HOME}/.termux/gancm/proot/${os_name}/root/.gancm
+	cp -r ${HOME}/.gancm/lib ${HOME}/.termux/gancm/proot/${os_name}/root/.gancm
+	cp -r ${HOME}/.gancm/modules ${HOME}/.termux/gancm/proot/${os_name}/root/.gancm
 	cp ${HOME}/.gancm/gancm.sh ${HOME}/.termux/gancm/proot/${os_name}/root/.gancm
-	cp ${HOME}/.gancm/git_push.sh ${HOME}/.termux/gancm/proot/${os_name}/root/.gancm
+	cp ${HOME}/.gancm/README.md ${HOME}/.termux/gancm/proot/${os_name}/root/.gancm
+
 	echo -e "${GREEN}复制优化脚本到容器${RES}"
-	cp ${HOME}/.gancm/function/proot_proc/.* ${HOME}/.termux/gancm/proot/${os_name}/proc/
-	cp ${HOME}/.gancm/function/proot_optimization ${HOME}/.termux/gancm/proot/${os_name}/root/优化.sh
+	cp ${HOME}/.gancm/lib/proot_proc/.* ${HOME}/.termux/gancm/proot/${os_name}/proc/
+	cp ${HOME}/.gancm/lib/proot_optimization.sh ${HOME}/.termux/gancm/proot/${os_name}/root/优化.sh
 	proot \
 		--link2symlink -0 \
 		--rootfs=${HOME}/.termux/gancm/proot/${os_name}/ \
@@ -257,8 +229,8 @@ install_proot() {
 		LC_MEASUREMENT="zh_CN.UTF-8" \
 		LC_IDENTIFICATION="zh_CN.UTF-8" \
 		/bin/bash 优化.sh
-	log "优化脚本执行成功"
-	log "退出容器"
+	log_info "优化脚本执行成功"
+	log_info "退出容器"
 
 }
 start_proot() {
@@ -266,17 +238,16 @@ start_proot() {
 	case $user_choice in
 	0)
 		echo -e "${RED}quit${RES}"
-		log "退出"
+		log_info "退出"
 		;;
 	*)
 		if [ ! $? = 0 ]; then
 			exit
 		fi
 		os_name=${list_items[$((user_choice - 1))]}
-		log "进入容器${os_name}"
+		log_info "进入容器${os_name}"
 		unset LD_PRELOAD
 		proot \
-			--bind=/data/data/com.termux/files/usr \
 			--bind=/vendor \
 			--bind=/system \
 			--bind=/system/product \
@@ -354,7 +325,7 @@ start_proot() {
 			USER=root \
 			TERM=xterm-256color \
 			/bin/bash --login
-		log "退出${os_name}"
+		log_info "退出${os_name}"
 		;;
 	esac
 }
@@ -363,7 +334,7 @@ rm_proot() {
 	case $user_choice in
 	0)
 		echo -e "${RED}quit${RES}"
-		log "退出"
+		log_info "退出"
 		;;
 	*)
 		if [ ! $? = 0 ]; then
@@ -372,10 +343,10 @@ rm_proot() {
 		os_name=${list_items[$((user_choice - 1))]}
 		num1=$((RANDOM % 100))
 		num2=$((RANDOM % 100))
-		log "num1=$num1 num2=$num2"
+		log_info "num1=$num1 num2=$num2"
 		# 读取用户输入
 		read -e -p "${num1}+${num2}=?" user_sum
-		log "user_sum=$user_sum"
+		log_info "user_sum=$user_sum"
 		# 计算正确的和
 		correct_sum=$(($num1 + $num2))
 		# 检查用户输入是否正确
