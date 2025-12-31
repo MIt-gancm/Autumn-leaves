@@ -40,7 +40,7 @@ _log_rotate() {
 log() {
     local level_prefix="$1"  # 颜色前缀 (如 ${INFO})
     local raw_level="$2"     # 纯文本等级 (如 INFO)
-    shift 3
+    shift 2
     local message="$*"       # 消息内容
     
     local log_file="${GANCM_ROOT}/logs/log.log"
