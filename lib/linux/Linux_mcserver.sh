@@ -1,6 +1,10 @@
 mkdir -p "${HOME}/.termux/gancm/MCserver"
 download_JAVA() {
 	echo "请选择要安装的java版本（支持多选，用空格分隔）:"
+if [ ! "${package_manager}" = "apt" ]; then
+    log_error "仅适用于apt安装器 当前安装器：${package_manager}"
+    exit 1 
+fi
 	options=("quit" $(${package_manager} list openjdk-*-jdk 2>/dev/null | awk -F'/' '{print $1}' | grep '^openjdk'))
 	for i in ${!options[@]}; do
 		echo "$i. ${options[$i]}"
@@ -85,7 +89,7 @@ install_MC_SERVER_MENU() {
     selected_id="${core_ids[$((user_choice-1))]}"
     selected_name="${core_names[$((user_choice-1))]}"
 
-    log_error "用户选择了: $selected_name (ID: $selected_id)"
+    log_info "用户选择了: $selected_name (ID: $selected_id)"
 
     # 调用安装函数，传入 ID 和 Name
     install_MC_SERVER "$selected_id" "$selected_name"

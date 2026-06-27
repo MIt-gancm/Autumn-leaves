@@ -49,10 +49,6 @@ startNapCatQQB | startnQQB)
 				"0" "退出" \
 				"D" "debuger" 3>&1 1>&2 2>&3
 		)
-		if [ ! "${package_manager}" = "apt" ]; then
-			echo -e "${RED}请使用apt包管理器${RES}"
-			exit 1
-		fi
 		case $Linux_menu in
 		1)
 			while true; do

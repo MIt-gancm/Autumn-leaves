@@ -127,6 +127,7 @@ self_install wget $package_manager
 self_install git $package_manager
 self_install jq $package_manager
 self_install curl $package_manager
+self_install newt $package_manager # 服气了合包了我说怎么打不开了
 self_install bc $package_manager
 echo -e "${GREEN}自己选择语言${RES}"
 hcjx
