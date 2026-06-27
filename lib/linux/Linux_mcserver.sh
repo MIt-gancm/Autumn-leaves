@@ -207,30 +207,28 @@ start_MC_SERVER() {
 	list_dir ${HOME}/.termux/gancm/MCserver/
 	case $user_choice in
 	0|"")
-		echo -e "${RED}quit${RES}"
-		exit
+		echo -e "${RED}返回上级${RES}"
+		return
 		;;
 	*)
-		start_MC_SERVER_class=${list_items[$((user_choice - 1))]}
+		start_MC_SERVER_class=${menu_items[$((user_choice - 1))]}
 		log_info "选择核心类型:${start_MC_SERVER_class}"
-		#核心
 		;;
 	esac
 
 	list_dir ${HOME}/.termux/gancm/MCserver/${start_MC_SERVER_class}
 	case $user_choice in
-	0)
-		echo -e "${RED}quit${RES}"
-		exit
+	0|"")
+		echo -e "${RED}返回上级${RES}"
+		return
 		;;
 	*)
-		if [ ! -f ${HOME}/.termux/gancm/MCserver/${start_MC_SERVER_class}/${list_items[$((user_choice - 1))]}/start.sh ]; then
+		if [ ! -f ${HOME}/.termux/gancm/MCserver/${start_MC_SERVER_class}/${menu_items[$((user_choice - 1))]}/start.sh ]; then
 			log_error "未寻找到启动脚本启动配置程序"
-			source ${HOME}/.gancm/lib/Start_Java_MC_SERVER.sh ${start_MC_SERVER_class} ${list_items[$((user_choice - 1))]}
+			source ${HOME}/.gancm/lib/Start_Java_MC_SERVER.sh ${start_MC_SERVER_class} ${menu_items[$((user_choice - 1))]}
 		fi
 		log_info "启动mcserver"
-		bash ${HOME}/.termux/gancm/MCserver/${start_MC_SERVER_class}/${list_items[$((user_choice - 1))]}/start.sh
-		#核心
+		bash ${HOME}/.termux/gancm/MCserver/${start_MC_SERVER_class}/${menu_items[$((user_choice - 1))]}/start.sh
 		;;
 	esac
 }
@@ -238,36 +236,28 @@ rm_MC_SERVER() {
 	log_info "准备删除mcserver"
 	list_dir ${HOME}/.termux/gancm/MCserver/
 	case $user_choice in
-	0)
-		echo -e "${RED}quit${RES}"
-		exit
+	0|"")
+		echo -e "${RED}返回上级${RES}"
+		return
 		;;
 	*)
-		if [ ! $? = 0 ]; then
-			exit
-		fi
-		rm_MC_SERVER_class=${list_items[$((user_choice - 1))]}
-		#核心
+		rm_MC_SERVER_class=${menu_items[$((user_choice - 1))]}
 		;;
 	esac
 	list_dir ${HOME}/.termux/gancm/MCserver/${rm_MC_SERVER_class}
 	case $user_choice in
 	0|"")
-		echo -e "${RED}quit${RES}"
-		exit
+		echo -e "${RED}返回上级${RES}"
+		return
 		;;
 	*)
 		num1=$((RANDOM % 100))
 		num2=$((RANDOM % 100))
-		# 读取用户输入
 		read -e -p "${num1}+${num2}=?" user_sum
-		# 计算正确的和
 		correct_sum=$(($num1 + $num2))
-		# 检查用户输入是否正确
 		if [ $user_sum -eq $correct_sum ]; then
 			echo -e "删除开始正确！你输入的和是正确的。"
-			rm -rfv "${HOME}/.termux/gancm/MCserver/${rm_MC_SERVER_class}/${list_items[$((user_choice - 1))]}"
-			# 在这里添加你想要执行的命令
+			rm -rfv "${HOME}/.termux/gancm/MCserver/${rm_MC_SERVER_class}/${menu_items[$((user_choice - 1))]}"
 			log_succ "删除完成"
 		else
 			echo -e "错误！你输入的和不正确。删除程序将不执行。"
@@ -309,26 +299,24 @@ Export_zip_MC_SERVER() {
 	list_dir ${HOME}/.termux/gancm/MCserver/
 	case $user_choice in
 	0|"")
-		echo -e "${RED}quit${RES}"
-		exit
+		echo -e "${RED}返回上级${RES}"
+		return
 		;;
 	*)
-		export_MC_SERVER_class=${list_items[$((user_choice - 1))]}
+		export_MC_SERVER_class=${menu_items[$((user_choice - 1))]}
 		log_info "选择核心类型:${export_MC_SERVER_class}"
-		#核心
 		;;
 	esac
 
 	list_dir ${HOME}/.termux/gancm/MCserver/${export_MC_SERVER_class}
 	case $user_choice in
 	0|"")
-		echo -e "${RED}quit${RES}"
-		exit
+		echo -e "${RED}返回上级${RES}"
+		return
 		;;
 	*)
-		export_MC_SERVER_class_bb=${list_items[$((user_choice - 1))]}
+		export_MC_SERVER_class_bb=${menu_items[$((user_choice - 1))]}
 		log_info "选择服务器版本类型:${export_MC_SERVER_class_bb}"
-		#核心
 		;;
 	esac
 

@@ -223,10 +223,7 @@ start_proot() {
 		log_info "退出"
 		;;
 	*)
-		if [ ! $? = 0 ]; then
-			exit
-		fi
-		os_name=${list_items[$((user_choice - 1))]}
+		os_name=${menu_items[$((user_choice - 1))]}
 		log_info "进入容器${os_name}"
 		unset LD_PRELOAD
 		proot \
@@ -319,7 +316,7 @@ rm_proot() {
 		log_info "退出"
 		;;
 	*)
-		os_name=${list_items[$((user_choice - 1))]}
+		os_name=${menu_items[$((user_choice - 1))]}
 		num1=$((RANDOM % 100))
 		num2=$((RANDOM % 100))
 		log_info "num1=$num1 num2=$num2"

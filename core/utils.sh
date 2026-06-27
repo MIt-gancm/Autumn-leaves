@@ -180,7 +180,7 @@ validity_auto_upgrade() {
 }
 
 # 打开目录并显示选择菜单 (list_dir) 或直接选择列表项 (list_items)
-# 两者逻辑完全一致，统一使用 list_items 处理
+# 选择结果存储在全局数组 ${menu_items[@]} 中，user_choice 为选中序号
 list_dir() {
     local dir=$1
     list_items $(ls "$dir")
@@ -197,8 +197,8 @@ list_items() {
     done
     
     user_choice=$(whiptail --title "选择" --menu "选择功能" 15 70 8 0 返回上级 ${menu_args} 3>&1 1>&2 2>&3)
-    # 选择结果 ${items[$((user_choice-1))]}
-    # 选择了第 $user_choice 个选项
+    # 保存到全局数组供调用方使用
+    menu_items=("${items[@]}")
 }
 
 show_help() {

@@ -30,53 +30,61 @@ start)
 
 	;;
 *)
-	Android_menu=$(
-		whiptail --title "选择功能" --menu "termux按自己需求来" 15 60 8 \
-			"1" "管理proot容器" \
-			"2" "垃圾清理" \
-			"3" "待添加" \
-			"0" "退出" \
-			"D" "debuger"  3>&1 1>&2 2>&3
-	)
-	case $Android_menu in
-	1)
-		log_info "管理proot容器"
-		open_proot=$(
-			whiptail --title "选择功能" --menu "termux按自己需求来" 15 60 4 \
-				"1" "安装proot容器" \
-				"2" "启动proot容器" \
-				"3" "删除proot容器" \
-				"0" "退出" 3>&1 1>&2 2>&3
+	while true; do
+		Android_menu=$(
+			whiptail --title "选择功能" --menu "termux按自己需求来" 15 60 8 \
+				"1" "管理proot容器" \
+				"2" "垃圾清理" \
+				"3" "待添加" \
+				"0" "退出" \
+				"D" "debuger"  3>&1 1>&2 2>&3
 		)
-		case $open_proot in
+		case $Android_menu in
 		1)
-			log_info "安装proot容器"
-			install_proot
+			log_info "管理proot容器"
+			while true; do
+				open_proot=$(
+					whiptail --title "选择功能" --menu "termux按自己需求来" 15 60 4 \
+						"1" "安装proot容器" \
+						"2" "启动proot容器" \
+						"3" "删除proot容器" \
+						"0" "返回上级" 3>&1 1>&2 2>&3
+				)
+				case $open_proot in
+				1)
+					log_info "安装proot容器"
+					install_proot
+					hcjx
+					;;
+				2)
+					log_info "启动proot容器"
+					start_proot
+					hcjx
+					;;
+				3)
+					log_info "删除proot容器"
+					rm_proot
+					hcjx
+					;;
+				*)
+					break
+					;;
+				esac
+			done
 			;;
 		2)
-			log_info "启动proot容器"
-			start_proot
+			log_info "垃圾清理"
+			garbage_collection
+			hcjx
 			;;
-		3)
-			log_info "删除proot容器"
-			rm_proot
+		D)
+			debuger
+			hcjx
 			;;
 		*)
-			log_info "退出"
-			echo -e "${RED}quit$RES"
+			break
 			;;
 		esac
-		;;
-	2)
-		log_info "垃圾清理"
-		garbage_collection
-		;;
-	D)
-		debuger
-		;;
-	*)
-		echo -e "待添加_Android_menu"
-		;;
-	esac
+	done
 	;;
 esac
