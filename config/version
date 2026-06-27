@@ -1,5 +1,5 @@
 {
-    "version": "2.0.1",
+    "version": "2.0.2",
     "git_clone": "MIt-gancm/Autumn-leaves",
-    "description": "目录结构重构了一下 如果要更新的化我会看得舒服一点  目录结构和功能放readme里了"
+    "description": "又对forge匹配做了小改 优化代码删除一些无用的文件 修复centos系统无法使用菜单的问题 当前该版本已知问题questing_ubuntu系统无法使用"
 }
