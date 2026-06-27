@@ -105,18 +105,18 @@ debuger() {
     echo -e "${INFO} 本机 IP   : ${ip_addr:-"未检测到"}"
     # --- 配置与日志 ---
     local config_file="${GANCM_ROOT}/config/config.sh"
-    echo -e "\n${PINK}--- [配置文件前5行] ---${RES}"
+    echo -e "\n${PINK}--- [配置文件前10行] ---${RES}"
     if [ -f "$config_file" ]; then
-        # 排除空行和注释，只看有效配置，且只看前5行
-        grep -vE '^\s*#|^\s*$' "$config_file" | head -n 5
+        # 排除空行和注释，只看有效配置，且只看前10行
+        grep -vE '^\s*#|^\s*$' "$config_file" | head -n 10
     else
         echo -e "${ERROR} 配置文件不存在: $config_file"
     fi
     
-    echo -e "\n${PINK}--- [日志文件末尾10行] ---${RES}"
+    echo -e "\n${PINK}--- [日志文件末尾50行] ---${RES}"
     local log_file="${GANCM_ROOT}/logs/log.log"
     if [ -f "$log_file" ]; then
-        tail -n 10 "$log_file"
+        tail -n 50 "$log_file"
     else
         echo -e "${WORRY} 暂无日志文件"
     fi
