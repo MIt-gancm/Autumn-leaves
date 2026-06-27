@@ -82,21 +82,7 @@ open_os_list() {
 }
 
 install_proot() {
-	case "$(uname -m)" in
-	aarch64)
-		archurl="arm64"
-		;;
-	armv7l)
-		archurl="armhf"
-		;;
-	x86_64)
-		archurl="amd64"
-		;;
-	*)
-		echo -e "${ERROR}未知框架"
-		exit
-		;;
-	esac
+	# archurl 已在 core/env.sh 中全局定义，此处无需重复检测
 	mkdir -p "${HOME}/.termux/gancm/proot"
 	Proot_os_download_source="https://sgp1lxdmirror01.do.letsbuildthe.cloud/images"
 	open_proot_os_list=$(
@@ -128,10 +114,26 @@ install_proot() {
 	log_info "Download_proot_NAME: ${Download_proot_NAME}"
 	log_info "Download_proot_url: ${Download_proot_url}"
 
-	wget_proot_url(){
+	download_file="${HOME}/.gancm/download/${os_name}.tar.xz"
+	
+	# 文件已存在且大于40MB，跳过下载
+	if [ -f "$download_file" ] && [ $(du -b "$download_file" | cut -f1) -ge 41943040 ]; then
+		log_info "\"${download_file}\" 已存在且大小正常，跳过下载"
+	else
+		# 文件不存在或损坏，执行下载
+		if [ -f "$download_file" ]; then
+			echo -e "${WORRY}${RED}${download_file}${RES}可能已经损坏，重新下载"
+			log_info "文件损坏，重新下载"
+		else
+			log_info "文件不存在，开始下载"
+		fi
+		
+		log_info "下载URL: \"${Download_proot_url}\" 保存到 \"$download_file\""
+		
+		counter=0
+		Maximum_number_of_attempts=2
 		while [ $counter -lt $Maximum_number_of_attempts ]; do
-			log_info "最大循环Maximum_number_of_attempts: $Maximum_number_of_attempts"
-			log_info "当前循环counter= $counter"
+			log_info "下载尝试: $((counter+1))/$Maximum_number_of_attempts"
 			if wget -q --show-progress "${Download_proot_url}" -O "$download_file"; then
 				echo -e "${INFO}文件存储在${RED}$download_file${RES}"
 				log_info "下载成功：$download_file"
@@ -141,35 +143,15 @@ install_proot() {
 				log_error "下载失败：$download_file"
 				if [ $counter -eq 0 ]; then
 					Download_proot_url="https://dl.gancmcs.top/${Download_proot_url}"
-					log_info "尝试使用备用 URL 下载，更新 Download_proot_url 为 \"$Download_proot_url\""
+					log_info "尝试使用备用 URL: ${Download_proot_url}"
 				fi
 				if [ $counter -eq $((Maximum_number_of_attempts - 1)) ]; then
 					echo -e "${ERROR}多次下载失败，退出程序"
 					exit 1
 				fi
 			fi
-
 			((counter++))
 		done
-	}
-
-	download_file="${HOME}/.gancm/download/${os_name}.tar.xz"
-	# 检查文件是否存在并且文件大小是否小于40MB
-	if [ -f "$download_file" ] && [ $(du -b "$download_file" | cut -f1) -lt 41943040 ]; then
-		echo -e "${WORRY}${RED}${download_file}${RES}可能已经损坏"
-		log_info "\"${HOME}/.gancm/download/${os_name}.tar.xz\"文件损坏，重新下载"
-		log_info "下载url:\"${Download_proot_url}\" 保存到 \"$download_file\""
-		counter=0
-		Maximum_number_of_attempts=2  # 定义最大重试次数
-		wget_proot_url
-	elif [ -f "$download_file" ]; then
-		log_info "\"${HOME}/.gancm/download/${os_name}.tar.xz\"存在且大于40MBB"
-	else
-		log_info "\"${HOME}/.gancm/download/${os_name}.tar.xz\"不存在"
-		log_info "下载url:\"${Download_proot_url}\" 保存到 \"$download_file\""
-		counter=0
-		Maximum_number_of_attempts=2  # 
-		wget_proot_url
 	fi
 
 	# 提示清理空间
@@ -236,14 +218,11 @@ install_proot() {
 start_proot() {
 	list_dir ${HOME}/.termux/gancm/proot
 	case $user_choice in
-	0)
+	0|"")
 		echo -e "${RED}quit${RES}"
 		log_info "退出"
 		;;
 	*)
-		if [ ! $? = 0 ]; then
-			exit
-		fi
 		os_name=${list_items[$((user_choice - 1))]}
 		log_info "进入容器${os_name}"
 		unset LD_PRELOAD
@@ -332,14 +311,11 @@ start_proot() {
 rm_proot() {
 	list_dir ${HOME}/.termux/gancm/proot
 	case $user_choice in
-	0)
+	0|"")
 		echo -e "${RED}quit${RES}"
 		log_info "退出"
 		;;
 	*)
-		if [ ! $? = 0 ]; then
-			exit
-		fi
 		os_name=${list_items[$((user_choice - 1))]}
 		num1=$((RANDOM % 100))
 		num2=$((RANDOM % 100))

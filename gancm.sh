@@ -58,20 +58,19 @@ case ${1} in
     ;;
 *)
     log_info "初始化完成"
+    # 检查并安装必要依赖 (通用依赖)
+    check_dependencies "jq" "git" "wget" "whiptail" "tmux" "bc"
+    # 检查脚本更新
+    bash "${GANCM_ROOT}/modules/update.sh"
+    
     # 根据系统类型加载菜单
     SYSTEM_TYPE=$(get_system_type)
     
     if [ "$SYSTEM_TYPE" == "Android" ]; then
         log_info "加载安卓功能"
-        # 检查并安装必要依赖
-        check_dependencies "jq" "git" "wget" "whiptail" "tmux" "bc"
-        # 检查脚本更新
-        bash "${GANCM_ROOT}/modules/update.sh"
         source "${GANCM_ROOT}/modules/android_menu.sh" $1 $2 $3 $4 $5
     else
         log_info "加载Linux功能"
-        check_dependencies "jq" "git" "wget" "whiptail" "tmux" "bc"
-        bash "${GANCM_ROOT}/modules/update.sh"
         source "${GANCM_ROOT}/modules/linux_menu.sh" $1 $2 $3 $4 $5
     fi
     ;;

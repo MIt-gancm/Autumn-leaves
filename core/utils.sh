@@ -59,9 +59,8 @@ log() {
     
     # 4. 写入文件 (始终执行)
     echo "$file_msg" >> "$log_file"
-    # 5. 输出到终端 (根据参数决定)
-    # 如果是 DEBUG_MODE，或者你想让错误信息(ERROR)始终显示，可以修改此处的判断逻辑
-    if [ "$DEBUG_MODE" = true ] || [ "$is_output" = true ]; then
+    # 5. 输出到终端 (只在 DEBUG_MODE 开启时显示普通日志)
+    if [ "$DEBUG_MODE" = true ]; then
         echo -e "$screen_msg"
     fi
 }
@@ -87,8 +86,8 @@ Modify_the_variable() {
     local var_name=$1
     local new_val=$2
     local file_path=$3
-    # 转义斜杠以防止 sed 报错
-    local escaped_val=$(echo "$new_val" | sed 's/\//\\\//g')
+    # 转义 sed 特殊字符: \ / & (顺序不能变，\ 必须最先转义)
+    local escaped_val=$(echo "$new_val" | sed 's/\\/\\\\/g; s/\//\\\//g; s/&/\\&/g')
     sed -i "s/^${var_name}=.*/${var_name}=${escaped_val}/" "${file_path}"
 }
 
@@ -180,34 +179,25 @@ validity_auto_upgrade() {
     esac
 }
 
-#打开目录
+# 打开目录并显示选择菜单 (list_dir) 或直接选择列表项 (list_items)
+# 两者逻辑完全一致，统一使用 list_items 处理
 list_dir() {
-	current_index=1
-	list=$(ls $1)
-	list_items=($list)
-	list_names=""
-
-	for item in $list; do
-		list_names+=" ${current_index} ${item}"
-		let current_index++
-	done
-	user_choice=$(whiptail --title "选择" --menu "选择功能" 15 70 8 0 返回上级 ${list_names} 3>&1 1>&2 2>&3)
-	# 选择结果 ${list_items[$((user_choice-1))]}
-    # 选择了第 $user_choice 个选项
+    local dir=$1
+    list_items $(ls "$dir")
 }
 
 list_items() {
-    current_index=1
-	list="$@"
-	list_items=($list)
-	list_names=""
-
-	for item in $list; do
-		list_names+=" ${current_index} ${item}"
-		let current_index++
-	done
-	user_choice=$(whiptail --title "选择" --menu "选择功能" 15 70 8 0 返回上级 ${list_names} 3>&1 1>&2 2>&3)
-	# 选择结果 ${list_items[$((user_choice-1))]}
+    local items=("$@")
+    local i=1
+    local menu_args=""
+    
+    for item in "${items[@]}"; do
+        menu_args+=" ${i} ${item}"
+        ((i++))
+    done
+    
+    user_choice=$(whiptail --title "选择" --menu "选择功能" 15 70 8 0 返回上级 ${menu_args} 3>&1 1>&2 2>&3)
+    # 选择结果 ${items[$((user_choice-1))]}
     # 选择了第 $user_choice 个选项
 }
 

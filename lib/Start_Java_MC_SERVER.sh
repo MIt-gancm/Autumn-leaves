@@ -26,8 +26,10 @@ else
 		echo -e "${INFO}Forge核心执行额外安装步骤"
 		if java -jar ${HOME}/.termux/gancm/MCserver/${Core_version}/${Game_version}/${Core_version}_${Game_version}_server.jar nogui --installServer; then
 			rm -rfv ${HOME}/.termux/gancm/MCserver/${Core_version}/${Game_version}/${Core_version}_${Game_version}_server.jar
+			cp ${HOME}/.termux/gancm/MCserver/${Core_version}/${Game_version}/*.jar ${HOME}/.termux/gancm/MCserver/${Core_version}/${Game_version}/${Core_version}_${Game_version}_server.jar
 			echo -e "${INFO}forge安装服务器成功 转换脚本可识别的文件"
-			echo -e "${INFO}forge安装服务器成功" >forge_server_yes.txt
+			echo -e "${INFO}forge安装服务器成功" > forge_server_yes.txt
+			log_info "forge安装目录内容: $(ls)"
 		fi
 		if [ -f "run.sh" ]; then
 			echo -e "

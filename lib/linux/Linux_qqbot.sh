@@ -20,7 +20,7 @@ startNapCatQQ() {
 		log_info "启动NapCatQQ"
 		if [ "${system_os_type2}" == Bookworm_Debian_12 ]; then
 			log_info "启动NapCatQQ"
-			if [ ${QQbot} = "" ]; then
+			if [ "${QQbot}" = "" ]; then
 				read -e -p "请输入您的选择：" QQbot
 				log_error "QQbot为空"
 				Modify_the_variable QQbot ${QQbot} ${HOME}/.gancm/config/config.sh

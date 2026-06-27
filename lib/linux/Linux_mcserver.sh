@@ -1,7 +1,7 @@
 mkdir -p "${HOME}/.termux/gancm/MCserver"
 download_JAVA() {
 	echo "请选择要安装的java版本（支持多选，用空格分隔）:"
-	options=("quit" $(apt list openjdk-*-jdk 2>/dev/null | awk -F'/' '{print $1}' | grep '^openjdk'))
+	options=("quit" $(${package_manager} list openjdk-*-jdk 2>/dev/null | awk -F'/' '{print $1}' | grep '^openjdk'))
 	for i in ${!options[@]}; do
 		echo "$i. ${options[$i]}"
 	done
@@ -206,14 +206,11 @@ start_MC_SERVER() {
 
 	list_dir ${HOME}/.termux/gancm/MCserver/
 	case $user_choice in
-	0)
+	0|"")
 		echo -e "${RED}quit${RES}"
 		exit
 		;;
 	*)
-		if [ ! $? = 0 ]; then
-			exit
-		fi
 		start_MC_SERVER_class=${list_items[$((user_choice - 1))]}
 		log_info "选择核心类型:${start_MC_SERVER_class}"
 		#核心
@@ -227,12 +224,9 @@ start_MC_SERVER() {
 		exit
 		;;
 	*)
-		if [ ! $? = 0 ]; then
-			exit
-		fi
 		if [ ! -f ${HOME}/.termux/gancm/MCserver/${start_MC_SERVER_class}/${list_items[$((user_choice - 1))]}/start.sh ]; then
 			log_error "未寻找到启动脚本启动配置程序"
-			source ${HOME}/.gancm/function/Start_Java_MC_SERVER.sh ${start_MC_SERVER_class} ${list_items[$((user_choice - 1))]}
+			source ${HOME}/.gancm/lib/Start_Java_MC_SERVER.sh ${start_MC_SERVER_class} ${list_items[$((user_choice - 1))]}
 		fi
 		log_info "启动mcserver"
 		bash ${HOME}/.termux/gancm/MCserver/${start_MC_SERVER_class}/${list_items[$((user_choice - 1))]}/start.sh
@@ -258,14 +252,11 @@ rm_MC_SERVER() {
 	esac
 	list_dir ${HOME}/.termux/gancm/MCserver/${rm_MC_SERVER_class}
 	case $user_choice in
-	0)
+	0|"")
 		echo -e "${RED}quit${RES}"
 		exit
 		;;
 	*)
-		if [ ! $? = 0 ]; then
-			exit
-		fi
 		num1=$((RANDOM % 100))
 		num2=$((RANDOM % 100))
 		# 读取用户输入
@@ -317,33 +308,24 @@ Export_zip_MC_SERVER() {
 	fi
 	list_dir ${HOME}/.termux/gancm/MCserver/
 	case $user_choice in
-	0)
+	0|"")
 		echo -e "${RED}quit${RES}"
 		exit
 		;;
 	*)
-		if [ ! $? = 0 ]; then
-			exit
-		fi
 		export_MC_SERVER_class=${list_items[$((user_choice - 1))]}
 		log_info "选择核心类型:${export_MC_SERVER_class}"
-		if [ ! $? = 0 ]; then
-			exit
-		fi
 		#核心
 		;;
 	esac
 
 	list_dir ${HOME}/.termux/gancm/MCserver/${export_MC_SERVER_class}
 	case $user_choice in
-	0)
+	0|"")
 		echo -e "${RED}quit${RES}"
 		exit
 		;;
 	*)
-		if [ ! $? = 0 ]; then
-			exit
-		fi
 		export_MC_SERVER_class_bb=${list_items[$((user_choice - 1))]}
 		log_info "选择服务器版本类型:${export_MC_SERVER_class_bb}"
 		#核心
