@@ -223,6 +223,9 @@ start_proot() {
 		log_info "退出"
 		;;
 	*)
+		if [ ! $? = 0 ]; then
+			exit
+		fi
 		os_name=${list_items[$((user_choice - 1))]}
 		log_info "进入容器${os_name}"
 		unset LD_PRELOAD
